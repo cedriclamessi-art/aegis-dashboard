@@ -1,0 +1,5 @@
+export { DashboardRefonte as Dashboard } from './DashboardRefonte';
+export { AgentsPage as Agents } from './Agents';
+export { TasksPage as Tasks } from './Tasks';
+export { AnalyticsPage as Analytics } from './Analytics';
+export { SettingsPage as Settings } from './Settings';

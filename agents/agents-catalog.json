@@ -1,0 +1,258 @@
+{
+  "version": "5.0.0",
+  "agents": [
+    {
+      "name": "content-creator",
+      "role": "content_creation",
+      "displayName": "Content Creator",
+      "description": "Generates high-quality, engaging content tailored to platform requirements",
+      "systemPrompt": "You are a professional content creator specializing in social media. Generate engaging, platform-specific content that drives engagement and conversions.",
+      "capabilities": ["content_generation", "platform_optimization", "hashtag_research", "tone_adaptation"],
+      "dependencies": [],
+      "isPremium": false,
+      "sortOrder": 1
+    },
+    {
+      "name": "social-optimizer",
+      "role": "optimization",
+      "displayName": "Social Optimizer",
+      "description": "Optimizes campaigns and posts for maximum engagement and reach",
+      "systemPrompt": "You are a social media optimization expert. Analyze performance metrics and recommend optimizations for campaigns.",
+      "capabilities": ["performance_analysis", "optimization_recommendation", "a_b_testing", "engagement_boost"],
+      "dependencies": ["content-creator"],
+      "isPremium": false,
+      "sortOrder": 2
+    },
+    {
+      "name": "budget-analyzer",
+      "role": "analytics",
+      "displayName": "Budget Analyzer",
+      "description": "Analyzes and optimizes ad spend across platforms",
+      "systemPrompt": "You are a financial analyst specializing in digital advertising. Analyze budget allocation and recommend optimizations.",
+      "capabilities": ["budget_analysis", "spend_optimization", "roi_calculation", "forecast"],
+      "dependencies": [],
+      "isPremium": false,
+      "sortOrder": 3
+    },
+    {
+      "name": "competitor-intel",
+      "role": "intelligence",
+      "displayName": "Competitor Intelligence",
+      "description": "Monitors and analyzes competitor strategies and trends",
+      "systemPrompt": "You are a competitive intelligence specialist. Analyze competitor activities and market trends.",
+      "capabilities": ["competitor_tracking", "trend_analysis", "strategy_comparison", "market_insights"],
+      "dependencies": [],
+      "isPremium": true,
+      "sortOrder": 4
+    },
+    {
+      "name": "customer-engagement",
+      "role": "engagement",
+      "displayName": "Customer Engagement",
+      "description": "Manages customer interactions and engagement across platforms",
+      "systemPrompt": "You are a customer engagement specialist. Craft personalized responses and engagement strategies.",
+      "capabilities": ["response_generation", "sentiment_analysis", "customer_segmentation", "personalization"],
+      "dependencies": ["content-creator"],
+      "isPremium": false,
+      "sortOrder": 5
+    },
+    {
+      "name": "conversion-optimizer",
+      "role": "conversion",
+      "displayName": "Conversion Optimizer",
+      "description": "Optimizes funnels and conversion rates",
+      "systemPrompt": "You are a conversion rate optimization expert. Analyze funnels and recommend conversion improvements.",
+      "capabilities": ["funnel_analysis", "conversion_optimization", "landing_page_enhancement", "upsell_strategy"],
+      "dependencies": ["budget-analyzer"],
+      "isPremium": true,
+      "sortOrder": 6
+    },
+    {
+      "name": "inventory-sync",
+      "role": "inventory",
+      "displayName": "Inventory Synchronizer",
+      "description": "Manages real-time inventory synchronization across platforms",
+      "systemPrompt": "You are an inventory management specialist. Ensure accurate product availability across all channels.",
+      "capabilities": ["inventory_sync", "stock_management", "availability_check", "sync_automation"],
+      "dependencies": [],
+      "isPremium": false,
+      "sortOrder": 7
+    },
+    {
+      "name": "pricing-strategist",
+      "role": "strategy",
+      "displayName": "Pricing Strategist",
+      "description": "Develops dynamic pricing strategies based on market conditions",
+      "systemPrompt": "You are a pricing strategy expert. Develop dynamic pricing recommendations based on market data.",
+      "capabilities": ["dynamic_pricing", "competitive_pricing", "margin_optimization", "demand_forecasting"],
+      "dependencies": ["competitor-intel", "budget-analyzer"],
+      "isPremium": true,
+      "sortOrder": 8
+    },
+    {
+      "name": "report-generator",
+      "role": "reporting",
+      "displayName": "Report Generator",
+      "description": "Creates comprehensive performance reports and dashboards",
+      "systemPrompt": "You are a data reporting specialist. Generate clear, actionable performance reports.",
+      "capabilities": ["report_generation", "data_visualization", "insight_extraction", "kpi_tracking"],
+      "dependencies": [],
+      "isPremium": false,
+      "sortOrder": 9
+    },
+    {
+      "name": "trend-analyzer",
+      "role": "analytics",
+      "displayName": "Trend Analyzer",
+      "description": "Identifies and analyzes emerging trends and opportunities",
+      "systemPrompt": "You are a trend analysis specialist. Identify emerging trends and market opportunities.",
+      "capabilities": ["trend_detection", "opportunity_identification", "trend_prediction", "market_analysis"],
+      "dependencies": ["competitor-intel"],
+      "isPremium": true,
+      "sortOrder": 10
+    },
+    {
+      "name": "automation-orchestrator",
+      "role": "orchestration",
+      "displayName": "Automation Orchestrator",
+      "description": "Coordinates and orchestrates automated workflows across agents",
+      "systemPrompt": "You are a workflow orchestration specialist. Coordinate multi-agent workflows and automation.",
+      "capabilities": ["workflow_orchestration", "task_scheduling", "event_handling", "inter_agent_communication"],
+      "dependencies": [],
+      "isPremium": false,
+      "sortOrder": 11
+    },
+    {
+      "name": "compliance-monitor",
+      "role": "compliance",
+      "displayName": "Compliance Monitor",
+      "description": "Ensures all activities comply with regulations and platform policies",
+      "systemPrompt": "You are a compliance and policy specialist. Monitor activities for regulatory compliance.",
+      "capabilities": ["compliance_check", "policy_enforcement", "audit_logging", "risk_assessment"],
+      "dependencies": [],
+      "isPremium": true,
+      "sortOrder": 12
+    },
+    {
+      "name": "performance-auditor",
+      "role": "audit",
+      "displayName": "Performance Auditor",
+      "description": "Audits and validates agent performance and accuracy",
+      "systemPrompt": "You are a performance audit specialist. Validate agent outputs and ensure quality standards.",
+      "capabilities": ["performance_audit", "quality_assurance", "accuracy_validation", "benchmark_comparison"],
+      "dependencies": [],
+      "isPremium": true,
+      "sortOrder": 13
+    },
+    {
+      "name": "sentiment-analyst",
+      "role": "sentiment",
+      "displayName": "Sentiment Analyst",
+      "description": "Analyzes customer sentiment and brand perception",
+      "systemPrompt": "You are a sentiment analysis expert. Analyze brand perception and customer sentiment.",
+      "capabilities": ["sentiment_detection", "brand_perception", "feedback_analysis", "emotion_classification"],
+      "dependencies": ["customer-engagement"],
+      "isPremium": false,
+      "sortOrder": 14
+    },
+    {
+      "name": "growth-hacker",
+      "role": "growth",
+      "displayName": "Growth Hacker",
+      "description": "Identifies and executes growth opportunities and strategies",
+      "systemPrompt": "You are a growth hacking specialist. Identify and implement growth strategies.",
+      "capabilities": ["growth_strategy", "viral_potential", "user_acquisition", "retention_optimization"],
+      "dependencies": ["social-optimizer", "conversion-optimizer"],
+      "isPremium": true,
+      "sortOrder": 15
+    },
+    {
+      "name": "crisis-manager",
+      "role": "crisis",
+      "displayName": "Crisis Manager",
+      "description": "Manages crisis situations and negative sentiment escalations",
+      "systemPrompt": "You are a crisis management specialist. Handle negative situations and reputation management.",
+      "capabilities": ["crisis_response", "reputation_management", "escalation_handling", "damage_control"],
+      "dependencies": ["sentiment-analyst", "customer-engagement"],
+      "isPremium": true,
+      "sortOrder": 16
+    }
+  ],
+  "roles": [
+    {
+      "code": "content_creation",
+      "name": "Content Creator",
+      "description": "Generates and optimizes content"
+    },
+    {
+      "code": "optimization",
+      "name": "Optimizer",
+      "description": "Optimizes campaigns and performance"
+    },
+    {
+      "code": "analytics",
+      "name": "Analyst",
+      "description": "Analyzes data and metrics"
+    },
+    {
+      "code": "intelligence",
+      "name": "Intelligence",
+      "description": "Gathers competitive and market intelligence"
+    },
+    {
+      "code": "engagement",
+      "name": "Engagement",
+      "description": "Manages customer engagement"
+    },
+    {
+      "code": "conversion",
+      "name": "Converter",
+      "description": "Optimizes conversions"
+    },
+    {
+      "code": "inventory",
+      "name": "Inventory Manager",
+      "description": "Manages inventory synchronization"
+    },
+    {
+      "code": "strategy",
+      "name": "Strategist",
+      "description": "Develops strategies"
+    },
+    {
+      "code": "reporting",
+      "name": "Reporter",
+      "description": "Generates reports"
+    },
+    {
+      "code": "orchestration",
+      "name": "Orchestrator",
+      "description": "Orchestrates workflows"
+    },
+    {
+      "code": "compliance",
+      "name": "Compliance Officer",
+      "description": "Ensures compliance"
+    },
+    {
+      "code": "audit",
+      "name": "Auditor",
+      "description": "Audits performance"
+    },
+    {
+      "code": "sentiment",
+      "name": "Sentiment Analyst",
+      "description": "Analyzes sentiment"
+    },
+    {
+      "code": "growth",
+      "name": "Growth Specialist",
+      "description": "Drives growth"
+    },
+    {
+      "code": "crisis",
+      "name": "Crisis Manager",
+      "description": "Manages crises"
+    }
+  ]
+}
