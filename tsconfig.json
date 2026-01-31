@@ -14,6 +14,6 @@
     "declaration": true,
     "sourceMap": true
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules", "dist", "tests", "vitest.config.ts"]
+  "include": ["api/**/*.ts", "config/**/*.ts", "connectors/**/*.ts", "database/**/*.ts", "jobs/**/*.ts", "scripts/**/*.ts"],
+  "exclude": ["node_modules", "dist", "tests", "vitest.config.ts", "frontend", "frontend/**/*"]
 }

@@ -1,12 +1,15 @@
 export interface MetaTokenResponse {
   access_token: string
+  refresh_token?: string
   expires_in: number
 }
 
 export interface MetaUserInfo {
-  id: string
-  name: string
-  email: string
+  user_id: string
+  username: string
+  id?: string
+  name?: string
+  email?: string
 }
 
 export class MetaService {
@@ -35,6 +38,7 @@ export class MetaService {
     // MOCK
     return {
       access_token: `meta_access_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      refresh_token: `meta_refresh_${Math.random().toString(36).substr(2, 9)}`,
       expires_in: 86400 * 30,
     }
   }
@@ -42,9 +46,16 @@ export class MetaService {
   async getUserInfo(accessToken: string): Promise<MetaUserInfo> {
     // MOCK
     return {
+      user_id: `meta_${Math.random().toString(36).substr(2, 9)}`,
+      username: `meta_user_${Math.random().toString(36).substr(2, 6)}`,
       id: `meta_${Math.random().toString(36).substr(2, 9)}`,
       name: `Meta User ${Math.floor(Math.random() * 9999)}`,
       email: `meta_user_${Math.random().toString(36).substr(2, 6)}@meta.example.com`,
     }
+  }
+
+  async refreshAccessToken(refreshToken: string): Promise<string> {
+    // MOCK
+    return `meta_access_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 }

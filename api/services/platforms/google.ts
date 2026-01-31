@@ -1,13 +1,15 @@
 export interface GoogleTokenResponse {
   access_token: string
-  refresh_token: string
+  refresh_token?: string
   expires_in: number
 }
 
 export interface GoogleUserInfo {
-  id: string
-  name: string
-  email: string
+  user_id: string
+  username: string
+  id?: string
+  name?: string
+  email?: string
 }
 
 export class GoogleService {
@@ -45,9 +47,16 @@ export class GoogleService {
   async getUserInfo(accessToken: string): Promise<GoogleUserInfo> {
     // MOCK
     return {
+      user_id: `google_${Math.random().toString(36).substr(2, 9)}`,
+      username: `google_user_${Math.random().toString(36).substr(2, 6)}`,
       id: `google_${Math.random().toString(36).substr(2, 9)}`,
       name: `Google User ${Math.floor(Math.random() * 9999)}`,
       email: `google_user_${Math.random().toString(36).substr(2, 6)}@gmail.example.com`,
     }
+  }
+
+  async refreshAccessToken(refreshToken: string): Promise<string> {
+    // MOCK
+    return `google_access_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 }
