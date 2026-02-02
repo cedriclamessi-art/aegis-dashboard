@@ -1,0 +1,15 @@
+.git
+.gitignore
+node_modules
+.env
+.env.local
+.DS_Store
+*.md
+Troubleshooting
+database/
+docs/
+DEPLOYMENT_*
+MEDIA_BUYING_*
+SQL_*
+FEATURES_*
+*.txt
