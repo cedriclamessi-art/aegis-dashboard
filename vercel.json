@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "aegis-media-buying",
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
