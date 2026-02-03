@@ -3,5 +3,5 @@
   "buildCommand": "npm run build:api && npm run build:dashboard",
   "installCommand": "npm install && npm install --prefix frontend",
   "devCommand": "npm run dev",
-  "public": "frontend/dist"
+  "outputDirectory": "frontend/dist"
 }
