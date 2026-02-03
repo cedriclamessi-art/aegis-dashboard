@@ -1,0 +1,230 @@
+═════════════════════════════════════════════════════════════════════════════
+                 AEGIS v5.0 - SQL FILES INDEX & GUIDE
+═════════════════════════════════════════════════════════════════════════════
+
+📍 OÙ TROUVER QUOI:
+
+1. 🎯 VOUS VOULEZ DÉPLOYER MAINTENANT?
+   ├─ Lire: SQL_PRODUCTION_SUMMARY.txt
+   └─ Exécuter: database/deploy.sql
+
+
+2. 📖 VOUS VOULEZ COMPRENDRE LA STRUCTURE?
+   ├─ Lire: SQL_DEPLOYMENT_README.md
+   ├─ Voir: database/deploy.sql (bien commenté)
+   └─ Consulter: database/schema.sql (ancien, voir deploy.sql à la place)
+
+
+3. 🔧 VOUS VOULEZ UN GUIDE COMPLET?
+   ├─ Lire: DEPLOYMENT_SQL_GUIDE.md
+   └─ Voir: Sections "VALIDATION", "CONFIGURATION", "TROUBLESHOOTING"
+
+
+4. ✅ VOUS VOULEZ VALIDER LE DÉPLOIEMENT?
+   └─ Exécuter: bash database/validate_deployment.sh
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+📂 FICHIERS PAR CATÉGORIE:
+
+PRODUCTION SQL:
+  database/deploy.sql                      ← 929 lignes, À UTILISER
+  database/schema.sql                      ← Ancien format, ne pas utiliser
+
+VALIDATION:
+  database/validate_deployment.sh          ← Script de test
+  SQL_PRODUCTION_SUMMARY.txt               ← Tests manuels
+  DEPLOYMENT_SQL_GUIDE.md                  ← Queries de validation
+
+DOCUMENTATION:
+  SQL_DEPLOYMENT_README.md                 ← Guide complet
+  DEPLOYMENT_SQL_GUIDE.md                  ← Troubleshooting
+  SQL_FILES_INDEX.txt                      ← CE FICHIER
+
+═════════════════════════════════════════════════════════════════════════════
+
+🚀 WORKFLOW RECOMMANDÉ:
+
+ÉTAPE 1: LIRE
+  └─ SQL_PRODUCTION_SUMMARY.txt (2 min)
+
+ÉTAPE 2: DÉPLOYER
+  ├─ createdb aegis_db
+  ├─ psql -d aegis_db -f database/deploy.sql
+  └─ bash database/validate_deployment.sh
+
+ÉTAPE 3: VALIDER
+  └─ Lire les logs: SELECT * FROM public.deployment_log;
+
+ÉTAPE 4: TESTER
+  └─ Exécuter les queries dans SQL_PRODUCTION_SUMMARY.txt > TEST RAPIDE
+
+ÉTAPE 5: INTÉGRER
+  └─ Connecter votre backend et configurer DATABASE_URL
+
+═════════════════════════════════════════════════════════════════════════════
+
+📋 CONTENU DÉTAILLÉ DE CHAQUE FICHIER:
+
+1. SQL_PRODUCTION_SUMMARY.txt (10 KB)
+   ├─ Vue d'ensemble complète
+   ├─ 3 étapes de déploiement
+   ├─ Checklist pré/post-déploiement
+   ├─ Ce qui est déployé
+   └─ Troubleshooting basique
+
+2. DEPLOYMENT_SQL_GUIDE.md (7.3 KB)
+   ├─ Guide de déploiement détaillé
+   ├─ Validations avec queries SQL
+   ├─ Statistiques de déploiement
+   ├─ Configuration de test
+   ├─ Maintenance régulière
+   └─ Troubleshooting avancé
+
+3. SQL_DEPLOYMENT_README.md (9.2 KB)
+   ├─ Quick start (3 options)
+   ├─ Validation post-déploiement
+   ├─ Contenu du deploy détaillé
+   ├─ Structure des tables par catégorie
+   ├─ Données initiales seeded
+   ├─ Utilisation dans le code
+   ├─ Configuration environnement
+   └─ Tester avec un tenant de démo
+
+4. database/deploy.sql (34 KB, 929 lignes)
+   ├─ Phase 1: Initialization & Safety
+   ├─ Phase 2: Schemas & Extensions
+   ├─ Phase 3: Tenant Infrastructure
+   ├─ Phase 4: Job Queue
+   ├─ Phase 5: AI Agents
+   ├─ Phase 6: Connectors (5 plateformes)
+   ├─ Phase 7: Indexes (16+)
+   ├─ Phase 8: Row Level Security
+   ├─ Phase 9: Audit Logging
+   ├─ Phase 10: Observability
+   ├─ Phase 11: Initial Data
+   └─ Phase 12: Validation & Logging
+
+5. database/validate_deployment.sh (11 KB, 297 lignes)
+   ├─ Phase 1: Check Schemas (9)
+   ├─ Phase 2: Check Tables (33+)
+   ├─ Phase 3: Check Indexes (16+)
+   ├─ Phase 4: Check Extensions (4)
+   ├─ Phase 5: Check Functions (2)
+   ├─ Phase 6: Check RLS Policies (5)
+   ├─ Phase 7: Check Plans (4)
+   ├─ Phase 8: Check Agent Roles (4)
+   ├─ Phase 9: Check Agent Catalog (3)
+   ├─ Phase 10: Check Deployment Log
+   ├─ Phase 11: Test Tenant Functions
+   ├─ Phase 12: Check Data Integrity
+   └─ Phase 13: Validation Summary
+
+═════════════════════════════════════════════════════════════════════════════
+
+🎯 QUICK REFERENCE - COMMANDES ESSENTIELLES:
+
+# Créer la base de données
+createdb aegis_db
+
+# Déployer le SQL complet
+psql -d aegis_db -f database/deploy.sql
+
+# Valider le déploiement
+bash database/validate_deployment.sh
+
+# Vérifier les logs de déploiement
+psql -d aegis_db -c "SELECT * FROM public.deployment_log;"
+
+# Compter les tables créées
+psql -d aegis_db -c "
+  SELECT table_schema, COUNT(*) as table_count 
+  FROM information_schema.tables 
+  WHERE table_schema IN ('saas','ops','jobs','intel','connectors')
+  GROUP BY table_schema;"
+
+# Vérifier les RLS policies
+psql -d aegis_db -c "SELECT tablename, policyname FROM pg_policies;"
+
+# Tester un tenant avec RLS
+psql -d aegis_db << 'SQL'
+  SET LOCAL saas.tenant_id = 'test-tenant-uuid';
+  SELECT COUNT(*) FROM ops.tenant_config;
+SQL
+
+═════════════════════════════════════════════════════════════════════════════
+
+✅ SI VOUS AVEZ CES 4 STATUTS VERTS, VOUS ÊTES BON:
+
+[ ✓ ] Database connection successful
+[ ✓ ] Schemas exist (9 créés)
+[ ✓ ] Tables created (33+)
+[ ✓ ] Indexes created (16+)
+[ ✓ ] All 4 extensions installed
+[ ✓ ] Tenant functions exist (2)
+[ ✓ ] RLS policies enabled (5)
+[ ✓ ] Default plans created (4)
+[ ✓ ] Agent roles created (4)
+[ ✓ ] Agents in catalog (3)
+[ ✓ ] Deployment completed successfully
+
+═════════════════════════════════════════════════════════════════════════════
+
+🔗 FLUX DE FICHIERS:
+
+1. deploy.sql 
+   ↓ (Exécute)
+   ├─ Crée 9 schémas
+   ├─ Crée 33+ tables
+   ├─ Crée 16+ indexes
+   ├─ Configure RLS (5 policies)
+   ├─ Seed les données initiales
+   └─ Logs tout dans public.deployment_log
+   
+2. validate_deployment.sh
+   ↓ (Valide)
+   ├─ Lit les schémas
+   ├─ Compte les tables
+   ├─ Vérifie les indexes
+   ├─ Teste les RLS
+   └─ Retourne ✓ ou ✗
+
+═════════════════════════════════════════════════════════════════════════════
+
+📞 SUPPORT & QUESTIONS:
+
+Q: Où trouver le schéma complet?
+A: Dans database/deploy.sql (bien commenté, 929 lignes)
+
+Q: Comment tester avant de déployer?
+A: Le script est idempotent, on peut le re-exécuter sans danger
+
+Q: Combien de temps ça prend?
+A: ~5-10 secondes pour le deploy, ~30 secondes pour la validation
+
+Q: Ça change ma base existante?
+A: Avec IF NOT EXISTS, c'est safe. Mais faire un backup avant!
+
+Q: Comment connecter mon backend?
+A: Voir SQL_DEPLOYMENT_README.md > UTILISATION STANDARD
+
+Q: Que faire en cas d'erreur?
+A: Voir DEPLOYMENT_SQL_GUIDE.md > TROUBLESHOOTING
+
+═════════════════════════════════════════════════════════════════════════════
+
+⚡ STATUS: PRODUCTION READY ✅
+
+Version:        AEGIS v5.0
+Database:       PostgreSQL 14+
+Multi-tenant:   Oui (RLS enabled)
+OAuth Ready:    Oui
+Security:       Multi-layer (RLS, context validation, audit logging)
+Performance:    Optimisé (16+ indexes)
+Deployment:     5-10 secondes
+
+═════════════════════════════════════════════════════════════════════════════
+
+Created: 2026-02-01
+Status: Ready for production deployment

@@ -25,3 +25,9 @@ npm-debug.log*
 
 # OS
 Thumbs.db
+.env*.local
+# Allow Vercel configuration
+# Allow Vercel project config
+!.vercel/
+!.vercel/project.json
+.vercel

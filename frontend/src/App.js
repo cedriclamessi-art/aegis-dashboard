@@ -2,7 +2,8 @@ import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
-import { DashboardRefonte } from './pages/DashboardRefonte';
+import { DashboardCyber } from './pages/DashboardCyber';
+import { LandingPage } from './pages/LandingPage';
 import { AgentsPage } from './pages/Agents';
 import { TasksPage } from './pages/Tasks';
 import { AnalyticsPage } from './pages/Analytics';
@@ -12,11 +13,15 @@ import { ConnectedAccountsPage } from './pages/ConnectedAccounts';
 import { PlatformCampaignsPage } from './pages/PlatformCampaigns';
 function App() {
     const location = useLocation();
-    const isHomePage = location.pathname === '/';
+    const isLandingPage = location.pathname === '/';
+    const isDashboard = location.pathname === '/dashboard';
     const isFullPage = ['/connect-platforms', '/connected-accounts'].includes(location.pathname) ||
         location.pathname.startsWith('/campaigns/');
-    if (isHomePage) {
-        return React.createElement(DashboardRefonte, {});
+    if (isLandingPage) {
+        return React.createElement(LandingPage, {});
+    }
+    if (isDashboard) {
+        return React.createElement(DashboardCyber, {});
     }
     if (isFullPage) {
         return React.createElement(Routes, {}, React.createElement(Route, { path: '/connect-platforms', element: React.createElement(ConnectPlatformsPage) }), React.createElement(Route, { path: '/connected-accounts', element: React.createElement(ConnectedAccountsPage) }), React.createElement(Route, { path: '/campaigns/:platform', element: React.createElement(PlatformCampaignsPage) }));
