@@ -1,8 +1,7 @@
 {
   "version": 2,
-  "name": "aegis-media-buying",
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build:api && npm run build:dashboard",
+  "installCommand": "npm install && npm install --prefix frontend",
   "devCommand": "npm run dev",
-  "installCommand": "npm install",
   "public": "frontend/dist"
 }
