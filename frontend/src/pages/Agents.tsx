@@ -103,24 +103,24 @@ export const AgentsPage = () => {
         React.createElement('div', {},
           React.createElement('h1', { className: 'text-3xl font-bold cyber-text flex items-center gap-3' },
             React.createElement(Bot, { size: 32, className: 'text-cyan-400' }),
-            'Agents IA'
+            '🤖 Mes robots IA'
           ),
           React.createElement('p', { className: 'text-slate-400 mt-1' }, 
-            `${agents.length} agents configurés, ${activeCount} actifs`
+            `${agents.length} robots configurés — ${activeCount} en train de travailler`
           )
         ),
         React.createElement('button', { className: 'cyber-button flex items-center gap-2' },
           React.createElement(Plus, { size: 20 }),
-          'Nouvel Agent'
+          '+ Ajouter un robot'
         )
       ),
 
       React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-4 gap-4' },
         [
-          { label: 'Total Agents', value: agents.length, icon: Bot, color: 'cyan' },
-          { label: 'Agents Actifs', value: activeCount, icon: Activity, color: 'green' },
-          { label: 'Tâches Totales', value: totalTasks.toLocaleString(), icon: Target, color: 'purple' },
-          { label: 'Taux Succès Moyen', value: `${avgSuccess}%`, icon: TrendingUp, color: 'orange' },
+          { label: '🤖 Total robots', value: agents.length, icon: Bot, color: 'cyan' },
+          { label: '✅ Robots actifs', value: activeCount, icon: Activity, color: 'green' },
+          { label: '📋 Tâches effectuées', value: totalTasks.toLocaleString(), icon: Target, color: 'purple' },
+          { label: '🎯 Taux de réussite', value: `${avgSuccess}%`, icon: TrendingUp, color: 'orange' },
         ].map((stat, idx) =>
           React.createElement('div', { key: idx, className: 'cyber-card p-4' },
             React.createElement('div', { className: 'flex items-center gap-3' },
@@ -152,7 +152,7 @@ export const AgentsPage = () => {
             }),
             React.createElement('input', {
               type: 'text',
-              placeholder: 'Rechercher agents...',
+              placeholder: 'Rechercher un robot par son nom...',
               value: searchQuery,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value),
               className: 'w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors'
@@ -163,26 +163,26 @@ export const AgentsPage = () => {
             onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setFilterStatus(e.target.value as FilterStatus),
             className: 'px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer'
           },
-            React.createElement('option', { value: 'all' }, 'Tous Status'),
-            React.createElement('option', { value: 'active' }, 'Actifs'),
-            React.createElement('option', { value: 'inactive' }, 'Inactifs'),
-            React.createElement('option', { value: 'error' }, 'Erreur')
+            React.createElement('option', { value: 'all' }, 'Tous les états'),
+            React.createElement('option', { value: 'active' }, '✅ En marche'),
+            React.createElement('option', { value: 'inactive' }, '⏸️ En pause'),
+            React.createElement('option', { value: 'error' }, '⚠️ En erreur')
           ),
           React.createElement('select', {
             value: filterPremium,
             onChange: (e: React.ChangeEvent<HTMLSelectElement>) => setFilterPremium(e.target.value as FilterPremium),
             className: 'px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer'
           },
-            React.createElement('option', { value: 'all' }, 'Tous Plans'),
-            React.createElement('option', { value: 'premium' }, 'Premium'),
-            React.createElement('option', { value: 'free' }, 'Gratuit')
+            React.createElement('option', { value: 'all' }, 'Tous les plans'),
+            React.createElement('option', { value: 'premium' }, '💎 Premium'),
+            React.createElement('option', { value: 'free' }, '🆓 Gratuit')
           ),
           React.createElement('button', {
             onClick: () => setViewMode(viewMode === 'grid' ? 'table' : 'grid'),
             className: 'px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-cyan-400 hover:border-cyan-500/50 transition-colors flex items-center gap-2'
           },
             React.createElement(viewMode === 'grid' ? BarChart3 : Sparkles, { size: 16 }),
-            viewMode === 'grid' ? 'Tableau' : 'Grille'
+            viewMode === 'grid' ? '📋 Vue tableau' : '🔲 Vue grille'
           )
         )
       ),
@@ -192,7 +192,7 @@ export const AgentsPage = () => {
       ) :
       filteredAgents.length === 0 ? React.createElement('div', { className: 'cyber-card p-12 text-center' },
         React.createElement(Bot, { size: 48, className: 'mx-auto text-slate-600 mb-4' }),
-        React.createElement('p', { className: 'text-slate-400' }, 'Aucun agent trouvé')
+        React.createElement('p', { className: 'text-slate-400' }, 'Aucun robot ne correspond à votre recherche')
       ) :
 
       viewMode === 'grid' ?
@@ -226,11 +226,11 @@ export const AgentsPage = () => {
             React.createElement('p', { className: 'text-xs text-slate-500 mb-4 line-clamp-2' }, agent.description),
             React.createElement('div', { className: 'space-y-3' },
               React.createElement('div', { className: 'flex items-center justify-between text-sm' },
-                React.createElement('span', { className: 'text-slate-500' }, 'Tâches'),
+                React.createElement('span', { className: 'text-slate-500' }, 'Tâches faites'),
                 React.createElement('span', { className: 'text-white font-mono' }, agent.task_count.toLocaleString())
               ),
               React.createElement('div', { className: 'flex items-center justify-between text-sm' },
-                React.createElement('span', { className: 'text-slate-500' }, 'Succès'),
+                React.createElement('span', { className: 'text-slate-500' }, 'Réussite'),
                 React.createElement('div', { className: 'flex items-center gap-2' },
                   React.createElement('div', { className: 'w-16 h-1.5 rounded-full bg-white/10 overflow-hidden' },
                     React.createElement('div', {
@@ -245,7 +245,7 @@ export const AgentsPage = () => {
                 )
               ),
               React.createElement('div', { className: 'flex items-center justify-between text-sm' },
-                React.createElement('span', { className: 'text-slate-500' }, 'Durée moy.'),
+                React.createElement('span', { className: 'text-slate-500' }, 'Vitesse moy.'),
                 React.createElement('span', { className: 'text-cyan-400 font-mono' }, formatDuration(agent.avg_duration_ms))
               )
             ),
@@ -280,7 +280,7 @@ export const AgentsPage = () => {
           React.createElement('table', { className: 'w-full' },
             React.createElement('thead', {},
               React.createElement('tr', { className: 'border-b border-white/10' },
-                ['Agent', 'Rôle', 'Statut', 'Tâches', 'Succès', 'Durée moy.', 'Dernière exec.', 'Actions'].map(h =>
+                ['Robot', 'Spécialité', 'État', 'Tâches faites', 'Réussite', 'Durée moyenne', 'Dernière activité', 'Actions'].map(h =>
                   React.createElement('th', { key: h, className: 'px-6 py-4 text-left text-xs font-mono text-slate-500 uppercase' }, h)
                 )
               )
@@ -361,16 +361,16 @@ export const AgentsPage = () => {
       React.createElement('div', { className: 'cyber-card p-4' },
         React.createElement('div', { className: 'flex items-center justify-between text-sm' },
           React.createElement('span', { className: 'text-slate-500' }, 
-            `Affichage ${filteredAgents.length} sur ${agents.length} agents`
+            `Affichage de ${filteredAgents.length} robot(s) sur ${agents.length} au total`
           ),
           React.createElement('div', { className: 'flex items-center gap-6' },
             React.createElement('div', { className: 'flex items-center gap-2' },
               React.createElement('div', { className: 'status-dot active' }),
-              React.createElement('span', { className: 'text-slate-400' }, `${activeCount} Actifs`)
+              React.createElement('span', { className: 'text-slate-400' }, `${activeCount} en marche`)
             ),
             React.createElement('div', { className: 'flex items-center gap-2' },
               React.createElement(Crown, { size: 14, className: 'text-amber-400' }),
-              React.createElement('span', { className: 'text-slate-400' }, `${premiumCount} Premium`)
+              React.createElement('span', { className: 'text-slate-400' }, `${premiumCount} Premium 💎`)
             )
           )
         )
