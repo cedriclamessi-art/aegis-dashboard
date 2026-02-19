@@ -56,8 +56,8 @@ export const AnalyticsPage = () => {
 
       React.createElement('div', { className: 'flex flex-col md:flex-row md:items-center justify-between gap-4' },
         React.createElement('div', {},
-          React.createElement('h1', { className: 'text-3xl font-bold cyber-text' }, 'Analytics'),
-          React.createElement('p', { className: 'text-slate-400 mt-1' }, 'Analyse détaillée des performances multi-plateformes')
+          React.createElement('h1', { className: 'text-3xl font-bold cyber-text' }, '📊 Mes statistiques'),
+          React.createElement('p', { className: 'text-slate-400 mt-1' }, 'Voici comment vos publicités ont performé sur chaque plateforme')
         ),
         React.createElement('div', { className: 'flex items-center gap-3' },
           React.createElement('div', { className: 'flex items-center gap-2 cyber-card px-3 py-2' },
@@ -67,29 +67,29 @@ export const AnalyticsPage = () => {
               onChange: (e: any) => setDateRange(e.target.value),
               className: 'bg-transparent text-white text-sm focus:outline-none cursor-pointer'
             },
-              React.createElement('option', { value: '7d' }, '7 derniers jours'),
-              React.createElement('option', { value: '14d' }, '14 derniers jours'),
-              React.createElement('option', { value: '30d' }, '30 derniers jours'),
-              React.createElement('option', { value: '90d' }, '90 derniers jours')
+              React.createElement('option', { value: '7d' }, '📅 7 derniers jours'),
+              React.createElement('option', { value: '14d' }, '📅 14 derniers jours'),
+              React.createElement('option', { value: '30d' }, '📅 30 derniers jours'),
+              React.createElement('option', { value: '90d' }, '📅 90 derniers jours')
             )
           ),
           React.createElement('button', { className: 'cyber-card px-3 py-2 flex items-center gap-2 hover:border-cyan-400/50 transition-colors' },
             React.createElement(Filter, { size: 16, className: 'text-cyan-400' }),
-            React.createElement('span', { className: 'text-sm text-white' }, 'Filtres')
+            React.createElement('span', { className: 'text-sm text-white' }, '🔍 Filtres')
           ),
           React.createElement('button', { className: 'cyber-card px-3 py-2 flex items-center gap-2 hover:border-cyan-400/50 transition-colors' },
             React.createElement(RefreshCw, { size: 16, className: 'text-cyan-400' }),
-            React.createElement('span', { className: 'text-sm text-white' }, 'Actualiser')
+            React.createElement('span', { className: 'text-sm text-white' }, '🔄 Actualiser')
           )
         )
       ),
 
       React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4' },
         [
-          { label: 'Dépenses totales', value: `${(totalSpend / 1000).toFixed(1)}K €`, change: 12.5, icon: DollarSign, color: 'cyan' },
-          { label: 'Revenus totaux', value: `${(totalRevenue / 1000).toFixed(1)}K €`, change: 18.2, icon: TrendingUp, color: 'green' },
-          { label: 'ROAS moyen', value: `${avgRoas.toFixed(2)}x`, change: 5.3, icon: Target, color: 'purple' },
-          { label: 'Conversions', value: totalConversions.toLocaleString(), change: 22.1, icon: Zap, color: 'orange' },
+          { label: '💸 Total dépensé en pub', value: `${(totalSpend / 1000).toFixed(1)}K €`, change: 12.5, icon: DollarSign, color: 'cyan' },
+          { label: '💰 Revenus générés', value: `${(totalRevenue / 1000).toFixed(1)}K €`, change: 18.2, icon: TrendingUp, color: 'green' },
+          { label: '📈 Rentabilité (ROAS)', value: `${avgRoas.toFixed(2)}x`, change: 5.3, icon: Target, color: 'purple' },
+          { label: '🛒 Ventes / Conversions', value: totalConversions.toLocaleString(), change: 22.1, icon: Zap, color: 'orange' },
         ].map((stat, idx) =>
           React.createElement('div', { key: idx, className: 'cyber-card p-5' },
             React.createElement('div', { className: 'flex items-start justify-between mb-3' },
@@ -122,16 +122,16 @@ export const AnalyticsPage = () => {
           React.createElement('div', { className: 'flex items-center justify-between mb-6' },
             React.createElement('h2', { className: 'text-lg font-bold text-white flex items-center gap-2' },
               React.createElement(LineChart, { size: 20, className: 'text-cyan-400' }),
-              'Tendance de performance'
+              '📈 Évolution de vos dépenses et revenus'
             ),
             React.createElement('div', { className: 'flex items-center gap-4 text-xs' },
               React.createElement('div', { className: 'flex items-center gap-2' },
                 React.createElement('div', { className: 'w-3 h-3 rounded-full bg-cyan-400' }),
-                React.createElement('span', { className: 'text-slate-400' }, 'Dépenses')
+                React.createElement('span', { className: 'text-slate-400' }, '💸 Dépenses pub')
               ),
               React.createElement('div', { className: 'flex items-center gap-2' },
                 React.createElement('div', { className: 'w-3 h-3 rounded-full bg-green-400' }),
-                React.createElement('span', { className: 'text-slate-400' }, 'Revenus')
+                React.createElement('span', { className: 'text-slate-400' }, '💰 Revenus')
               )
             )
           ),
@@ -157,7 +157,7 @@ export const AnalyticsPage = () => {
         React.createElement('div', { className: 'cyber-card p-6' },
           React.createElement('h2', { className: 'text-lg font-bold text-white flex items-center gap-2 mb-6' },
             React.createElement(Globe, { size: 20, className: 'text-purple-400' }),
-            'Multi-Devises'
+            '🌍 Répartition par devise'
           ),
           React.createElement('div', { className: 'space-y-4' },
             CURRENCY_DATA.map(currency =>
@@ -185,7 +185,7 @@ export const AnalyticsPage = () => {
       React.createElement('div', { className: 'cyber-card p-6' },
         React.createElement('h2', { className: 'text-lg font-bold text-white flex items-center gap-2 mb-6' },
           React.createElement(BarChart3, { size: 20, className: 'text-orange-400' }),
-          'Performance par Plateforme'
+          '📊 Résultats par plateforme publicitaire'
         ),
         React.createElement('div', { className: 'overflow-x-auto' },
           React.createElement('table', { className: 'w-full' },
@@ -194,10 +194,10 @@ export const AnalyticsPage = () => {
                 React.createElement('th', { className: 'pb-4 pr-6' }, 'Plateforme'),
                 React.createElement('th', { className: 'pb-4 pr-6' }, 'Dépenses'),
                 React.createElement('th', { className: 'pb-4 pr-6' }, 'Revenus'),
-                React.createElement('th', { className: 'pb-4 pr-6' }, 'ROAS'),
-                React.createElement('th', { className: 'pb-4 pr-6' }, 'CPA'),
-                React.createElement('th', { className: 'pb-4 pr-6' }, 'Conversions'),
-                React.createElement('th', { className: 'pb-4' }, 'Part')
+                React.createElement('th', { className: 'pb-4 pr-6' }, 'ROAS (rentabilité)'),
+                React.createElement('th', { className: 'pb-4 pr-6' }, 'Coût/vente'),
+                React.createElement('th', { className: 'pb-4 pr-6' }, 'Ventes'),
+                React.createElement('th', { className: 'pb-4' }, 'Part du budget')
               )
             ),
             React.createElement('tbody', {},
@@ -235,7 +235,7 @@ export const AnalyticsPage = () => {
           React.createElement('div', { className: 'flex items-center justify-between mb-6' },
             React.createElement('h2', { className: 'text-lg font-bold text-white flex items-center gap-2' },
               React.createElement(Bell, { size: 20, className: 'text-orange-400' }),
-              'Historique Alertes'
+              '🔔 Alertes et notifications'
             ),
             React.createElement('span', { className: 'text-xs text-orange-400 bg-orange-500/20 px-2 py-1 rounded font-mono' },
               `${ALERTS_HISTORY.filter(a => a.status === 'pending').length} en attente`
@@ -266,7 +266,7 @@ export const AnalyticsPage = () => {
                       alert.status === 'acknowledged' ? 'bg-cyan-500/20 text-cyan-400' :
                       'bg-orange-500/20 text-orange-400'
                     }`
-                  }, alert.status)
+                  }, alert.status === 'resolved' ? 'Résolu' : alert.status === 'acknowledged' ? 'Pris en compte' : 'En attente')
                 )
               )
             )
@@ -277,9 +277,9 @@ export const AnalyticsPage = () => {
           React.createElement('div', { className: 'flex items-center justify-between mb-6' },
             React.createElement('h2', { className: 'text-lg font-bold text-white flex items-center gap-2' },
               React.createElement(Calendar, { size: 20, className: 'text-purple-400' }),
-              'Événements Saisonniers'
+              '📆 Événements à venir'
             ),
-            React.createElement('span', { className: 'text-xs text-purple-400 bg-purple-500/20 px-2 py-1 rounded font-mono' }, 'À venir')
+            React.createElement('span', { className: 'text-xs text-purple-400 bg-purple-500/20 px-2 py-1 rounded font-mono' }, '🔮 À venir')
           ),
           React.createElement('div', { className: 'space-y-4' },
             SEASONAL_EVENTS.map((event, idx) =>
@@ -294,7 +294,7 @@ export const AnalyticsPage = () => {
                       event.impact === 'high' ? 'bg-orange-500/20 text-orange-400' :
                       'bg-cyan-500/20 text-cyan-400'
                     }`
-                  }, event.impact)
+                  }, event.impact === 'high' ? '🔥 Fort impact' : '📊 Impact moyen')
                 ),
                 React.createElement('div', { className: 'flex items-center justify-between text-sm' },
                   React.createElement('span', { className: 'text-slate-400' }, event.date),
@@ -308,7 +308,7 @@ export const AnalyticsPage = () => {
             )
           ),
           React.createElement('div', { className: 'mt-4 pt-4 border-t border-white/10 text-center' },
-            React.createElement('p', { className: 'text-xs text-slate-500' }, 'Baselines ajustées automatiquement')
+            React.createElement('p', { className: 'text-xs text-slate-500' }, '📌 Les performances de référence sont ajustées automatiquement par l\'IA')
           )
         )
       )
