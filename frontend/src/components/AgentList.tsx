@@ -62,7 +62,7 @@ export const AgentList = ({ limit = 8, showPremiumBadge = true }: AgentListProps
   if (loading) {
     return React.createElement('div',
       { className: 'glass rounded-lg p-6' },
-      React.createElement('h2', { className: 'text-lg font-semibold text-white mb-4' }, 'Active Agents'),
+      React.createElement('h2', { className: 'text-lg font-semibold text-white mb-4' }, 'Agents Actifs'),
       React.createElement('div', { className: 'flex items-center justify-center py-8' },
         React.createElement('div', { className: 'animate-spin rounded-full h-8 w-8 border-b-2 border-aegis-500' })
       )
@@ -75,10 +75,10 @@ export const AgentList = ({ limit = 8, showPremiumBadge = true }: AgentListProps
     { className: 'glass rounded-lg p-6' },
     React.createElement('div', 
       { className: 'flex items-center justify-between mb-4' },
-      React.createElement('h2', { className: 'text-lg font-semibold text-white' }, 'Active Agents'),
+      React.createElement('h2', { className: 'text-lg font-semibold text-white' }, 'Agents Actifs'),
       React.createElement('span', 
         { className: 'text-sm text-slate-400' }, 
-        `${agents.filter(a => a.status === 'active').length}/${agents.length} active`
+        `${agents.filter(a => a.status === 'active').length}/${agents.length} actifs`
       )
     ),
     React.createElement('div', { className: 'space-y-3' },
@@ -117,7 +117,7 @@ export const AgentList = ({ limit = 8, showPremiumBadge = true }: AgentListProps
               `${agent.success_rate}%`
             ),
             React.createElement('p', { className: 'text-xs text-slate-400' }, 
-              `${agent.task_count.toLocaleString()} tasks`
+              `${agent.task_count.toLocaleString()} tâches`
             )
           )
         )
@@ -127,7 +127,7 @@ export const AgentList = ({ limit = 8, showPremiumBadge = true }: AgentListProps
       { className: 'mt-4 text-center' },
       React.createElement('button', 
         { className: 'text-sm text-aegis-400 hover:text-aegis-300 transition-colors' },
-        `View all ${agents.length} agents`
+        `Voir les ${agents.length} agents`
       )
     )
   )
