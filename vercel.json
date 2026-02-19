@@ -1,7 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:api && npm run build:dashboard",
-  "installCommand": "npm install && npm install --prefix frontend",
-  "devCommand": "npm run dev",
+  "buildCommand": "npm install --prefix frontend && npm run build --prefix frontend",
+  "installCommand": "echo 'install done'",
   "outputDirectory": "frontend/dist"
 }
