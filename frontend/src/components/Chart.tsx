@@ -4,7 +4,7 @@ import { mockTaskChartData } from '../services/mockData'
 export const TaskChart = () => {
   return (
     <div className='glass rounded-lg p-6'>
-      <h2 className='text-lg font-semibold text-white mb-6'>Tasks Overview (7 days)</h2>
+      <h2 className='text-lg font-semibold text-white mb-6'>Aperçu des tâches (7 jours)</h2>
       <div className='w-full h-96'>
         <ResponsiveContainer width='100%' height='100%'>
           <BarChart data={mockTaskChartData}>
@@ -20,9 +20,9 @@ export const TaskChart = () => {
               labelStyle={{ color: '#ffffff' }}
             />
             <Legend wrapperStyle={{ color: '#e2e8f0' }} />
-            <Bar dataKey='completed' fill='#10b981' name='Completed' />
-            <Bar dataKey='pending' fill='#f59e0b' name='Pending' />
-            <Bar dataKey='failed' fill='#ef4444' name='Failed' />
+            <Bar dataKey='completed' fill='#10b981' name='Complétées' />
+            <Bar dataKey='pending' fill='#f59e0b' name='En attente' />
+            <Bar dataKey='failed' fill='#ef4444' name='Échouées' />
           </BarChart>
         </ResponsiveContainer>
       </div>
