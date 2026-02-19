@@ -91,7 +91,7 @@ export default function App() {
   const launchPipeline = async () => {
     setLoading(true)
     try {
-      const { data, error } = await supabase.rpc('enqueue_product_pipeline', {
+      const { error } = await supabase.rpc('enqueue_product_pipeline', {
         p_tenant_id: TENANT_ID, p_product_id: crypto.randomUUID(),
         p_product_name: 'Product ' + Date.now().toString().slice(-6), p_budget: 500, p_target_roas: 1.5
       })
