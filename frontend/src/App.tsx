@@ -80,11 +80,14 @@ export default function App() {
   const [santeStatus, setSanteStatus] = useState<any>({})
   const [phase, setPhase] = useState(1)
   // Nouveaux états - APIs, graphiques, connexions
-  const [apiConnections, setApiConnections] = useState({ meta: false, google: false, tiktok: false, shopify: false, gemini: false })
+  const [apiConnections, setApiConnections] = useState({ meta: false, google: false, tiktok: false, snapchat: false, pinterest: false, shopify: false, gemini: false })
   const [geminiApiKey, setGeminiApiKey] = useState('')
   const [metaApiKey, setMetaApiKey] = useState('')
   const [googleApiKey, setGoogleApiKey] = useState('')
   const [shopifyApiKey, setShopifyApiKey] = useState('')
+  const [tiktokApiKey, setTiktokApiKey] = useState('')
+  const [snapApiKey, setSnapApiKey] = useState('')
+  const [pinterestApiKey, setPinterestApiKey] = useState('')
   const [geminiGenerating, setGeminiGenerating] = useState(false)
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string|null>(null)
   const [chartView, setChartView] = useState<'7j'|'30j'|'90j'>('7j')
@@ -558,13 +561,15 @@ export default function App() {
               data={[
                 { label: 'Meta', value: 450, color: '#4f46e5' },
                 { label: 'Google', value: 280, color: '#0ea5e9' },
-                { label: 'TikTok', value: 120, color: '#ec4899' },
-                { label: 'Reserve', value: 147, color: '#374151' },
+                { label: 'TikTok', value: 180, color: '#ff0050' },
+                { label: 'Snap', value: 120, color: '#fffc00' },
+                { label: 'Pinterest', value: 80, color: '#e60023' },
+                { label: 'Réserve', value: 90, color: '#374151' },
               ]}
               height={100}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '11px', color: '#64748b' }}>
-              <span>Total: 997 EUR/j</span>
+              <span>Total: 1 200 EUR/j</span>
               <span style={{ color: '#4ade80' }}>ROAS global: 3.4x</span>
             </div>
           </div>
@@ -637,11 +642,13 @@ export default function App() {
         </div>
 
         {/* Statut connexions */}
-        <div style={{ ...S.grid(5), marginBottom: '24px' }}>
+        <div style={{ ...S.grid(4), marginBottom: '24px' }}>
           {[
             { key: 'meta', label: 'Meta Ads', icon: '📘', color: '#1877f2' },
             { key: 'google', label: 'Google Ads', icon: '🔵', color: '#4285f4' },
             { key: 'tiktok', label: 'TikTok Ads', icon: '🎵', color: '#ff0050' },
+            { key: 'snapchat', label: 'Snapchat Ads', icon: '👻', color: '#fffc00' },
+            { key: 'pinterest', label: 'Pinterest Ads', icon: '📌', color: '#e60023' },
             { key: 'shopify', label: 'Shopify', icon: '🛍️', color: '#96bf48' },
             { key: 'gemini', label: 'Gemini IA', icon: '🤖', color: '#a855f7' },
           ].map((api) => (
@@ -847,6 +854,147 @@ export default function App() {
             )}
           </div>
 
+
+          {/* TikTok Ads */}
+          <div style={S.card}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '16px' }}>
+              <span style={{ fontSize: '24px' }}>🎵</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '15px' }}>TikTok Ads</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>In-Feed, TopView, Spark Ads, Shopping</div>
+              </div>
+            </div>
+            {!apiConnections.tiktok ? (
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>TikTok Ads Access Token</label>
+                <input style={{ ...S.input, marginBottom: '8px' }} type="password" placeholder="0000xxxx..." value={tiktokApiKey} onChange={e => setTiktokApiKey(e.target.value)} />
+                <div style={{ fontSize: '11px', color: '#475569', marginBottom: '12px' }}>
+                  💡 Via <span style={{ color: '#60a5fa' }}>ads.tiktok.com</span> → Assets → Developer
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button style={S.btn('primary')} onClick={() => connecterAPI('tiktok', tiktokApiKey)} disabled={loading || !tiktokApiKey}>
+                    {loading ? '⏳...' : '🔗 Connecter TikTok'}
+                  </button>
+                  <button style={S.btn('outline')} onClick={() => { setTiktokApiKey('demo_tiktok_key'); connecterAPI('tiktok', 'demo_tiktok_key') }}>
+                    Demo
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ background: '#1a0014', border: '1px solid #ff0050', borderRadius: '8px', padding: '12px', marginBottom: '12px' }}>
+                  <div style={{ color: '#ff6b9d', fontWeight: 700 }}>✅ TikTok Ads connecté</div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>Advertiser ID: TT_****7823</div>
+                </div>
+                {[
+                  { label: 'Campagnes actives', val: '4' },
+                  { label: 'Budget total/j', val: '180 EUR' },
+                  { label: 'CPM moyen', val: '12.40 EUR' },
+                  { label: 'VTR (Video Views)', val: '68%' },
+                ].map((r,i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #0f0f1a', fontSize: '13px' }}>
+                    <span style={{ color: '#64748b' }}>{r.label}</span>
+                    <span style={{ fontWeight: 600 }}>{r.val}</span>
+                  </div>
+                ))}
+                <button style={{ ...S.btn('danger'), marginTop: '12px' }} onClick={() => setApiConnections(p => ({...p, tiktok: false}))}>Déconnecter</button>
+              </div>
+            )}
+          </div>
+
+          {/* Snapchat Ads */}
+          <div style={S.card}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '16px' }}>
+              <span style={{ fontSize: '24px' }}>👻</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '15px' }}>Snapchat Ads</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>Story Ads, Collection Ads, AR Lenses</div>
+              </div>
+            </div>
+            {!apiConnections.snapchat ? (
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Snapchat Marketing API Token</label>
+                <input style={{ ...S.input, marginBottom: '8px' }} type="password" placeholder="Bearer eyJhb..." value={snapApiKey} onChange={e => setSnapApiKey(e.target.value)} />
+                <div style={{ fontSize: '11px', color: '#475569', marginBottom: '12px' }}>
+                  💡 Via <span style={{ color: '#60a5fa' }}>businesshelp.snapchat.com</span> → Marketing API
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button style={S.btn('primary')} onClick={() => connecterAPI('snapchat', snapApiKey)} disabled={loading || !snapApiKey}>
+                    {loading ? '⏳...' : '🔗 Connecter Snapchat'}
+                  </button>
+                  <button style={S.btn('outline')} onClick={() => { setSnapApiKey('demo_snap_key'); connecterAPI('snapchat', 'demo_snap_key') }}>
+                    Demo
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ background: '#1a1a00', border: '1px solid #fffc00', borderRadius: '8px', padding: '12px', marginBottom: '12px' }}>
+                  <div style={{ color: '#ffd700', fontWeight: 700 }}>✅ Snapchat Ads connecté</div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>Ad Account: SNAP_****4512</div>
+                </div>
+                {[
+                  { label: 'Campagnes actives', val: '3' },
+                  { label: 'Budget total/j', val: '120 EUR' },
+                  { label: 'Swipe-up Rate', val: '4.2%' },
+                  { label: '18-24 ans reach', val: '82%' },
+                ].map((r,i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #0f0f1a', fontSize: '13px' }}>
+                    <span style={{ color: '#64748b' }}>{r.label}</span>
+                    <span style={{ fontWeight: 600 }}>{r.val}</span>
+                  </div>
+                ))}
+                <button style={{ ...S.btn('danger'), marginTop: '12px' }} onClick={() => setApiConnections(p => ({...p, snapchat: false}))}>Déconnecter</button>
+              </div>
+            )}
+          </div>
+
+          {/* Pinterest Ads */}
+          <div style={S.card}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '16px' }}>
+              <span style={{ fontSize: '24px' }}>📌</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '15px' }}>Pinterest Ads</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>Shopping Pins, Carousel, Idea Pins</div>
+              </div>
+            </div>
+            {!apiConnections.pinterest ? (
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Pinterest Ads API Token</label>
+                <input style={{ ...S.input, marginBottom: '8px' }} type="password" placeholder="pina_xxxxxx..." value={pinterestApiKey} onChange={e => setPinterestApiKey(e.target.value)} />
+                <div style={{ fontSize: '11px', color: '#475569', marginBottom: '12px' }}>
+                  💡 Via <span style={{ color: '#60a5fa' }}>developers.pinterest.com</span> → Apps → Create App
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button style={S.btn('primary')} onClick={() => connecterAPI('pinterest', pinterestApiKey)} disabled={loading || !pinterestApiKey}>
+                    {loading ? '⏳...' : '🔗 Connecter Pinterest'}
+                  </button>
+                  <button style={S.btn('outline')} onClick={() => { setPinterestApiKey('demo_pin_key'); connecterAPI('pinterest', 'demo_pin_key') }}>
+                    Demo
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ background: '#1a0007', border: '1px solid #e60023', borderRadius: '8px', padding: '12px', marginBottom: '12px' }}>
+                  <div style={{ color: '#ff6b81', fontWeight: 700 }}>✅ Pinterest Ads connecté</div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>Ad Account: PIN_****2391</div>
+                </div>
+                {[
+                  { label: 'Campagnes actives', val: '2' },
+                  { label: 'Budget total/j', val: '80 EUR' },
+                  { label: 'ROAS moyen', val: '3.8x' },
+                  { label: 'Saves/Pin', val: '1 240' },
+                ].map((r,i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #0f0f1a', fontSize: '13px' }}>
+                    <span style={{ color: '#64748b' }}>{r.label}</span>
+                    <span style={{ fontWeight: 600 }}>{r.val}</span>
+                  </div>
+                ))}
+                <button style={{ ...S.btn('danger'), marginTop: '12px' }} onClick={() => setApiConnections(p => ({...p, pinterest: false}))}>Déconnecter</button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Sync bidirectionnelle si boutique connectée */}
@@ -1172,6 +1320,7 @@ UTILISATION: Premier test', score: 78 },
             { id: 'video', label: '🎬 Vidéos UGC', desc: '6 templates' },
             { id: 'copy', label: '✍️ Copy & Hooks', desc: '6 types' },
             { id: 'landing', label: '🔁 Landing Pages', desc: 'Structures' },
+            { id: 'plateformes', label: '📲 Plateformes', desc: 'TikTok · Snap · Pin' },
           ].map(tab => (
             <button key={tab.id} onClick={() => setCreatifType(tab.id)} style={{
               padding: '10px 18px', borderRadius: '10px', border: 'none', cursor: 'pointer',
@@ -1501,6 +1650,224 @@ UTILISATION: Premier test', score: 78 },
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* === ONGLET PLATEFORMES === */}
+        {creatifType === 'plateformes' && (
+          <div>
+
+            {/* TikTok Ads */}
+            <div style={{ ...S.card, marginBottom: '16px', borderLeft: '4px solid #ff0050' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <span style={{ fontSize: '32px' }}>🎵</span>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '18px' }}>TikTok Ads</div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>Formats natifs · Vertical 9:16 · Hook 3s · Sound On</div>
+                </div>
+                <span style={{ ...S.badge('green'), marginLeft: 'auto' }}>Avg ROAS 4.2x</span>
+              </div>
+              <div style={S.grid(3)}>
+                {[
+                  { format: 'In-Feed Ad', emoji: '📱', ratio: '9:16', duree: '15-60s', desc: "Vidéo native dans le fil For You Page", hook: 'Hook 3s + Twist + CTA', score: 94, color: '#ff0050' },
+                  { format: 'TopView', emoji: '👑', ratio: '9:16', duree: '5-60s', desc: "Premier spot au lancement de l'app", hook: 'Impact immédiat + Brand story', score: 97, color: '#ff6b9d' },
+                  { format: 'Spark Ads', emoji: '✨', ratio: '9:16', duree: '7-60s', desc: 'Booste du contenu organique existant', hook: 'UGC authentique + Engagement réel', score: 91, color: '#fbbf24' },
+                  { format: 'Collection Ad', emoji: '🛍️', ratio: '9:16', duree: '5-15s', desc: 'Galerie produits directement dans le feed', hook: 'Produit hero + Grille catalogue', score: 88, color: '#4ade80' },
+                  { format: 'Branded Hashtag', emoji: '#️⃣', ratio: '9:16', duree: '15s', desc: 'Challenge viral avec ton hashtag de marque', hook: 'Dance/trend + CTA participation', score: 86, color: '#a78bfa' },
+                  { format: 'Shopping Live', emoji: '🔴', ratio: '9:16', duree: 'Live', desc: 'Vente en direct avec produits épinglés', hook: 'Demo live + Offre limitée', score: 92, color: '#f97316' },
+                ].map((f, i) => (
+                  <div key={i} style={{ ...S.card, border: `1px solid ${f.color}40`, background: '#0a0a1a' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <span style={{ fontSize: '20px' }}>{f.emoji}</span>
+                        <div style={{ fontWeight: 700, fontSize: '13px', color: f.color }}>{f.format}</div>
+                      </div>
+                      <span style={S.badge('green')}>Score {f.score}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                      <span style={S.tag}>{f.ratio}</span>
+                      <span style={S.tag}>{f.duree}</span>
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>{f.desc}</div>
+                    <div style={{ background: '#0f0f1a', borderRadius: '6px', padding: '8px', fontFamily: 'monospace', fontSize: '11px', color: '#ff6b9d', marginBottom: '8px' }}>{f.hook}</div>
+                    <button style={{ ...S.btn('primary'), width: '100%', fontSize: '12px', padding: '8px', background: f.color }}>
+                      🎵 Créer ce format
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: '16px', background: '#0f0f1a', borderRadius: '10px', padding: '14px' }}>
+                <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '10px', color: '#ff6b9d' }}>⚡ Best Practices TikTok Ads 2025</div>
+                <div style={S.grid(2)}>
+                  {[
+                    { tip: 'Hook dans les 3 premières secondes', impact: '+67% view rate' },
+                    { tip: 'Sound On — musique tendance / son produit', impact: '+43% engagement' },
+                    { tip: 'Text overlay natif (pas sur-produit)', impact: '+28% CTR' },
+                    { tip: 'Finir avec CTA clair + promo', impact: '+52% CVR' },
+                    { tip: 'UGC + creator face (pas studio)', impact: '+81% trust' },
+                    { tip: 'Hashtag niche + brand (#fyp)', impact: '+34% reach' },
+                  ].map((t, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1e1e3a', fontSize: '12px' }}>
+                      <span style={{ color: '#94a3b8' }}>✅ {t.tip}</span>
+                      <span style={{ color: '#4ade80', fontWeight: 700, whiteSpace: 'nowrap', marginLeft: '8px' }}>{t.impact}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Snapchat Ads */}
+            <div style={{ ...S.card, marginBottom: '16px', borderLeft: '4px solid #fffc00' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <span style={{ fontSize: '32px' }}>👻</span>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '18px' }}>Snapchat Ads</div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>Gen Z · 13-34 ans · Vertical immersif · Swipe-up</div>
+                </div>
+                <span style={{ ...S.badge('yellow'), marginLeft: 'auto' }}>Avg CPM 8€</span>
+              </div>
+              <div style={S.grid(3)}>
+                {[
+                  { format: 'Snap Ad', emoji: '⚡', ratio: '9:16', duree: '3-180s', desc: 'Vidéo ou image plein écran entre les Stories', hook: 'Visuel fort + Swipe up pour plus', score: 88, color: '#fffc00' },
+                  { format: 'Story Ad', emoji: '📖', ratio: '9:16', duree: '5-180s', desc: 'Collection de Snaps dans la section Discover', hook: 'Séquence narrative + teaser final', score: 85, color: '#ffd700' },
+                  { format: 'Collection Ad', emoji: '🛍️', ratio: '9:16', duree: '5-180s', desc: 'Tuile produits avec swipe horizontal sous la vidéo', hook: 'Hero produit + grille catalogue 4 produits', score: 91, color: '#f97316' },
+                  { format: 'Dynamic Ad', emoji: '🔄', ratio: '9:16', duree: 'Auto', desc: 'Retargeting auto avec catalogue produits connecté', hook: 'Produit vu + offre personnalisée', score: 93, color: '#4ade80' },
+                  { format: 'AR Lens', emoji: '🔮', ratio: '1:1', duree: '10s', desc: 'Filtre AR pour essayage virtuel du produit', hook: 'Try-on immersif + achat direct', score: 89, color: '#a78bfa' },
+                  { format: 'Spotlight Ad', emoji: '🌟', ratio: '9:16', duree: '3-60s', desc: "Contenu viral dans l'onglet Spotlight", hook: 'Trend Snap + CTA discret', score: 84, color: '#60a5fa' },
+                ].map((f, i) => (
+                  <div key={i} style={{ ...S.card, border: `1px solid ${f.color}40`, background: '#0a0a1a' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <span style={{ fontSize: '20px' }}>{f.emoji}</span>
+                        <div style={{ fontWeight: 700, fontSize: '13px', color: f.color }}>{f.format}</div>
+                      </div>
+                      <span style={S.badge('green')}>Score {f.score}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                      <span style={S.tag}>{f.ratio}</span>
+                      <span style={S.tag}>{f.duree}</span>
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>{f.desc}</div>
+                    <div style={{ background: '#0f0f1a', borderRadius: '6px', padding: '8px', fontFamily: 'monospace', fontSize: '11px', color: '#ffd700', marginBottom: '8px' }}>{f.hook}</div>
+                    <button style={{ ...S.btn('primary'), width: '100%', fontSize: '12px', padding: '8px', background: '#1a1a00', border: `1px solid ${f.color}`, color: f.color }}>
+                      👻 Créer ce format
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: '16px', background: '#0f0f1a', borderRadius: '10px', padding: '14px' }}>
+                <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '10px', color: '#ffd700' }}>⚡ Best Practices Snapchat Ads 2025</div>
+                <div style={S.grid(2)}>
+                  {[
+                    { tip: "Texte en haut de l'écran (zone thumb safe)", impact: '+38% lisibilité' },
+                    { tip: '13-34 ans — audience native Snap', impact: 'CPM -40% vs Meta' },
+                    { tip: 'Son activé + voix humaine', impact: '+55% retention' },
+                    { tip: 'CTA "Swipe Up" animé en bas', impact: '+29% CVR' },
+                    { tip: 'Collection Ad pour catalogues 4+ produits', impact: 'ROAS +1.8x' },
+                    { tip: 'Pixel Snap activé pour retargeting dynamic', impact: 'CAC -35%' },
+                  ].map((t, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1e1e3a', fontSize: '12px' }}>
+                      <span style={{ color: '#94a3b8' }}>✅ {t.tip}</span>
+                      <span style={{ color: '#4ade80', fontWeight: 700, whiteSpace: 'nowrap', marginLeft: '8px' }}>{t.impact}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Pinterest Ads */}
+            <div style={{ ...S.card, marginBottom: '16px', borderLeft: '4px solid #e60023' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <span style={{ fontSize: '32px' }}>📌</span>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '18px' }}>Pinterest Ads</div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>Intent élevé · Shopping mindset · Long lifetime · ROAS fort</div>
+                </div>
+                <span style={{ ...S.badge('green'), marginLeft: 'auto' }}>Avg ROAS 5.1x</span>
+              </div>
+              <div style={S.grid(3)}>
+                {[
+                  { format: 'Standard Pin', emoji: '📌', ratio: '2:3', duree: 'Image', desc: 'Pin image statique — format originel Pinterest', hook: 'Visuel aspirationnel + titre accrocheur', score: 85, color: '#e60023' },
+                  { format: 'Video Pin', emoji: '🎬', ratio: '1:1 ou 2:3', duree: '4-15s', desc: 'Vidéo courte silencieuse dans le feed', hook: 'Démo produit silent + text overlay', score: 88, color: '#ff6b81' },
+                  { format: 'Carousel Pin', emoji: '🎠', ratio: '1:1', duree: '2-5 images', desc: 'Swipe horizontal de plusieurs images produit', hook: 'Unboxing ou looks multiples', score: 90, color: '#f97316' },
+                  { format: 'Shopping Pin', emoji: '🛒', ratio: '1:1 ou 2:3', duree: 'Catalogue', desc: 'Pin avec prix, titre et CTA achat direct', hook: 'Produit clean + prix visible + badge promo', score: 93, color: '#4ade80' },
+                  { format: 'Collections Pin', emoji: '🗂️', ratio: '1:1 hero', duree: 'Hero + 3', desc: 'Image hero + 3 produits secondaires en dessous', hook: 'Lifestyle hero + produits assortis', score: 89, color: '#a78bfa' },
+                  { format: 'Idea Pin', emoji: '💡', ratio: '9:16', duree: '2-20 pages', desc: 'Format multi-pages inspirational', hook: 'Tutoriel produit + étapes visuelles', score: 86, color: '#60a5fa' },
+                ].map((f, i) => (
+                  <div key={i} style={{ ...S.card, border: `1px solid ${f.color}40`, background: '#0a0a1a' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <span style={{ fontSize: '20px' }}>{f.emoji}</span>
+                        <div style={{ fontWeight: 700, fontSize: '13px', color: f.color }}>{f.format}</div>
+                      </div>
+                      <span style={S.badge('green')}>Score {f.score}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                      <span style={S.tag}>{f.ratio}</span>
+                      <span style={S.tag}>{f.duree}</span>
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>{f.desc}</div>
+                    <div style={{ background: '#0f0f1a', borderRadius: '6px', padding: '8px', fontFamily: 'monospace', fontSize: '11px', color: '#ff6b81', marginBottom: '8px' }}>{f.hook}</div>
+                    <button style={{ ...S.btn('primary'), width: '100%', fontSize: '12px', padding: '8px', background: '#1a0007', border: `1px solid ${f.color}`, color: f.color }}>
+                      📌 Créer ce format
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: '16px', background: '#0f0f1a', borderRadius: '10px', padding: '14px' }}>
+                <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '10px', color: '#ff6b81' }}>⚡ Best Practices Pinterest Ads 2025</div>
+                <div style={S.grid(2)}>
+                  {[
+                    { tip: 'Format 2:3 vertical — plus de clics organiques', impact: '+42% impressions' },
+                    { tip: 'Texte titre clair + mot-clé dans description', impact: '+67% découverte' },
+                    { tip: 'Palette couleurs chaudes (rouge/orange)', impact: '+31% saves' },
+                    { tip: 'Shopping Pin avec catalogue synchronisé', impact: 'ROAS +2.3x' },
+                    { tip: 'Ciblage par intérêts + mots-clés combinés', impact: 'CAC -28%' },
+                    { tip: 'Pinterest Tag activé pour retargeting visiteurs', impact: '+45% CVR' },
+                  ].map((t, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1e1e3a', fontSize: '12px' }}>
+                      <span style={{ color: '#94a3b8' }}>✅ {t.tip}</span>
+                      <span style={{ color: '#4ade80', fontWeight: 700, whiteSpace: 'nowrap', marginLeft: '8px' }}>{t.impact}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Comparaison 5 plateformes */}
+            <div style={S.card}>
+              <div style={S.sectionTitle}>📊 Comparaison Multi-Plateforme — Budget & ROAS</div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #1e1e3a' }}>
+                      {['Plateforme', 'Formats', 'CPM moyen', 'Audience cible', 'ROAS typique', 'Idéal pour'].map(h => (
+                        <th key={h} style={{ padding: '10px 12px', textAlign: 'left', color: '#64748b', fontWeight: 600 }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { platform: '📘 Meta', format: '1:1 · 4:5 · 9:16', cpm: '12-25€', audience: 'Tous âges, lookalike', roas: '3-6x', ideal: 'Evergreen, retargeting' },
+                      { platform: '🔵 Google', format: 'Shopping · PMax', cpm: '8-18€', audience: 'Intent achat élevé', roas: '4-8x', ideal: 'Search, Shopping' },
+                      { platform: '🎵 TikTok', format: '9:16 · 15-60s', cpm: '10-20€', audience: '18-34 ans, Gen Z', roas: '3-5x', ideal: 'Viral, UGC, lancement' },
+                      { platform: '👻 Snapchat', format: '9:16 · Story', cpm: '6-14€', audience: '13-34 ans', roas: '2-4x', ideal: 'Gen Z, notoriété' },
+                      { platform: '📌 Pinterest', format: '2:3 · Shopping', cpm: '5-12€', audience: 'Femmes 25-45', roas: '4-7x', ideal: 'Mode, déco, beauté' },
+                    ].map((row, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid #0f0f1a', background: i % 2 === 0 ? '#0a0a1a' : 'transparent' }}>
+                        <td style={{ padding: '10px 12px', fontWeight: 700 }}>{row.platform}</td>
+                        <td style={{ padding: '10px 12px', color: '#94a3b8', fontFamily: 'monospace', fontSize: '12px' }}>{row.format}</td>
+                        <td style={{ padding: '10px 12px', color: '#fbbf24', fontWeight: 600 }}>{row.cpm}</td>
+                        <td style={{ padding: '10px 12px', color: '#94a3b8', fontSize: '12px' }}>{row.audience}</td>
+                        <td style={{ padding: '10px 12px', color: '#4ade80', fontWeight: 700 }}>{row.roas}</td>
+                        <td style={{ padding: '10px 12px', color: '#a5b4fc', fontSize: '12px' }}>{row.ideal}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
         )}
 
@@ -1938,20 +2305,22 @@ UTILISATION: Premier test', score: 78 },
     return (
       <div>
         <div style={S.info}>
-          📡 <strong>Media Buying Engine.</strong> Gere tes campagnes sur Meta, Google et TikTok.
+          📡 <strong>Media Buying Engine.</strong> Gère tes campagnes sur Meta, Google, TikTok, Snapchat et Pinterest.
           Scaling automatique des pubs gagnantes, kill auto des perdantes, CBO/ABO logic.
-          {!apiConnections.meta && !apiConnections.google && (
+          {!apiConnections.meta && !apiConnections.google && !apiConnections.tiktok && !apiConnections.snapchat && !apiConnections.pinterest && (
             <span style={{ color: '#fbbf24' }}> ⚠️ Connecte tes APIs dans <button style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }} onClick={() => setPage('boutique')}>Boutique</button> pour activer le pilotage reel.</span>
           )}
         </div>
 
         {/* KPIs plateformes */}
-        <div style={S.grid(4)}>
+        <div style={S.grid(3)}>
           {[
             { plateforme: 'Meta Ads', budget: '450', roas: '3.2x', status: apiConnections.meta ? 'Connecte' : 'Demo', color: apiConnections.meta ? 'green' : 'yellow', icon: '📘' },
             { plateforme: 'Google Ads', budget: '280', roas: '4.1x', status: apiConnections.google ? 'Connecte' : 'Demo', color: apiConnections.google ? 'green' : 'yellow', icon: '🔵' },
-            { plateforme: 'TikTok Ads', budget: '120', roas: '2.8x', status: 'Pause', color: 'yellow', icon: '🎵' },
-            { plateforme: 'Budget total', budget: '850', roas: '3.4x', status: 'Actif', color: 'green', icon: '💰' },
+            { plateforme: 'TikTok Ads', budget: '180', roas: '3.1x', status: apiConnections.tiktok ? 'Connecte' : 'Demo', color: apiConnections.tiktok ? 'green' : 'yellow', icon: '🎵' },
+            { plateforme: 'Snapchat Ads', budget: '120', roas: '2.6x', status: apiConnections.snapchat ? 'Connecte' : 'Demo', color: apiConnections.snapchat ? 'green' : 'yellow', icon: '👻' },
+            { plateforme: 'Pinterest Ads', budget: '80', roas: '3.8x', status: apiConnections.pinterest ? 'Connecte' : 'Demo', color: apiConnections.pinterest ? 'green' : 'yellow', icon: '📌' },
+            { plateforme: 'Budget total', budget: '1 110', roas: '3.3x', status: 'Actif', color: 'green', icon: '💰' },
           ].map((p,i) => (
             <div key={i} style={S.card}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
