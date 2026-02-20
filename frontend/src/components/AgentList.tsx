@@ -125,7 +125,7 @@ export const AgentList = ({ limit = 8, showPremiumBadge = true }: AgentListProps
               React.createElement('div', { className: 'flex items-center gap-2' },
                 React.createElement('p', { className: 'font-medium text-white truncate text-sm' }, agent.displayName),
                 showPremiumBadge && agent.isPremium && 
-                  React.createElement(Crown, { size: 12, className: 'text-amber-400 flex-shrink-0', title: 'Agent Premium' })
+                  React.createElement(Crown, { size: 12, className: 'text-amber-400 flex-shrink-0' })
               ),
               // Rôle en langage clair + statut
               React.createElement('div', { className: 'flex items-center gap-2 mt-0.5' },
