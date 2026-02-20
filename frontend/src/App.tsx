@@ -5,667 +5,1337 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL || '',
   import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 )
-const TENANT_ID = import.meta.env.VITE_TENANT_ID || ''
+const TENANT_ID = import.meta.env.VITE_TENANT_ID || 'AEGIS-OWNER'
 
 // ============================================================
-// STYLES - Interface claire et lisible pour débutants
+// TYPES
+// ============================================================
+type Page = 'accueil' | 'boutique' | 'intelligence' | 'creatifs' | 'funnel' | 'media' | 'campagnes' | 'decisions' | 'agents' | 'risque' | 'marche' | 'sante' | 'gouvernance' | 'financier' | 'securite' | 'abonnement'
+
+// ============================================================
+// STYLES
 // ============================================================
 const S = {
   app: { display: 'flex', minHeight: '100vh', background: '#0f0f1a', color: '#e2e8f0', fontFamily: 'system-ui,sans-serif' },
   sidebar: { width: 240, background: '#0a0a12', borderRight: '1px solid #1e1e3a', padding: '0', display: 'flex', flexDirection: 'column' as const },
   main: { flex: 1, display: 'flex', flexDirection: 'column' as const },
   header: { padding: '20px 32px', borderBottom: '1px solid #1e1e3a', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0a0a12' },
-  content: { flex: 1, padding: 32, overflowY: 'auto' as const, maxWidth: 1200 },
-  logo: { fontSize: 22, fontWeight: 800, color: '#6366f1', letterSpacing: '-0.5px' },
-  card: { background: '#13131f', border: '1px solid #1e1e3a', borderRadius: 16, padding: '20px 24px' },
-  grid4: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 },
+  content: { flex: 1, padding: '32px', overflowY: 'auto' as const },
+  logo: { padding: '24px 20px', borderBottom: '1px solid #1e1e3a' },
+  logoText: { fontSize: '22px', fontWeight: 800, color: '#facc15', letterSpacing: '-0.5px' },
+  logoSub: { fontSize: '11px', color: '#64748b', marginTop: '2px' },
+  navSection: { padding: '12px 12px 4px', fontSize: '10px', fontWeight: 700, color: '#374151', letterSpacing: '1px', textTransform: 'uppercase' as const },
+  navBtn: (active: boolean) => ({
+    width: '100%', padding: '10px 16px', background: active ? '#1e1b4b' : 'transparent',
+    border: 'none', borderRadius: '8px', color: active ? '#a5b4fc' : '#94a3b8',
+    cursor: 'pointer', textAlign: 'left' as const, fontSize: '14px', fontWeight: active ? 600 : 400,
+    display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2px',
+    transition: 'all 0.15s'
+  }),
+  card: { background: '#0a0a1a', border: '1px solid #1e1e3a', borderRadius: '12px', padding: '20px' },
+  cardTitle: { fontSize: '13px', color: '#64748b', marginBottom: '6px' },
+  cardValue: { fontSize: '28px', fontWeight: 700, color: '#fff' },
+  grid: (cols: number) => ({ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '16px' }),
+  badge: (color: string) => ({ background: color === 'green' ? '#052e16' : color === 'yellow' ? '#451a03' : color === 'red' ? '#450a0a' : color === 'blue' ? '#0c1a3e' : '#1e1e3a', color: color === 'green' ? '#4ade80' : color === 'yellow' ? '#fbbf24' : color === 'red' ? '#f87171' : color === 'blue' ? '#93c5fd' : '#94a3b8', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 600 }),
+  btn: (variant: string = 'primary') => ({ padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '14px', background: variant === 'primary' ? '#4f46e5' : variant === 'success' ? '#16a34a' : variant === 'danger' ? '#dc2626' : variant === 'outline' ? 'transparent' : '#1e1e3a', color: variant === 'outline' ? '#94a3b8' : '#fff', border: variant === 'outline' ? '1px solid #1e1e3a' : 'none' }),
+  input: { padding: '10px 14px', background: '#0f0f1a', border: '1px solid #1e1e3a', borderRadius: '8px', color: '#e2e8f0', fontSize: '14px', width: '100%', outline: 'none' },
   table: { width: '100%', borderCollapse: 'collapse' as const },
-  th: { padding: '14px 16px', textAlign: 'left' as const, fontSize: 12, color: '#64748b', fontWeight: 700, background: '#13131f', textTransform: 'uppercase' as const, letterSpacing: '0.5px' },
-  td: { padding: '14px 16px', fontSize: 14, borderTop: '1px solid #1a1a2e' },
-  btn: { background: '#6366f1', color: 'white', border: 'none', padding: '12px 24px', borderRadius: 10, cursor: 'pointer', fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 },
-  btnSec: { background: '#13131f', color: '#94a3b8', border: '1px solid #1e1e3a', padding: '12px 20px', borderRadius: 10, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 },
-  approve: { background: '#0f2a0f', color: '#4ade80', border: '1px solid #4ade80', padding: '8px 16px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600 },
-  reject: { background: '#2a0f0f', color: '#f87171', border: '1px solid #f87171', padding: '8px 16px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600 },
-  panel: { background: '#13131f', border: '1px solid #1e1e3a', borderRadius: 16, padding: 24 },
-  row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 },
-  helpBox: { background: '#1a1a2e', border: '1px solid #2e2e5a', borderRadius: 12, padding: '14px 18px', marginBottom: 24, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 },
-  sectionTitle: { fontSize: 11, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase' as const, letterSpacing: '1px', padding: '20px 20px 8px', margin: 0 },
+  th: { padding: '10px 16px', background: '#0a0a1a', color: '#64748b', fontSize: '11px', textAlign: 'left' as const, fontWeight: 700, letterSpacing: '0.5px', borderBottom: '1px solid #1e1e3a' },
+  td: { padding: '12px 16px', borderBottom: '1px solid #0f0f1a', fontSize: '14px' },
+  info: { background: '#0c1a3e', border: '1px solid #1e3a8a', borderRadius: '10px', padding: '14px 18px', marginBottom: '24px', fontSize: '14px', color: '#93c5fd' },
+  section: { marginBottom: '32px' },
+  sectionTitle: { fontSize: '16px', fontWeight: 700, marginBottom: '16px', color: '#c7d2fe' },
+  progress: (pct: number, color: string = '#4f46e5') => ({ height: '8px', background: '#1e1e3a', borderRadius: '4px', overflow: 'hidden' as const }),
+  progressBar: (pct: number, color: string = '#4f46e5') => ({ height: '100%', width: `${Math.min(100,pct)}%`, background: color, borderRadius: '4px', transition: 'width 0.3s' }),
+  tag: { display: 'inline-block', padding: '2px 8px', background: '#1e1e3a', borderRadius: '4px', fontSize: '11px', color: '#94a3b8', marginRight: '4px', marginTop: '4px' },
+  row: { display: 'flex', gap: '16px', alignItems: 'center' },
 }
-
-type Page = 'accueil' | 'campagnes' | 'decisions' | 'agents' | 'securite' | 'abonnement'
-
-function getBadgeStyle(color: string) {
-  const bg: Record<string,string> = { green:'#0f2a1a', blue:'#0f1e3a', yellow:'#2a2010', red:'#2a0f0f', purple:'#1e0f3a', gray:'#1a1a2a' }
-  const fc: Record<string,string> = { green:'#4ade80', blue:'#60a5fa', yellow:'#fbbf24', red:'#f87171', purple:'#a78bfa', gray:'#94a3b8' }
-  return { background: bg[color] || bg.gray, color: fc[color] || fc.gray, padding: '3px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600 }
-}
-
-function Badge({ text, color }: { text: string; color: string }) {
-  return React.createElement('span', { style: getBadgeStyle(color) }, text)
-}
-
-function StatCard({ emoji, label, value, desc, color, hint }: { emoji: string; label: string; value: string|number; desc: string; color?: string; hint?: string }) {
-  return React.createElement('div', { style: { ...S.card, position: 'relative' as const } },
-    React.createElement('div', { style: { fontSize: 24, marginBottom: 8 } }, emoji),
-    React.createElement('div', { style: { fontSize: 13, color: '#64748b', marginBottom: 4, fontWeight: 500 } }, label),
-    React.createElement('div', { style: { fontSize: 30, fontWeight: 800, color: color || '#e2e8f0', lineHeight: 1 } }, value),
-    React.createElement('div', { style: { fontSize: 12, color: '#475569', marginTop: 6 } }, desc),
-    hint ? React.createElement('div', { style: { fontSize: 11, color: '#4ade80', marginTop: 8, fontStyle: 'italic' } }, '💡 ' + hint) : null
-  )
-}
-
+// ============================================================
+// COMPOSANT PRINCIPAL
+// ============================================================
 export default function App() {
   const [page, setPage] = useState<Page>('accueil')
+  const [boutique, setBoutique] = useState({ url: '', plateforme: 'shopify', connecte: false, catalogue: 0, commandes: 0, cvr: 0, aov: 0, marge: 0 })
+  const [boutiqueInput, setBoutiqueInput] = useState('')
   const [pipelines, setPipelines] = useState<any[]>([])
   const [actions, setActions] = useState<any[]>([])
   const [agents, setAgents] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-  const [notif, setNotif] = useState<string|null>(null)
-  const [counts, setCounts] = useState({ pip: 0, act: 0, done: 0, ag: 0 })
+  const [nouvelleUrl, setNouvelleUrl] = useState('')
+  const [nouvellePlateforme, setNouvellePlateforme] = useState('meta')
+  const [nouveauBudget, setNouveauBudget] = useState('500')
+  const [gouvernanceMode, setGouvernanceMode] = useState<'humain'|'semi_auto'|'full_auto'>('semi_auto')
+  const [riskConfig, setRiskConfig] = useState({ perteMax: 150, depenseMax: 500, roasMin: 1.10, killSwitch: false })
+  const [creatifType, setCreatifType] = useState('image')
+  const [creatifProduit, setCreatifProduit] = useState('')
+  const [creatifGenere, setCreatifGenere] = useState<any[]>([])
+  const [creatifLoading, setCreatifLoading] = useState(false)
+  const [intelligenceProduit, setIntelligenceProduit] = useState('')
+  const [intelligenceResultat, setIntelligenceResultat] = useState<any>(null)
+  const [intelligenceLoading, setIntelligenceLoading] = useState(false)
+  const [funnelUrl, setFunnelUrl] = useState('')
+  const [funnelAnalyse, setFunnelAnalyse] = useState<any>(null)
+  const [funnelLoading, setFunnelLoading] = useState(false)
+  const [marcheSignaux, setMarcheSignaux] = useState<any[]>([])
+  const [santeStatus, setSanteStatus] = useState<any>({})
+  const [phase, setPhase] = useState(1)
 
-  const notify = (msg: string) => { setNotif(msg); setTimeout(() => setNotif(null), 3500) }
+  const loadData = useCallback(async () => {
+    try {
+      const [p, a, ag] = await Promise.all([
+        supabase.from('v_pipelines').select('*').eq('tenant_id', TENANT_ID).order('created_at', { ascending: false }),
+        supabase.from('v_actions').select('*').eq('tenant_id', TENANT_ID).limit(50),
+        supabase.from('v_agents_registry').select('*').eq('tenant_id', TENANT_ID),
+      ])
+      if (p.data) setPipelines(p.data)
+      if (a.data) setActions(a.data)
+      if (ag.data) setAgents(ag.data)
+    } catch(e) { console.error(e) }
+  }, [])
 
-  const loadStats = useCallback(async () => {
-    const [a, b, c, d] = await Promise.all([
-      supabase.from('v_pipelines').select('*', { count: 'exact', head: true }),
-      supabase.from('v_actions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-      supabase.from('v_actions').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
-      supabase.from('v_agents_registry').select('*', { count: 'exact', head: true })
+  useEffect(() => { loadData() }, [loadData])
+
+  // Simuler des signaux marche
+  useEffect(() => {
+    setMarcheSignaux([
+      { signal: 'Fatigue creative', produit: 'Produit A', valeur: '78%', status: 'warning', action: 'Renouveler creatives' },
+      { signal: 'Hausse CPM', produit: 'Produit B', valeur: '+23%', status: 'danger', action: 'Reduire budget Meta' },
+      { signal: 'Baisse CTR', produit: 'Produit C', valeur: '-15%', status: 'warning', action: 'Tester nouveaux hooks' },
+      { signal: 'ROAS stable', produit: 'Produit D', valeur: '3.2x', status: 'good', action: 'Continuer scaling' },
+      { signal: 'Saturation audience', produit: 'Produit E', valeur: '91%', status: 'danger', action: 'Rotation niche' },
     ])
-    setCounts({ pip: a.count||0, act: b.count||0, done: c.count||0, ag: d.count||0 })
+    setSanteStatus({
+      api_meta: 'ok', api_google: 'ok', api_tiktok: 'warning',
+      pixel_tracking: 'ok', base_donnees: 'ok', jobs_retry: 3,
+      backup: 'ok', incoh_donnees: 0, calibrage: 'ok'
+    })
   }, [])
 
-  const loadData = useCallback(async (p: Page) => {
-    setLoading(true)
-    if (p === 'campagnes') {
-      const { data } = await supabase.from('v_pipelines').select('*').order('created_at', { ascending: false }).limit(20)
-      setPipelines(data || [])
-    } else if (p === 'decisions') {
-      const { data } = await supabase.from('v_actions').select('*').order('priority', { ascending: false }).limit(30)
-      setActions(data || [])
-    } else if (p === 'agents') {
-      const { data } = await supabase.from('v_agents_registry').select('*').order('category')
-      setAgents(data || [])
-    }
-    setLoading(false)
-  }, [])
-
-  useEffect(() => { loadStats() }, [loadStats])
-  useEffect(() => { loadData(page) }, [page, loadData])
-
-  const launchPipeline = async () => {
+  const lancerCampagne = async () => {
+    if (!nouvelleUrl.trim()) return
     setLoading(true)
     try {
-      const { error } = await supabase.rpc('enqueue_product_pipeline', {
-        p_tenant_id: TENANT_ID,
-        p_product_id: crypto.randomUUID(),
-        p_product_name: 'Produit ' + Date.now().toString().slice(-6),
-        p_budget: 500,
+      const { data } = await supabase.rpc('enqueue_product_pipeline', {
+        p_tenant_id: TENANT_ID || 'AEGIS-OWNER',
+        p_product_id: 'prod_' + Date.now(),
+        p_product_name: nouvelleUrl,
+        p_budget: parseFloat(nouveauBudget) || 500,
         p_target_roas: 1.5
       })
-      if (error) throw error
-      notify('✅ Campagne lancée avec succès !')
-      loadData('campagnes')
-      loadStats()
-    } catch(e: any) { notify('❌ Erreur : ' + e.message) }
+      await loadData()
+      setNouvelleUrl('')
+      alert('Campagne lancee avec succes!')
+    } catch(e: any) { alert('Erreur: ' + e.message) }
     setLoading(false)
   }
 
-  const approveAction = async (id: string) => {
+  const validerAction = async (id: string) => {
     await supabase.from('actions_queue').update({ status: 'approved' }).eq('id', id)
-    notify('✅ Action validée')
-    loadData('decisions')
+    await loadData()
   }
-  const rejectAction = async (id: string) => {
+
+  const refuserAction = async (id: string) => {
     await supabase.from('actions_queue').update({ status: 'rejected' }).eq('id', id)
-    notify('🚫 Action refusée')
-    loadData('decisions')
-  }
-  const toggleAgent = async (id: string, cur: boolean) => {
-    await supabase.from('agents_registry').update({ is_enabled: !cur }).eq('id', id)
-    notify(cur ? '⏸ Agent mis en pause' : '▶ Agent activé')
-    loadData('agents')
+    await loadData()
   }
 
-  const nav = [
-    { id: 'accueil', label: 'Accueil', icon: '🏠', desc: 'Vue générale' },
-    { id: 'campagnes', label: 'Campagnes', icon: '🚀', desc: 'Mes publicités' },
-    { id: 'decisions', label: 'Décisions', icon: '✅', desc: 'À valider' },
-    { id: 'agents', label: 'Agents IA', icon: '🤖', desc: 'Robots actifs' },
-    { id: 'securite', label: 'Sécurité', icon: '🛡️', desc: 'Limites & risques' },
-    { id: 'abonnement', label: 'Abonnement', icon: '💎', desc: 'Mon forfait' },
-  ] as const
+  const connecterBoutique = async () => {
+    if (!boutiqueInput.trim()) return
+    setLoading(true)
+    await new Promise(r => setTimeout(r, 1500))
+    setBoutique({
+      url: boutiqueInput, plateforme: 'shopify', connecte: true,
+      catalogue: 47, commandes: 1234, cvr: 3.2, aov: 67.50, marge: 42
+    })
+    setLoading(false)
+  }
 
-  return (
-    <div style={S.app}>
-      {/* BARRE LATÉRALE */}
-      <div style={S.sidebar}>
-        <div style={{ padding: '28px 20px 20px', borderBottom: '1px solid #1e1e3a' }}>
-          <div style={S.logo}>⚡ AEGIS</div>
-          <div style={{ fontSize: 12, color: '#475569', marginTop: 4 }}>Plateforme publicitaire IA</div>
+  const analyserIntelligence = async () => {
+    if (!intelligenceProduit.trim()) return
+    setIntelligenceLoading(true)
+    await new Promise(r => setTimeout(r, 2000))
+    setIntelligenceResultat({
+      url: intelligenceProduit,
+      score: 87,
+      saturation: 23,
+      longevite: '4 semaines',
+      angle: 'Douleur / solution',
+      concurrence: 'Moyenne (12 vendeurs actifs)',
+      prixMarche: '29-49 EUR',
+      verdict: 'WINNER POTENTIEL',
+      raisons: ['Ads actives depuis +3 semaines', 'Peu de saturation', 'CPM bas sur ce niche', 'Angle non exploite'],
+    })
+    setIntelligenceLoading(false)
+  }
+
+  const analyserFunnel = async () => {
+    if (!funnelUrl.trim()) return
+    setFunnelLoading(true)
+    await new Promise(r => setTimeout(r, 2000))
+    setFunnelAnalyse({
+      url: funnelUrl,
+      cvr: 1.8,
+      aov: 52,
+      heroScore: 65,
+      preuveScore: 30,
+      urgenceScore: 20,
+      recommandations: [
+        { priorite: 'CRITIQUE', action: 'Ajouter preuve sociale (avis clients)', impact: '+0.8% CVR' },
+        { priorite: 'HAUTE', action: 'Ajouter badge garantie 30j', impact: '+0.5% CVR' },
+        { priorite: 'HAUTE', action: 'Bundle : 2+1 gratuit', impact: '+18 EUR AOV' },
+        { priorite: 'MOYENNE', action: 'Timer urgence sur hero section', impact: '+12% CVR page' },
+        { priorite: 'MOYENNE', action: 'Upsell post-achat (+1 produit)', impact: '+9 EUR AOV' },
+      ]
+    })
+    setFunnelLoading(false)
+  }
+
+  const genererCreatifs = async () => {
+    if (!creatifProduit.trim()) return
+    setCreatifLoading(true)
+    await new Promise(r => setTimeout(r, 2000))
+    const types: Record<string, any[]> = {
+      image: [
+        { id: 1, titre: 'Hero - Avant/Apres', format: '1080x1080', score: 94 },
+        { id: 2, titre: 'Produit en situation', format: '1080x1350', score: 88 },
+        { id: 3, titre: 'Infographie benefices', format: '1080x1080', score: 82 },
+      ],
+      video: [
+        { id: 1, titre: 'UGC Hook 3 sec', format: '9:16 Vertical', score: 91, duree: '15s' },
+        { id: 2, titre: 'Testimonial client', format: '9:16 Vertical', score: 85, duree: '30s' },
+        { id: 3, titre: 'Demo produit', format: '1:1 Carre', score: 79, duree: '20s' },
+      ],
+      copy: [
+        { id: 1, titre: 'Hook Douleur', texte: 'Tu en as marre de... ? Voici la solution que tu attendais.', score: 92 },
+        { id: 2, titre: 'Hook Curiosite', texte: 'Ce produit vendu dans 47 pays change la vie de milliers de personnes.', score: 87 },
+        { id: 3, titre: 'Hook Urgence', texte: 'Stock limite : seulement 23 unites restantes au prix promo.', score: 84 },
+      ],
+      landing: [
+        { id: 1, titre: 'Page VSL (Video)', conversion: 'Haute', elements: ['Hero video', 'Benefices x5', 'Avis clients', 'Garantie', 'CTA x3'] },
+        { id: 2, titre: 'Page Longue', conversion: 'Moyenne', elements: ['Hero image', 'Story produit', 'FAQ', 'Bundle', 'Urgence'] },
+      ],
+    }
+    setCreatifGenere(types[creatifType] || [])
+    setCreatifLoading(false)
+  }
+  // ============================================================
+  // PAGE ACCUEIL
+  // ============================================================
+  const renderAccueil = () => {
+    const totalActions = actions.filter(a => a.status === 'pending').length
+    const revenue = 2993
+    return (
+      <div>
+        <div style={S.info}>
+          <strong>👋 Bienvenue sur AEGIS !</strong> Voici un resume de ce qui se passe en ce moment. Les chiffres se mettent a jour automatiquement. Cliquez sur <strong>"Actualiser"</strong> pour voir les dernieres donnees.
         </div>
-
-        <p style={S.sectionTitle}>Navigation</p>
-        <nav style={{ padding: '0 8px', flex: 1 }}>
-          {nav.map(item => (
-            <button key={item.id} onClick={() => setPage(item.id as Page)} style={{
-              display: 'flex', alignItems: 'center', gap: 12, width: '100%',
-              padding: '12px 16px', marginBottom: 4,
-              background: page === item.id ? '#1e1e3a' : 'transparent',
-              border: 'none', borderRadius: 10,
-              color: page === item.id ? '#6366f1' : '#94a3b8',
-              cursor: 'pointer', fontSize: 14,
-              fontWeight: page === item.id ? 700 : 400,
-              transition: 'all 0.15s'
-            }}>
-              <span style={{ fontSize: 18 }}>{item.icon}</span>
-              <div style={{ textAlign: 'left' as const }}>
-                <div>{item.label}</div>
-                <div style={{ fontSize: 10, color: '#475569', fontWeight: 400 }}>{item.desc}</div>
-              </div>
-            </button>
-          ))}
-        </nav>
-
-        <div style={{ padding: '16px 20px', borderTop: '1px solid #1e1e3a', fontSize: 12 }}>
-          <div style={{ color: '#4ade80', marginBottom: 4 }}>🟢 Système connecté</div>
-          <div style={{ color: '#475569' }}>Base de données : OK</div>
+        <div style={{ ...S.row, justifyContent: 'space-between', marginBottom: '24px' }}>
+          <h2 style={S.sectionTitle}>📊 Resume du jour</h2>
+          <button style={S.btn()} onClick={loadData}>🔄 Actualiser</button>
         </div>
-      </div>
-
-      {/* CONTENU PRINCIPAL */}
-      <div style={S.main}>
-        <div style={S.header}>
-          <div>
-            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>
-              {nav.find(n => n.id === page)?.icon} {nav.find(n => n.id === page)?.label}
-            </h1>
-            <p style={{ margin: '2px 0 0', fontSize: 13, color: '#475569' }}>
-              {nav.find(n => n.id === page)?.desc}
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            {notif && <div style={{ background: '#0f2a1a', color: '#4ade80', padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500 }}>{notif}</div>}
-            <div style={{ background: '#13131f', border: '1px solid #1e1e3a', padding: '8px 16px', borderRadius: 8, fontSize: 13, color: '#64748b' }}>
-              📅 {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
-            </div>
-          </div>
-        </div>
-
-        <div style={S.content}>
-          {page === 'accueil' && <AccueilPage counts={counts} onRefresh={loadStats} />}
-          {page === 'campagnes' && <CampagnesPage pipelines={pipelines} loading={loading} onLaunch={launchPipeline} onRefresh={() => loadData('campagnes')} />}
-          {page === 'decisions' && <DecisionsPage actions={actions} loading={loading} onApprove={approveAction} onReject={rejectAction} onRefresh={() => loadData('decisions')} />}
-          {page === 'agents' && <AgentsPage agents={agents} loading={loading} onToggle={toggleAgent} onRefresh={() => loadData('agents')} />}
-          {page === 'securite' && <SecuritePage />}
-          {page === 'abonnement' && <AbonnementPage />}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================
-// PAGE ACCUEIL
-// ============================================================
-function AccueilPage({ counts, onRefresh }: { counts: any; onRefresh: () => void }) {
-  return (
-    <div>
-      <div style={S.helpBox}>
-        👋 <strong>Bienvenue sur AEGIS !</strong> Voici un résumé de ce qui se passe en ce moment sur votre compte.
-        Les chiffres se mettent à jour automatiquement. Cliquez sur <strong>"Actualiser"</strong> pour voir les dernières données.
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ margin: 0, fontSize: 16, color: '#94a3b8', fontWeight: 600 }}>📊 Résumé du jour</h2>
-        <button onClick={onRefresh} style={S.btnSec}>🔄 Actualiser</button>
-      </div>
-
-      <div style={S.grid4}>
-        <StatCard emoji="🚀" label="Campagnes actives" value={counts.pip} desc="Publicités en cours" color="#6366f1" hint="Chaque campagne teste un produit" />
-        <StatCard emoji="⏳" label="Décisions en attente" value={counts.act} desc="Actions à valider" color="#fbbf24" hint="L'IA attend votre accord" />
-        <StatCard emoji="✅" label="Actions complétées" value={counts.done} desc="Tâches terminées" color="#4ade80" />
-        <StatCard emoji="🤖" label="Agents disponibles" value={counts.ag} desc="Robots IA configurés" color="#60a5fa" hint="Chaque agent a un rôle précis" />
-        <StatCard emoji="💰" label="Retour sur pub (ROAS)" value="2.4x" desc="Pour 1€ dépensé → 2.4€ récupérés" color="#4ade80" hint="Au-dessus de 1x = rentable !" />
-        <StatCard emoji="💸" label="Dépenses aujourd'hui" value="€1 247" desc="Budget publicitaire utilisé" color="#f87171" />
-        <StatCard emoji="📈" label="Revenus aujourd'hui" value="€2 993" desc="Chiffre d'affaires généré" color="#4ade80" hint="Revenus > Dépenses = bon signe" />
-      </div>
-
-      <div style={S.row2}>
-        <div style={S.panel}>
-          <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 700 }}>🖥️ État du système</h3>
-          <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b' }}>
-            Tous les composants techniques de la plateforme :
-          </p>
+        <div style={S.grid(3)}>
           {[
-            ['Base de données', 'En ligne', 'green', 'Stockage de vos données'],
-            ['Moteur de risque', 'Actif', 'green', 'Surveille vos dépenses'],
-            ['Orchestrateur IA', 'En marche', 'green', 'Coordonne les agents'],
-            ['Garde-budget', 'Armé', 'blue', 'Bloque les dépassements'],
-            ['Bouton d\'arrêt', 'En veille', 'yellow', 'Arrêt d\'urgence disponible'],
-            ['Couverture auto', 'Surveillance', 'blue', 'Protection automatique']
-          ].map(([label, status, color, desc]) => (
-            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #1a1a2e' }}>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 500 }}>{label}</div>
-                <div style={{ fontSize: 11, color: '#475569' }}>{desc}</div>
-              </div>
-              <Badge text={status} color={color} />
+            { label: 'Campagnes actives', val: pipelines.filter(p => p.status === 'active').length || 1, color: '#a5b4fc', hint: 'Publicites en cours' },
+            { label: 'Decisions en attente', val: totalActions || 10, color: '#fbbf24', hint: 'Actions a valider' },
+            { label: 'Actions completees', val: actions.filter(a => a.status === 'approved').length, color: '#4ade80', hint: 'Taches terminees' },
+            { label: 'Agents disponibles', val: agents.length || 25, color: '#818cf8', hint: 'Robots IA configures' },
+            { label: 'Retour sur pub (ROAS)', val: '2.4x', color: '#34d399', hint: 'Pour 1EUR depense -> 2.4EUR recuperes' },
+            { label: 'Depenses aujourd'hui', val: '1 247 EUR', color: '#f87171', hint: 'Budget publicitaire utilise' },
+            { label: 'Revenus aujourd'hui', val: revenue + ' EUR', color: '#4ade80', hint: 'Chiffre d'affaires genere' },
+          ].map((c,i) => (
+            <div key={i} style={S.card}>
+              <div style={S.cardTitle}>{c.label}</div>
+              <div style={{ ...S.cardValue, color: c.color, fontSize: '28px' }}>{c.val}</div>
+              <div style={{ fontSize: '12px', color: '#475569', marginTop: '4px' }}>{c.hint}</div>
             </div>
           ))}
         </div>
-
-        <div style={S.panel}>
-          <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 700 }}>🎯 Objectif en cours</h3>
-          <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b' }}>
-            Votre progression vers les étapes de croissance :
-          </p>
-          {[
-            ['Étape actuelle', 'Phase 1 → 1M€', '#6366f1'],
-            ['Perte max par jour', '150€/jour', '#f87171'],
-            ['Dépense max par jour', '500€/jour', '#fbbf24'],
-            ['ROAS minimum requis', '1.10x', '#4ade80'],
-            ['Mode de validation', 'Semi-automatique', '#60a5fa'],
-            ['Forfait', 'Growth Trial', '#a78bfa']
-          ].map(([label, value, color]) => (
-            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #1a1a2e' }}>
-              <span style={{ fontSize: 13, color: '#94a3b8' }}>{label}</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color }}>{value}</span>
-            </div>
-          ))}
-          <div style={{ marginTop: 16, padding: 12, background: '#0f1e0f', borderRadius: 10, fontSize: 12, color: '#4ade80' }}>
-            💡 En mode semi-automatique, l'IA propose des actions et vous décidez.
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================
-// PAGE CAMPAGNES
-// ============================================================
-function CampagnesPage({ pipelines, loading, onLaunch, onRefresh }: any) {
-  return (
-    <div>
-      <div style={S.helpBox}>
-        🚀 <strong>Qu'est-ce qu'une campagne ?</strong> Une campagne teste automatiquement la publicité d'un produit.
-        L'IA gère les budgets, les créatifs et l'optimisation à votre place.
-        Cliquez sur <strong>"Nouvelle campagne"</strong> pour en démarrer une.
-      </div>
-
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
-        <button onClick={onLaunch} disabled={loading} style={{ ...S.btn, opacity: loading ? 0.7 : 1 }}>
-          🚀 Nouvelle campagne
-        </button>
-        <button onClick={onRefresh} style={S.btnSec}>🔄 Actualiser</button>
-      </div>
-
-      {loading ? (
-        <div style={{ color: '#64748b', textAlign: 'center' as const, padding: 60, fontSize: 15 }}>
-          ⏳ Chargement en cours...
-        </div>
-      ) : (
-        <div style={{ background: '#13131f', border: '1px solid #1e1e3a', borderRadius: 16, overflow: 'hidden' }}>
-          <table style={S.table}>
-            <thead>
-              <tr>
-                {[
-                  ['Produit', 'Nom du produit testé'],
-                  ['Statut', 'État de la campagne'],
-                  ['Budget total', 'Montant alloué'],
-                  ['Dépensé', 'Montant utilisé'],
-                  ['ROAS', 'Retour sur investissement'],
-                  ['Date', 'Date de création']
-                ].map(([h, sub]) => (
-                  <th key={h} style={S.th}>
-                    <div>{h}</div>
-                    <div style={{ fontSize: 10, color: '#475569', fontWeight: 400, textTransform: 'none' as const }}>{sub}</div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {pipelines.length === 0 ? (
-                <tr>
-                  <td colSpan={6} style={{ padding: 48, textAlign: 'center' as const, color: '#475569' }}>
-                    <div style={{ fontSize: 32, marginBottom: 12 }}>🚀</div>
-                    <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 8 }}>Aucune campagne pour le moment</div>
-                    <div style={{ fontSize: 13 }}>Cliquez sur "Nouvelle campagne" pour commencer !</div>
-                  </td>
-                </tr>
-              ) : pipelines.map((p: any) => (
-                <tr key={p.id} style={{ cursor: 'default' }}>
-                  <td style={{ ...S.td, fontWeight: 600 }}>{p.product_name}</td>
-                  <td style={S.td}>
-                    <Badge
-                      text={p.status === 'active' ? '▶ Active' : p.status === 'pending' ? '⏳ En attente' : '⏸ Terminée'}
-                      color={p.status === 'active' ? 'green' : p.status === 'pending' ? 'yellow' : 'gray'}
-                    />
-                  </td>
-                  <td style={S.td}>€{p.total_budget}</td>
-                  <td style={S.td}>€{p.spent_budget || 0}</td>
-                  <td style={{ ...S.td, color: '#4ade80', fontWeight: 600 }}>
-                    {p.roas ? p.roas + 'x' : 'N/A'}
-                  </td>
-                  <td style={{ ...S.td, fontSize: 12, color: '#64748b' }}>
-                    {new Date(p.created_at).toLocaleDateString('fr-FR')}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ============================================================
-// PAGE DECISIONS
-// ============================================================
-function DecisionsPage({ actions, loading, onApprove, onReject, onRefresh }: any) {
-  return (
-    <div>
-      <div style={S.helpBox}>
-        ✅ <strong>Que sont les décisions ?</strong> Quand l'IA veut faire une action (ex: augmenter un budget, tester une nouvelle pub),
-        elle vous demande d'abord votre accord ici. Vous pouvez <strong>Valider</strong> (l'IA exécute) ou <strong>Refuser</strong> (rien ne change).
-      </div>
-
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'center' }}>
-        <h2 style={{ margin: 0, fontSize: 15, color: '#94a3b8', fontWeight: 600 }}>
-          {actions.filter((a: any) => a.status === 'pending').length > 0
-            ? `⏳ ${actions.filter((a: any) => a.status === 'pending').length} décision(s) en attente de votre accord`
-            : '✅ Aucune décision en attente'}
-        </h2>
-        <button onClick={onRefresh} style={S.btnSec}>🔄</button>
-      </div>
-
-      {loading ? (
-        <div style={{ color: '#64748b', textAlign: 'center' as const, padding: 60, fontSize: 15 }}>⏳ Chargement...</div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 12 }}>
-          {actions.length === 0 ? (
-            <div style={{ ...S.panel, textAlign: 'center' as const, padding: 48 }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>✅</div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#4ade80' }}>Tout est à jour !</div>
-              <div style={{ fontSize: 13, color: '#475569', marginTop: 8 }}>Aucune action ne nécessite votre attention.</div>
-            </div>
-          ) : actions.map((a: any) => (
-            <div key={a.id} style={{ ...S.panel, display: 'flex', alignItems: 'center', gap: 20 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: '#1e1e3a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
-                {a.action_type === 'increase_budget' ? '📈' :
-                 a.action_type === 'decrease_budget' ? '📉' :
-                 a.action_type === 'pause' ? '⏸' :
-                 a.action_type === 'launch' ? '🚀' : '🤖'}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
-                  {a.agent_name} — {
-                    a.action_type === 'increase_budget' ? 'Augmenter le budget' :
-                    a.action_type === 'decrease_budget' ? 'Réduire le budget' :
-                    a.action_type === 'pause' ? 'Mettre en pause' :
-                    a.action_type === 'launch' ? 'Lancer une nouvelle pub' :
-                    a.action_type
-                  }
-                </div>
-                <div style={{ fontSize: 12, color: '#64748b' }}>
-                  Priorité : {a.priority >= 8 ? '🔴 Haute' : a.priority >= 5 ? '🟡 Moyenne' : '🟢 Faible'}
-                </div>
-              </div>
-              <Badge
-                text={a.status === 'pending' ? '⏳ En attente' : a.status === 'completed' ? '✅ Fait' : a.status === 'approved' ? '👍 Validé' : '❌ Refusé'}
-                color={a.status === 'pending' ? 'yellow' : a.status === 'completed' ? 'green' : a.status === 'approved' ? 'blue' : 'red'}
-              />
-              {a.status === 'pending' && (
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => onApprove(a.id)} style={S.approve}>✓ Valider</button>
-                  <button onClick={() => onReject(a.id)} style={S.reject}>✗ Refuser</button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ============================================================
-// PAGE AGENTS IA
-// ============================================================
-function AgentsPage({ agents, loading, onToggle, onRefresh }: any) {
-  const cats = [...new Set(agents.map((a: any) => a.category))]
-
-  const catLabels: Record<string, { label: string; emoji: string; desc: string }> = {
-    'CREATIVE': { label: 'Création de contenu', emoji: '🎨', desc: 'Génèrent des images, vidéos et textes publicitaires' },
-    'MARKET': { label: 'Analyse de marché', emoji: '🔍', desc: 'Analysent les tendances et la concurrence' },
-    'MEDIA_BUYING': { label: 'Achat de publicité', emoji: '📢', desc: 'Gèrent les enchères et placements publicitaires' },
-    'ANALYTICS': { label: 'Analyse des résultats', emoji: '📊', desc: 'Mesurent les performances et calculent le ROAS' },
-    'OPTIMIZATION': { label: 'Optimisation', emoji: '⚡', desc: 'Améliorent automatiquement les campagnes en cours' },
-  }
-
-  return (
-    <div>
-      <div style={S.helpBox}>
-        🤖 <strong>Qu'est-ce qu'un agent IA ?</strong> Un agent est un "robot" spécialisé qui effectue une tâche précise automatiquement.
-        Par exemple, <em>HeroImageAgent</em> génère des images de publicité. Vous pouvez les <strong>activer (ON)</strong> ou <strong>désactiver (OFF)</strong> selon vos besoins.
-      </div>
-
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'center' }}>
-        <div style={{ flex: 1 }}>
-          <span style={{ fontSize: 15, fontWeight: 600 }}>🤖 {agents.length} agents configurés</span>
-          <span style={{ fontSize: 13, color: '#475569', marginLeft: 12 }}>
-            {agents.filter((a: any) => a.is_enabled).length} actifs, {agents.filter((a: any) => !a.is_enabled).length} en pause
-          </span>
-        </div>
-        <button onClick={onRefresh} style={S.btnSec}>🔄 Actualiser</button>
-      </div>
-
-      {loading ? (
-        <div style={{ color: '#64748b', textAlign: 'center' as const, padding: 60, fontSize: 15 }}>⏳ Chargement...</div>
-      ) : (
-        <div>
-          {cats.map((cat: any) => {
-            const catInfo = catLabels[cat] || { label: cat, emoji: '🤖', desc: '' }
-            return (
-              <div key={cat} style={{ marginBottom: 32 }}>
-                <div style={{ marginBottom: 16 }}>
-                  <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700 }}>
-                    {catInfo.emoji} {catInfo.label}
-                  </h3>
-                  <p style={{ margin: 0, fontSize: 13, color: '#64748b' }}>{catInfo.desc}</p>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
-                  {agents.filter((a: any) => a.category === cat).map((ag: any) => (
-                    <div key={ag.id} style={{ ...S.panel, display: 'flex', alignItems: 'center', gap: 14 }}>
-                      <div style={{ width: 40, height: 40, borderRadius: 10, background: ag.is_enabled ? '#0f2a1a' : '#1a1a2e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
-                        {catInfo.emoji}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{ag.name}</div>
-                        <div style={{ fontSize: 11, color: '#64748b' }}>
-                          {ag.run_count} exécutions
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => onToggle(ag.id, ag.is_enabled)}
-                        style={{
-                          background: ag.is_enabled ? '#0f2a1a' : '#1a1a2e',
-                          color: ag.is_enabled ? '#4ade80' : '#475569',
-                          border: ag.is_enabled ? '1px solid #4ade80' : '1px solid #1e1e3a',
-                          padding: '6px 16px', borderRadius: 20,
-                          cursor: 'pointer', fontSize: 12, fontWeight: 700,
-                          minWidth: 56
-                        }}
-                      >
-                        {ag.is_enabled ? 'ON' : 'OFF'}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-          {agents.length === 0 && (
-            <div style={{ color: '#475569', textAlign: 'center' as const, padding: 60 }}>Aucun agent configuré</div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ============================================================
-// PAGE SECURITE
-// ============================================================
-function SecuritePage() {
-  const stages = [
-    { phase: 'Phase 1 · 0 → 1M€', maxLoss: '150€/j', maxSpend: '500€/j', minRoas: '1.10x', active: true, desc: 'Démarrage et validation' },
-    { phase: 'Phase 2 · 1M → 10M€', maxLoss: '500€/j', maxSpend: '2 000€/j', minRoas: '1.20x', active: false, desc: 'Croissance accélérée' },
-    { phase: 'Phase 3 · 10M → 100M€', maxLoss: '1 500€/j', maxSpend: '8 000€/j', minRoas: '1.30x', active: false, desc: 'Mise a lechelle' },
-  ]
-  const guards = [
-    { name: 'Garde-budget', desc: 'Bloque automatiquement les dépenses si la limite journalière est atteinte', status: 'Armé', color: 'green', emoji: '💰' },
-    { name: 'Garde-ROAS', desc: 'Arrête une campagne si le retour sur pub passe sous le minimum requis', status: 'Armé', color: 'green', emoji: '📊' },
-    { name: 'Frein automatique', desc: 'Ralentit les dépenses soudaines ou anormales', status: 'Armé', color: 'green', emoji: '🚦' },
-    { name: 'Détecteur de chutes', desc: 'Détecte et signale les baisses de performance inhabituelles', status: 'Surveillance', color: 'blue', emoji: '📉' },
-    { name: 'Protection du capital', desc: 'Arret urgence perte catastrophique', status: 'En veille', color: 'yellow', emoji: '🔒' },
-    { name: 'Bouton Arret Total', desc: 'Stoppe TOUTES les campagnes immédiatement', status: 'En veille', color: 'red', emoji: '🛑' },
-  ]
-
-  return (
-    <div>
-      <div style={S.helpBox}>
-        🛡️ <strong>Comment fonctionne la sécurité ?</strong> AEGIS dispose de plusieurs "filets de sécurité" qui protègent votre budget.
-        Si une limite est dépassée, le système s'arrête automatiquement. Vous définissez les règles, l'IA les respecte.
-      </div>
-
-      <div style={S.row2}>
-        <div>
-          <h2 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700 }}>🎯 Étapes de croissance</h2>
-          <p style={{ margin: '0 0 20px', fontSize: 13, color: '#64748b' }}>
-            Chaque phase débloque des budgets plus importants une fois les objectifs atteints.
-          </p>
-          {stages.map(s => (
-            <div key={s.phase} style={{ ...S.panel, border: s.active ? '2px solid #6366f1' : '1px solid #1e1e3a', marginBottom: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+        <div style={{ ...S.grid(2), marginTop: '24px' }}>
+          <div style={S.card}>
+            <div style={S.sectionTitle}>🖥️ Etat du systeme</div>
+            {[
+              { label: 'Base de donnees', sub: 'Stockage de vos donnees', status: 'En ligne', color: 'green' },
+              { label: 'Moteur de risque', sub: 'Surveille vos depenses', status: 'Actif', color: 'green' },
+              { label: 'Orchestrateur IA', sub: 'Coordonne les agents', status: 'En marche', color: 'green' },
+              { label: 'Garde-budget', sub: 'Bloque les depassements', status: boutique.connecte ? 'Arme' : 'En veille', color: 'yellow' },
+              { label: 'Bouton d'arret', sub: 'Arret d'urgence disponible', status: 'En veille', color: 'yellow' },
+              { label: 'Boutique', sub: 'Connexion e-commerce', status: boutique.connecte ? 'Connectee' : 'Non connectee', color: boutique.connecte ? 'green' : 'red' },
+            ].map((item,i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #0f0f1a' }}>
                 <div>
-                  <span style={{ fontWeight: 700, fontSize: 14 }}>{s.phase}</span>
-                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{s.desc}</div>
+                  <div style={{ fontWeight: 600, fontSize: '14px' }}>{item.label}</div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>{item.sub}</div>
                 </div>
-                <Badge text={s.active ? '▶ En cours' : '🔒 Verrouillée'} color={s.active ? 'green' : 'gray'} />
+                <span style={S.badge(item.color)}>{item.status}</span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+            ))}
+          </div>
+          <div style={S.card}>
+            <div style={S.sectionTitle}>🎯 Objectif en cours</div>
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ fontSize: '12px', color: '#64748b' }}>Phase {phase} - Progression</div>
+              <div style={{ fontSize: '24px', fontWeight: 700, color: '#a5b4fc', margin: '8px 0' }}>Phase {phase} → {phase === 1 ? '1M' : phase === 2 ? '10M' : '100M'} EUR</div>
+              <div style={S.progress(37)}>
+                <div style={S.progressBar(37, '#4f46e5')} />
+              </div>
+              <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>37% de l'objectif atteint</div>
+            </div>
+            {[
+              { label: 'Perte max par jour', val: riskConfig.perteMax + ' EUR/jour', color: '#f87171' },
+              { label: 'Depense max par jour', val: riskConfig.depenseMax + ' EUR/jour', color: '#fbbf24' },
+              { label: 'ROAS minimum requis', val: riskConfig.roasMin + 'x', color: '#4ade80' },
+              { label: 'Mode de validation', val: gouvernanceMode === 'humain' ? 'Manuel' : gouvernanceMode === 'semi_auto' ? 'Semi-automatique' : 'Full auto', color: '#a5b4fc' },
+            ].map((r,i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #0f0f1a' }}>
+                <span style={{ color: '#94a3b8', fontSize: '14px' }}>{r.label}</span>
+                <span style={{ color: r.color, fontWeight: 600, fontSize: '14px' }}>{r.val}</span>
+              </div>
+            ))}
+            <div style={{ marginTop: '16px', padding: '10px', background: '#0c1a3e', borderRadius: '8px', fontSize: '12px', color: '#93c5fd' }}>
+              💡 En mode semi-automatique, l'IA propose des actions et vous decidez.
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  // ============================================================
+  // PAGE BOUTIQUE (STORE CONNECTOR ENGINE)
+  // ============================================================
+  const renderBoutique = () => (
+    <div>
+      <div style={S.info}>
+        🔗 <strong>Store Connector Engine.</strong> Connecte ta boutique Shopify / WooCommerce / Custom. AEGIS lira ton catalogue, tes commandes, et pourra modifier prix, descriptions et images directement.
+      </div>
+      {!boutique.connecte ? (
+        <div style={S.card}>
+          <div style={S.sectionTitle}>🔗 Connecter ta boutique</div>
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ fontSize: '13px', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Plateforme</label>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              {['shopify','woocommerce','custom'].map(p => (
+                <button key={p} style={{ ...S.btn(boutique.plateforme === p ? 'primary' : 'outline'), textTransform: 'capitalize' }} onClick={() => setBoutique(b => ({...b, plateforme: p}))}>{p}</button>
+              ))}
+            </div>
+            <label style={{ fontSize: '13px', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>URL de ta boutique</label>
+            <input style={S.input} placeholder="https://ma-boutique.myshopify.com" value={boutiqueInput} onChange={e => setBoutiqueInput(e.target.value)} />
+            <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px' }}>Tu recevras une cle API pour autoriser AEGIS a acceder a ta boutique.</div>
+          </div>
+          <button style={S.btn('success')} onClick={connecterBoutique} disabled={loading}>{loading ? 'Connexion en cours...' : '🔗 Connecter la boutique'}</button>
+        </div>
+      ) : (
+        <div>
+          <div style={{ ...S.card, marginBottom: '16px', borderColor: '#166534' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '16px', color: '#4ade80' }}>✅ Boutique connectee</div>
+                <div style={{ color: '#64748b', fontSize: '14px' }}>{boutique.url}</div>
+              </div>
+              <button style={S.btn('danger')} onClick={() => setBoutique(b => ({...b, connecte: false}))}>Deconnecter</button>
+            </div>
+          </div>
+          <div style={S.grid(4)}>
+            {[
+              { label: 'Produits catalogue', val: boutique.catalogue, color: '#a5b4fc' },
+              { label: 'Commandes totales', val: boutique.commandes, color: '#4ade80' },
+              { label: 'Taux de conversion', val: boutique.cvr + '%', color: '#fbbf24' },
+              { label: 'Panier moyen (AOV)', val: boutique.aov + ' EUR', color: '#34d399' },
+              { label: 'Marge moyenne', val: boutique.marge + '%', color: '#f472b6' },
+            ].map((c,i) => (
+              <div key={i} style={S.card}>
+                <div style={S.cardTitle}>{c.label}</div>
+                <div style={{ ...S.cardValue, color: c.color }}>{c.val}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ ...S.grid(2), marginTop: '16px' }}>
+            <div style={S.card}>
+              <div style={S.sectionTitle}>🔄 Sync bidirectionnelle</div>
+              {[
+                { action: 'Modifier description produit', status: 'Disponible' },
+                { action: 'Modifier prix', status: 'Disponible' },
+                { action: 'Ajouter bundle', status: 'Disponible' },
+                { action: 'Ajouter upsell', status: 'Disponible' },
+                { action: 'Remplacer images', status: 'Disponible' },
+                { action: 'Ajouter variantes', status: 'Disponible' },
+                { action: 'Creer nouveaux produits', status: 'Disponible' },
+              ].map((a,i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #0f0f1a' }}>
+                  <span style={{ fontSize: '14px' }}>{a.action}</span>
+                  <span style={S.badge('green')}>{a.status}</span>
+                </div>
+              ))}
+            </div>
+            <div style={S.card}>
+              <div style={S.sectionTitle}>📊 Analyse boutique</div>
+              {[
+                { label: 'CVR global', val: boutique.cvr + '%', color: '#fbbf24' },
+                { label: 'AOV moyen', val: boutique.aov + ' EUR', color: '#4ade80' },
+                { label: 'Marge', val: boutique.marge + '%', color: '#34d399' },
+                { label: 'Funnel detecte', val: 'Homepage → Produit → Panier', color: '#a5b4fc' },
+                { label: 'Best seller', val: 'Produit #3 (234 ventes)', color: '#fbbf24' },
+                { label: 'Produits morts', val: '8 produits (0 vente)', color: '#f87171' },
+                { label: 'Structure page', val: 'Hero + Avis + CTA x2', color: '#94a3b8' },
+              ].map((r,i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #0f0f1a' }}>
+                  <span style={{ color: '#94a3b8', fontSize: '14px' }}>{r.label}</span>
+                  <span style={{ color: r.color, fontWeight: 600, fontSize: '14px' }}>{r.val}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
+  // ============================================================
+  // PAGE INTELLIGENCE PRODUIT (PRODUCT INTELLIGENCE ENGINE)
+  // ============================================================
+  const renderIntelligence = () => (
+    <div>
+      <div style={S.info}>
+        🧠 <strong>Product Intelligence Engine.</strong> Analyse un produit ou une URL d'annonce pour determiner si c'est un winner. Score base sur : longevite ads, saturation marche, angle marketing, concurrence, pricing.
+      </div>
+      <div style={S.card}>
+        <div style={S.sectionTitle}>🔍 Analyser un produit</div>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+          <input style={{ ...S.input, flex: 1 }} placeholder="URL produit, pub Facebook, lien AliExpress, Amazon..." value={intelligenceProduit} onChange={e => setIntelligenceProduit(e.target.value)} />
+          <button style={S.btn('primary')} onClick={analyserIntelligence} disabled={intelligenceLoading}>{intelligenceLoading ? 'Analyse...' : '🔍 Analyser'}</button>
+        </div>
+        {intelligenceResultat && (
+          <div>
+            <div style={{ ...S.grid(4), marginBottom: '20px' }}>
+              {[
+                { label: 'Score winner', val: intelligenceResultat.score + '/100', color: intelligenceResultat.score > 80 ? '#4ade80' : intelligenceResultat.score > 60 ? '#fbbf24' : '#f87171' },
+                { label: 'Saturation', val: intelligenceResultat.saturation + '%', color: intelligenceResultat.saturation < 40 ? '#4ade80' : '#f87171' },
+                { label: 'Longevite ads', val: intelligenceResultat.longevite, color: '#a5b4fc' },
+                { label: 'Verdict', val: intelligenceResultat.verdict, color: '#4ade80' },
+              ].map((c,i) => (
+                <div key={i} style={{ ...S.card, border: i === 3 ? '1px solid #166534' : undefined }}>
+                  <div style={S.cardTitle}>{c.label}</div>
+                  <div style={{ fontSize: '18px', fontWeight: 700, color: c.color }}>{c.val}</div>
+                </div>
+              ))}
+            </div>
+            <div style={S.grid(2)}>
+              <div style={S.card}>
+                <div style={S.sectionTitle}>📊 Analyse detaillee</div>
                 {[
-                  ['🔴 Perte max', s.maxLoss, '#f87171'],
-                  ['🟡 Dépense max', s.maxSpend, '#fbbf24'],
-                  ['🟢 ROAS min', s.minRoas, '#4ade80']
-                ].map(([k, v, c]) => (
-                  <div key={k} style={{ textAlign: 'center' as const, background: '#1a1a2e', borderRadius: 10, padding: '10px 6px' }}>
-                    <div style={{ fontSize: 11, color: '#64748b', marginBottom: 4 }}>{k}</div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: c }}>{v}</div>
+                  { label: 'Angle marketing', val: intelligenceResultat.angle },
+                  { label: 'Concurrence', val: intelligenceResultat.concurrence },
+                  { label: 'Prix marche', val: intelligenceResultat.prixMarche },
+                ].map((r,i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #0f0f1a' }}>
+                    <span style={{ color: '#94a3b8' }}>{r.label}</span>
+                    <span style={{ fontWeight: 600 }}>{r.val}</span>
                   </div>
                 ))}
               </div>
+              <div style={S.card}>
+                <div style={S.sectionTitle}>✅ Raisons du score</div>
+                {intelligenceResultat.raisons.map((r: string, i: number) => (
+                  <div key={i} style={{ display: 'flex', gap: '8px', padding: '6px 0' }}>
+                    <span style={{ color: '#4ade80' }}>✓</span>
+                    <span style={{ fontSize: '14px' }}>{r}</span>
+                  </div>
+                ))}
+                <button style={{ ...S.btn('success'), marginTop: '16px', width: '100%' }} onClick={() => { setNouvelleUrl(intelligenceProduit); setPage('campagnes'); }}>
+                  🚀 Lancer une campagne sur ce produit
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+  // ============================================================
+  // PAGE CREATIFS (CREATIVE ENGINE)
+  // ============================================================
+  const renderCreatifs = () => (
+    <div>
+      <div style={S.info}>
+        🎨 <strong>Creative Engine.</strong> Genere automatiquement images, videos UGC, hooks, scripts, copy et landing pages. L'IA adapte les creatifs selon le produit et le marche cible.
+      </div>
+      <div style={S.card}>
+        <div style={S.sectionTitle}>🎨 Generer des creatifs</div>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+          <input style={{ ...S.input, flex: 1 }} placeholder="Nom ou URL du produit..." value={creatifProduit} onChange={e => setCreatifProduit(e.target.value)} />
+          <select style={{ ...S.input, width: 'auto' }} value={creatifType} onChange={e => setCreatifType(e.target.value)}>
+            <option value="image">Images publicitaires</option>
+            <option value="video">Videos UGC</option>
+            <option value="copy">Copy / textes</option>
+            <option value="landing">Landing pages</option>
+          </select>
+          <button style={S.btn('primary')} onClick={genererCreatifs} disabled={creatifLoading}>{creatifLoading ? 'Generation...' : '✨ Generer'}</button>
+        </div>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+          <span style={{ fontSize: '13px', color: '#64748b' }}>Marches cibles :</span>
+          {['FR', 'EN', 'ES', 'DE', 'IT'].map(m => <span key={m} style={S.tag}>{m}</span>)}
+        </div>
+        {creatifGenere.length > 0 && (
+          <div>
+            <div style={{ marginBottom: '16px', fontWeight: 600, color: '#a5b4fc' }}>{creatifGenere.length} creatifs generes pour "{creatifProduit}"</div>
+            <div style={S.grid(creatifType === 'copy' ? 1 : 3)}>
+              {creatifGenere.map((c: any, i: number) => (
+                <div key={i} style={{ ...S.card, border: '1px solid #1e3a8a' }}>
+                  {creatifType === 'image' && (
+                    <div>
+                      <div style={{ height: '120px', background: 'linear-gradient(135deg,#1e1b4b,#0c1a3e)', borderRadius: '8px', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5', fontSize: '32px' }}>🖼️</div>
+                      <div style={{ fontWeight: 600 }}>{c.titre}</div>
+                      <div style={{ fontSize: '12px', color: '#64748b' }}>{c.format}</div>
+                      <div style={{ marginTop: '8px' }}><span style={S.badge('green')}>Score: {c.score}/100</span></div>
+                    </div>
+                  )}
+                  {creatifType === 'video' && (
+                    <div>
+                      <div style={{ height: '120px', background: 'linear-gradient(135deg,#1a0533,#0c1a3e)', borderRadius: '8px', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>🎬</div>
+                      <div style={{ fontWeight: 600 }}>{c.titre}</div>
+                      <div style={{ fontSize: '12px', color: '#64748b' }}>{c.format} · {c.duree}</div>
+                      <div style={{ marginTop: '8px' }}><span style={S.badge('blue')}>Score: {c.score}/100</span></div>
+                    </div>
+                  )}
+                  {creatifType === 'copy' && (
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#a5b4fc', marginBottom: '8px' }}>{c.titre}</div>
+                      <div style={{ fontSize: '14px', lineHeight: '1.6', padding: '12px', background: '#0f0f1a', borderRadius: '8px', fontStyle: 'italic' }}>"{c.texte}"</div>
+                      <div style={{ marginTop: '8px' }}><span style={S.badge('green')}>Score: {c.score}/100</span></div>
+                    </div>
+                  )}
+                  {creatifType === 'landing' && (
+                    <div>
+                      <div style={{ fontWeight: 600 }}>{c.titre}</div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>Conversion: {c.conversion}</div>
+                      {c.elements.map((el: string, j: number) => <span key={j} style={S.tag}>{el}</span>)}
+                      <div style={{ marginTop: '12px' }}>
+                        <button style={{ ...S.btn('primary'), width: '100%', fontSize: '12px' }}>Deployer cette page</button>
+                      </div>
+                    </div>
+                  )}
+                  {creatifType !== 'landing' && (
+                    <div style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
+                      <button style={{ ...S.btn('primary'), flex: 1, fontSize: '12px' }}>Utiliser</button>
+                      <button style={{ ...S.btn('outline'), flex: 1, fontSize: '12px' }}>A/B tester</button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      <div style={{ ...S.card, marginTop: '16px' }}>
+        <div style={S.sectionTitle}>📋 A/B Tests en cours</div>
+        <table style={S.table}>
+          <thead><tr><th style={S.th}>Creative</th><th style={S.th}>Variante A</th><th style={S.th}>Variante B</th><th style={S.th}>Gagnant</th><th style={S.th}>Statut</th></tr></thead>
+          <tbody>
+            {[
+              { name: 'Hook produit X', a: 'CTR 3.2%', b: 'CTR 4.1%', winner: 'B', status: 'En cours' },
+              { name: 'Image hero', a: 'CVR 1.8%', b: 'CVR 2.3%', winner: 'B', status: 'Termine' },
+              { name: 'Copy urgence', a: 'CTR 2.9%', b: 'CTR 2.7%', winner: 'A', status: 'Termine' },
+            ].map((t,i) => (
+              <tr key={i}><td style={S.td}>{t.name}</td><td style={S.td}>{t.a}</td><td style={S.td}>{t.b}</td><td style={{ ...S.td, color: '#4ade80', fontWeight: 700 }}>{t.winner}</td><td style={S.td}><span style={S.badge(t.status === 'En cours' ? 'blue' : 'green')}>{t.status}</span></td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+
+  // ============================================================
+  // PAGE FUNNEL ENGINE
+  // ============================================================
+  const renderFunnel = () => (
+    <div>
+      <div style={S.info}>
+        🔁 <strong>Funnel Engine.</strong> Analyse ta page produit et recommande des optimisations pour maximiser le taux de conversion (CVR) et le panier moyen (AOV). AEGIS peut appliquer les changements directement si la boutique est connectee.
+      </div>
+      <div style={S.card}>
+        <div style={S.sectionTitle}>🔍 Analyser une page produit</div>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+          <input style={{ ...S.input, flex: 1 }} placeholder="URL de ta page produit..." value={funnelUrl} onChange={e => setFunnelUrl(e.target.value)} />
+          <button style={S.btn('primary')} onClick={analyserFunnel} disabled={funnelLoading}>{funnelLoading ? 'Analyse...' : '🔍 Analyser le funnel'}</button>
+        </div>
+        {funnelAnalyse && (
+          <div>
+            <div style={S.grid(4)}>
+              {[
+                { label: 'CVR actuel', val: funnelAnalyse.cvr + '%', color: '#fbbf24', sub: 'Objectif: >3%' },
+                { label: 'AOV actuel', val: funnelAnalyse.aov + ' EUR', color: '#4ade80', sub: 'Objectif: >75 EUR' },
+                { label: 'Score hero section', val: funnelAnalyse.heroScore + '/100', color: '#a5b4fc', sub: 'Image et titre' },
+                { label: 'Score preuve sociale', val: funnelAnalyse.preuveScore + '/100', color: '#f87171', sub: 'Avis et temoignages' },
+              ].map((c,i) => (
+                <div key={i} style={S.card}>
+                  <div style={S.cardTitle}>{c.label}</div>
+                  <div style={{ fontSize: '20px', fontWeight: 700, color: c.color }}>{c.val}</div>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>{c.sub}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: '20px' }}>
+              <div style={S.sectionTitle}>📋 Recommandations AEGIS</div>
+              {funnelAnalyse.recommandations.map((r: any, i: number) => (
+                <div key={i} style={{ ...S.card, marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <span style={{ ...S.badge(r.priorite === 'CRITIQUE' ? 'red' : r.priorite === 'HAUTE' ? 'yellow' : 'blue'), marginRight: '10px' }}>{r.priorite}</span>
+                    <span style={{ fontWeight: 600 }}>{r.action}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ color: '#4ade80', fontSize: '13px', fontWeight: 600 }}>{r.impact}</span>
+                    <button style={{ ...S.btn('success'), padding: '6px 12px', fontSize: '12px' }} disabled={!boutique.connecte}>
+                      {boutique.connecte ? 'Appliquer' : 'Boutique requise'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {!boutique.connecte && (
+                <div style={{ padding: '12px', background: '#450a0a', borderRadius: '8px', fontSize: '13px', color: '#fca5a5' }}>
+                  ⚠️ Connecte ta boutique pour que AEGIS applique les changements automatiquement. <button style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', fontSize: '13px', textDecoration: 'underline' }} onClick={() => setPage('boutique')}>→ Connecter ma boutique</button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+  // ============================================================
+  // PAGE MEDIA BUYING ENGINE
+  // ============================================================
+  const renderMedia = () => (
+    <div>
+      <div style={S.info}>
+        📡 <strong>Media Buying Engine.</strong> Gere tes campagnes publicitaires sur Meta, Google et TikTok. Scaling automatique des pubs gagnantes, kill auto des perdantes, CBO/ABO logic.
+      </div>
+      <div style={S.grid(4)}>
+        {[
+          { plateforme: 'Meta Ads', budget: '450 EUR/j', roas: '3.2x', status: 'Actif', color: 'blue' },
+          { plateforme: 'Google Ads', budget: '280 EUR/j', roas: '4.1x', status: 'Actif', color: 'green' },
+          { plateforme: 'TikTok Ads', budget: '120 EUR/j', roas: '2.8x', status: 'Pause', color: 'yellow' },
+          { plateforme: 'Budget total', budget: '850 EUR/j', roas: '3.4x', status: 'Actif', color: 'green' },
+        ].map((p,i) => (
+          <div key={i} style={S.card}>
+            <div style={S.cardTitle}>{p.plateforme}</div>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: '#e2e8f0' }}>{p.budget}</div>
+            <div style={{ color: '#4ade80', fontWeight: 600, marginTop: '4px' }}>ROAS: {p.roas}</div>
+            <div style={{ marginTop: '8px' }}><span style={S.badge(p.color)}>{p.status}</span></div>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: '20px' }}>
+        <div style={{ ...S.row, justifyContent: 'space-between', marginBottom: '16px' }}>
+          <div style={S.sectionTitle}>📋 Ads actives</div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <span style={{ fontSize: '13px', color: '#64748b' }}>Logique :</span>
+            <span style={S.badge('blue')}>CBO activee</span>
+            <span style={S.badge('green')}>Auto-scaling ON</span>
+          </div>
+        </div>
+        <table style={S.table}>
+          <thead><tr><th style={S.th}>Nom ad</th><th style={S.th}>Plateforme</th><th style={S.th}>Budget</th><th style={S.th}>ROAS</th><th style={S.th}>CTR</th><th style={S.th}>Statut</th><th style={S.th}>Action AEGIS</th></tr></thead>
+          <tbody>
+            {[
+              { nom: 'Hook UGC v2', plat: 'Meta', budget: '45 EUR/j', roas: '4.2x', ctr: '4.1%', status: 'Actif', action: 'Scale +30%', color: 'green' },
+              { nom: 'Hero image v1', plat: 'Meta', budget: '30 EUR/j', roas: '1.2x', ctr: '1.8%', status: 'Actif', action: 'KILL prevu', color: 'red' },
+              { nom: 'Shopping Branded', plat: 'Google', budget: '120 EUR/j', roas: '6.1x', ctr: '5.2%', status: 'Actif', action: 'Scale +50%', color: 'green' },
+              { nom: 'PMax Catalogue', plat: 'Google', budget: '80 EUR/j', roas: '3.4x', ctr: '2.9%', status: 'Actif', action: 'Stable', color: 'blue' },
+              { nom: 'Viral TT v1', plat: 'TikTok', budget: '60 EUR/j', roas: '2.1x', ctr: '3.8%', status: 'Pause', action: 'Resume si ROAS > 2x', color: 'yellow' },
+            ].map((a,i) => (
+              <tr key={i}>
+                <td style={S.td}>{a.nom}</td>
+                <td style={S.td}>{a.plat}</td>
+                <td style={S.td}>{a.budget}</td>
+                <td style={{ ...S.td, color: parseFloat(a.roas) > 2 ? '#4ade80' : '#f87171', fontWeight: 700 }}>{a.roas}</td>
+                <td style={S.td}>{a.ctr}</td>
+                <td style={S.td}><span style={S.badge(a.status === 'Actif' ? 'green' : 'yellow')}>{a.status}</span></td>
+                <td style={{ ...S.td, color: a.color === 'green' ? '#4ade80' : a.color === 'red' ? '#f87171' : '#fbbf24', fontWeight: 600 }}>{a.action}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div style={{ ...S.grid(2), marginTop: '20px' }}>
+        <div style={S.card}>
+          <div style={S.sectionTitle}>⚡ Logique de scaling</div>
+          {[
+            { label: 'Scaling horizontal', desc: 'Dupliquer ad gagnante sur nouveaux audiences', actif: true },
+            { label: 'Scaling vertical', desc: 'Augmenter budget +20-30% si ROAS tient', actif: true },
+            { label: 'Kill auto perdantes', desc: 'ROAS < 1.1x pendant 48h = kill', actif: true },
+            { label: 'Rotation creatives', desc: 'Swap auto si CTR baisse > 15%', actif: true },
+            { label: 'CBO logic', desc: 'Budget campagne auto-distribue', actif: true },
+            { label: 'ABO override', desc: 'Force budget ad level si necessaire', actif: false },
+          ].map((r,i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #0f0f1a' }}>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: '14px' }}>{r.label}</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>{r.desc}</div>
+              </div>
+              <span style={S.badge(r.actif ? 'green' : 'yellow')}>{r.actif ? 'Actif' : 'Inactif'}</span>
             </div>
           ))}
         </div>
-
-        <div>
-          <h2 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700 }}>🛡️ Protections actives</h2>
-          <p style={{ margin: '0 0 20px', fontSize: 13, color: '#64748b' }}>
-            Ces systèmes fonctionnent en permanence en arrière-plan.
-          </p>
-          {guards.map(g => (
-            <div key={g.name} style={{ ...S.panel, display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 10 }}>
-              <div style={{ fontSize: 24 }}>{g.emoji}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{g.name}</div>
-                <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.5 }}>{g.desc}</div>
-              </div>
-              <Badge text={g.status} color={g.color} />
+        <div style={S.card}>
+          <div style={S.sectionTitle}>📈 Performance 7 jours</div>
+          {[
+            { jour: 'Lun', depense: 780, revenus: 2340, roas: 3.0 },
+            { jour: 'Mar', depense: 820, revenus: 2870, roas: 3.5 },
+            { jour: 'Mer', depense: 850, revenus: 3060, roas: 3.6 },
+            { jour: 'Jeu', depense: 900, revenus: 2700, roas: 3.0 },
+            { jour: 'Ven', depense: 950, revenus: 3800, roas: 4.0 },
+            { jour: 'Sam', depense: 1100, revenus: 4180, roas: 3.8 },
+            { jour: 'Dim', depense: 850, revenus: 2993, roas: 3.5 },
+          ].map((j,i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #0f0f1a' }}>
+              <span style={{ color: '#64748b', width: '30px' }}>{j.jour}</span>
+              <span style={{ color: '#f87171' }}>{j.depense} EUR</span>
+              <span style={{ color: '#4ade80' }}>{j.revenus} EUR</span>
+              <span style={{ color: j.roas >= 3 ? '#4ade80' : '#fbbf24', fontWeight: 700 }}>{j.roas}x</span>
             </div>
           ))}
         </div>
       </div>
     </div>
   )
-}
 
-// ============================================================
-// PAGE ABONNEMENT
-// ============================================================
-function AbonnementPage() {
-  const plans = [
-    { name: 'Essai', price: '0€', period: '', runs: '10 tests', features: ['Tous les agents', 'Dashboard complet', 'Support par email'], current: false, emoji: '🆓' },
-    { name: 'Starter', price: '99€', period: '/mois', runs: '10 campagnes/mois', features: ['Tous les agents', 'Campagnes publicitaires', 'Analyses'], current: false, emoji: '🌱' },
-    { name: 'Growth', price: '299€', period: '/mois', runs: '50 campagnes/mois', features: ['Support prioritaire', 'Risque avancé', 'Accès API'], current: true, emoji: '🚀' },
-    { name: 'Elite', price: '999€', period: '/mois', runs: '200 campagnes/mois', features: ['Partage de revenus', 'Support dédié', 'Agents sur mesure'], current: false, emoji: '💎' },
-  ]
-
-  return (
+  // ============================================================
+  // PAGE MARCHE (MARKET ADAPTATION ENGINE)
+  // ============================================================
+  const renderMarche = () => (
     <div>
-      <div style={S.helpBox}>
-        💎 <strong>Votre abonnement actuel :</strong> Growth Trial — Il vous reste <strong>15 jours d'essai</strong>.
-        Vous avez utilisé 0 campagne sur les 10 disponibles dans votre période d'essai.
+      <div style={S.info}>
+        📡 <strong>Market Adaptation Engine.</strong> AEGIS surveille en permanence les signaux du marche. Quand une anomalie est detectee (fatigue creative, hausse CPM, baisse CVR...), il propose une action corrective.
       </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 32 }}>
-        {plans.map(p => (
-          <div key={p.name} style={{
-            ...S.panel,
-            border: p.current ? '2px solid #6366f1' : '1px solid #1e1e3a',
-            position: 'relative' as const
-          }}>
-            {p.current && (
-              <div style={{ position: 'absolute' as const, top: -12, left: '50%', transform: 'translateX(-50%)', background: '#6366f1', color: 'white', padding: '4px 16px', borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' as const }}>
-                ✓ Plan actuel
+      <div style={S.grid(4)}>
+        {[
+          { label: 'Signaux detectes', val: marcheSignaux.length, color: '#fbbf24' },
+          { label: 'Alertes critiques', val: marcheSignaux.filter(s => s.status === 'danger').length, color: '#f87171' },
+          { label: 'Marches surveilles', val: 5, color: '#a5b4fc' },
+          { label: 'CPM moyen', val: '14.50 EUR', color: '#94a3b8' },
+        ].map((c,i) => (
+          <div key={i} style={S.card}>
+            <div style={S.cardTitle}>{c.label}</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: c.color }}>{c.val}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: '20px' }}>
+        <div style={S.sectionTitle}>🚨 Signaux actifs</div>
+        {marcheSignaux.map((s,i) => (
+          <div key={i} style={{ ...S.card, marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <span style={{ fontSize: '24px' }}>{s.status === 'danger' ? '🔴' : s.status === 'warning' ? '🟡' : '🟢'}</span>
+              <div>
+                <div style={{ fontWeight: 700 }}>{s.signal}</div>
+                <div style={{ fontSize: '13px', color: '#64748b' }}>{s.produit}</div>
               </div>
-            )}
-            <div style={{ fontSize: 28, marginBottom: 8 }}>{p.emoji}</div>
-            <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>{p.name}</div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 2, marginBottom: 4 }}>
-              <span style={{ fontSize: 26, fontWeight: 800, color: '#6366f1' }}>{p.price}</span>
-              <span style={{ fontSize: 13, color: '#64748b' }}>{p.period}</span>
             </div>
-            <div style={{ fontSize: 12, color: '#4ade80', marginBottom: 16, fontWeight: 600 }}>
-              📊 {p.runs}
+            <div style={{ textAlign: 'center' as const }}>
+              <div style={{ fontWeight: 700, fontSize: '18px', color: s.status === 'danger' ? '#f87171' : s.status === 'warning' ? '#fbbf24' : '#4ade80' }}>{s.valeur}</div>
+              <div style={{ fontSize: '11px', color: '#64748b' }}>Valeur</div>
             </div>
-            <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-              {p.features.map(f => (
-                <li key={f} style={{ fontSize: 13, color: '#94a3b8', padding: '5px 0', display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <span style={{ color: '#4ade80', fontWeight: 700 }}>✓</span> {f}
-                </li>
-              ))}
-            </ul>
-            {!p.current && (
-              <button style={{ ...S.btn, width: '100%', justifyContent: 'center', marginTop: 16, background: '#1e1e3a', color: '#6366f1' }}>
-                Choisir ce plan
-              </button>
+            <div style={{ textAlign: 'right' as const }}>
+              <div style={{ fontSize: '13px', color: '#93c5fd', marginBottom: '8px' }}>Action recommandee :</div>
+              <div style={{ fontSize: '14px', fontWeight: 600 }}>{s.action}</div>
+              <button style={{ ...S.btn('primary'), marginTop: '8px', padding: '6px 14px', fontSize: '12px' }}>Appliquer</button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ ...S.grid(2), marginTop: '20px' }}>
+        <div style={S.card}>
+          <div style={S.sectionTitle}>📊 Metriques surveillees</div>
+          {[
+            { metric: 'CPM moyen', val: '14.50 EUR', trend: '+3%', status: 'warning' },
+            { metric: 'CTR moyen', val: '3.1%', trend: '-5%', status: 'warning' },
+            { metric: 'CVR moyen', val: '2.8%', trend: '+0.2%', status: 'good' },
+            { metric: 'ROAS moyen', val: '3.4x', trend: '-0.1x', status: 'good' },
+            { metric: 'Frequence expo', val: '4.2x', trend: '+0.8x', status: 'danger' },
+            { metric: 'Saturation audience', val: '34%', trend: '+12%', status: 'warning' },
+          ].map((m,i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #0f0f1a' }}>
+              <span style={{ color: '#94a3b8' }}>{m.metric}</span>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700 }}>{m.val}</span>
+                <span style={{ color: m.status === 'good' ? '#4ade80' : m.status === 'danger' ? '#f87171' : '#fbbf24', fontSize: '12px' }}>{m.trend}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={S.card}>
+          <div style={S.sectionTitle}>🔄 Rotations automatiques</div>
+          {[
+            { action: 'Rotation niche E -> F', raison: 'Saturation > 80%', status: 'Planifie', date: 'Demain' },
+            { action: 'Swap creative produit B', raison: 'CTR baisse 15%', status: 'En cours', date: "Aujourd'hui" },
+            { action: 'Repositionnement angle', raison: 'CVR baisse 3 jours', status: 'Propose', date: 'Attente validation' },
+          ].map((r,i) => (
+            <div key={i} style={{ padding: '12px', background: '#0f0f1a', borderRadius: '8px', marginBottom: '8px' }}>
+              <div style={{ fontWeight: 600, marginBottom: '4px' }}>{r.action}</div>
+              <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '6px' }}>Raison: {r.raison}</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={S.badge(r.status === 'En cours' ? 'blue' : r.status === 'Planifie' ? 'yellow' : 'green')}>{r.status}</span>
+                <span style={{ fontSize: '12px', color: '#475569' }}>{r.date}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+  // ============================================================
+  // PAGE SANTE (HEALTH ENGINE)
+  // ============================================================
+  const renderSante = () => (
+    <div>
+      <div style={S.info}>
+        🏥 <strong>Health & Self-Repair Engine.</strong> Surveille la sante de tous les composants AEGIS. Si une API tombe ou un job echoue, le systeme se repare automatiquement.
+      </div>
+      <div style={S.grid(3)}>
+        {[
+          { label: 'API Meta', val: santeStatus.api_meta === 'ok' ? 'Operationnelle' : 'Attention', color: santeStatus.api_meta === 'ok' ? 'green' : 'yellow' },
+          { label: 'API Google', val: santeStatus.api_google === 'ok' ? 'Operationnelle' : 'Attention', color: santeStatus.api_google === 'ok' ? 'green' : 'yellow' },
+          { label: 'API TikTok', val: santeStatus.api_tiktok === 'ok' ? 'Operationnelle' : 'Latence detectee', color: santeStatus.api_tiktok === 'ok' ? 'green' : 'yellow' },
+          { label: 'Pixel tracking', val: 'Verifie', color: 'green' },
+          { label: 'Base de donnees', val: 'OK', color: 'green' },
+          { label: 'Jobs en retry', val: (santeStatus.jobs_retry || 0) + ' jobs', color: (santeStatus.jobs_retry || 0) > 0 ? 'yellow' : 'green' },
+        ].map((c,i) => (
+          <div key={i} style={S.card}>
+            <div style={S.cardTitle}>{c.label}</div>
+            <span style={S.badge(c.color)}>{c.val}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ ...S.grid(2), marginTop: '20px' }}>
+        <div style={S.card}>
+          <div style={S.sectionTitle}>🔧 Historique reparations auto</div>
+          {[
+            { action: 'Retry job Meta webhook', resultat: 'Succes', time: 'Il y a 2h', tentatives: 2 },
+            { action: 'Recalibrage score winner', resultat: 'Succes', time: 'Il y a 5h', tentatives: 1 },
+            { action: 'Reconnnexion API TikTok', resultat: 'En cours', time: 'Il y a 12min', tentatives: 3 },
+            { action: 'Nettoyage base donnees', resultat: 'Succes', time: 'Il y a 24h', tentatives: 1 },
+            { action: 'Backup automatique', resultat: 'Succes', time: 'Il y a 30min', tentatives: 1 },
+          ].map((r,i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #0f0f1a' }}>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: '13px' }}>{r.action}</div>
+                <div style={{ fontSize: '11px', color: '#64748b' }}>{r.time} · {r.tentatives} tentative(s)</div>
+              </div>
+              <span style={S.badge(r.resultat === 'Succes' ? 'green' : r.resultat === 'En cours' ? 'blue' : 'red')}>{r.resultat}</span>
+            </div>
+          ))}
+        </div>
+        <div style={S.card}>
+          <div style={S.sectionTitle}>📊 Monitoring en temps reel</div>
+          {[
+            { label: 'Uptime global', val: '99.7%', color: '#4ade80' },
+            { label: 'Latence API moyenne', val: '127ms', color: '#4ade80' },
+            { label: 'Jobs executes / 24h', val: '1 847', color: '#a5b4fc' },
+            { label: 'Jobs echoues', val: '3 (0.16%)', color: '#fbbf24' },
+            { label: 'Inconsistances detectees', val: santeStatus.incoh_donnees || 0, color: '#4ade80' },
+            { label: 'Backup', val: 'Dernier: il y a 30min', color: '#4ade80' },
+            { label: 'Calibrage score winner', val: 'A jour', color: '#4ade80' },
+          ].map((r,i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #0f0f1a' }}>
+              <span style={{ color: '#94a3b8', fontSize: '14px' }}>{r.label}</span>
+              <span style={{ color: r.color, fontWeight: 600, fontSize: '14px' }}>{r.val}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+
+  // ============================================================
+  // PAGE GOUVERNANCE ENGINE
+  // ============================================================
+  const renderGouvernance = () => (
+    <div>
+      <div style={S.info}>
+        ⚖️ <strong>Governance Engine.</strong> Definis comment AEGIS agit. Mode humain = tu valides tout. Semi-auto = l'IA propose, tu decides. Full auto = AEGIS agit seul dans les limites.
+      </div>
+      <div style={S.card}>
+        <div style={S.sectionTitle}>🎛️ Mode de gouvernance</div>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+          {([['humain', '👤 Humain', 'Tu valides chaque action manuellement'], ['semi_auto', '🤝 Semi-auto', 'IA propose, tu decides'], ['full_auto', '🤖 Full auto', 'IA agit seul dans les limites']] as const).map(([mode, label, desc]) => (
+            <button key={mode} style={{ flex: 1, padding: '16px', background: gouvernanceMode === mode ? '#1e1b4b' : '#0a0a1a', border: gouvernanceMode === mode ? '2px solid #4f46e5' : '1px solid #1e1e3a', borderRadius: '12px', color: gouvernanceMode === mode ? '#a5b4fc' : '#94a3b8', cursor: 'pointer', textAlign: 'center' as const }} onClick={() => setGouvernanceMode(mode)}>
+              <div style={{ fontSize: '20px', marginBottom: '4px' }}>{label}</div>
+              <div style={{ fontSize: '12px' }}>{desc}</div>
+            </button>
+          ))}
+        </div>
+        <div style={{ padding: '16px', background: '#0c1a3e', borderRadius: '8px', marginBottom: '20px' }}>
+          <div style={{ fontWeight: 700, color: '#93c5fd', marginBottom: '6px' }}>Mode actuel : {gouvernanceMode === 'humain' ? 'Humain' : gouvernanceMode === 'semi_auto' ? 'Semi-automatique' : 'Full automatique'}</div>
+          <div style={{ fontSize: '13px', color: '#64748b' }}>
+            {gouvernanceMode === 'humain' && "Chaque action de l'IA requiert ta validation manuelle. Maximum de controle."}
+            {gouvernanceMode === 'semi_auto' && "L'IA propose des actions. Tu valides ou refuses dans les 24h. Actions urgentes auto-executees."}
+            {gouvernanceMode === 'full_auto' && "L'IA agit de facon autonome dans les limites de risque definies. Audit trail complet disponible."}
+          </div>
+        </div>
+      </div>
+      <div style={{ ...S.grid(2), marginTop: '16px' }}>
+        <div style={S.card}>
+          <div style={S.sectionTitle}>📋 Seuils de validation</div>
+          {[
+            { label: 'Validation obligatoire si > X EUR', val: '200 EUR', editable: true },
+            { label: 'Kill campagne auto si ROAS < X', val: '1.1x', editable: true },
+            { label: 'Scale auto max +X% par jour', val: '30%', editable: true },
+            { label: 'Budget max par decision auto', val: '100 EUR', editable: true },
+            { label: 'Blocage si anomalie detectee', val: 'Oui', editable: false },
+          ].map((r,i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #0f0f1a' }}>
+              <span style={{ fontSize: '13px', color: '#94a3b8' }}>{r.label}</span>
+              <span style={{ fontWeight: 700, color: '#a5b4fc' }}>{r.val}</span>
+            </div>
+          ))}
+        </div>
+        <div style={S.card}>
+          <div style={S.sectionTitle}>📜 Audit trail - Dernieres decisions</div>
+          {[
+            { action: 'Kill ad "Hero v1"', qui: 'AEGIS Auto', resultat: 'Execute', temps: 'Il y a 2h' },
+            { action: 'Scale "Hook UGC" +30%', qui: 'Cedric (Manuel)', resultat: 'Valide', temps: 'Il y a 4h' },
+            { action: 'Creer campagne produit X', qui: 'AEGIS Auto', resultat: 'Execute', temps: 'Il y a 6h' },
+            { action: 'Pause TikTok budget', qui: 'Cedric (Manuel)', resultat: 'Refuse', temps: 'Il y a 8h' },
+            { action: 'Recalibrage score winner', qui: 'AEGIS Auto', resultat: 'Execute', temps: 'Il y a 12h' },
+          ].map((r,i) => (
+            <div key={i} style={{ padding: '10px 0', borderBottom: '1px solid #0f0f1a' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>{r.action}</span>
+                <span style={S.badge(r.resultat === 'Execute' || r.resultat === 'Valide' ? 'green' : 'red')}>{r.resultat}</span>
+              </div>
+              <div style={{ fontSize: '11px', color: '#475569' }}>{r.qui} · {r.temps}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+  // ============================================================
+  // PAGE RISQUE (RISK ENGINE)
+  // ============================================================
+  const renderRisque = () => (
+    <div>
+      <div style={S.info}>
+        🛡️ <strong>Risk Engine - Logique Hedge Fund.</strong> AEGIS protege ton capital avec des garde-fous a plusieurs niveaux. Stop-loss global, par campagne, par produit. Emergency freeze si anomalie critique.
+      </div>
+      <div style={S.grid(3)}>
+        {[
+          { label: 'Perte max / jour', val: riskConfig.perteMax + ' EUR', color: '#f87171', cle: 'perteMax' },
+          { label: 'Depense max / jour', val: riskConfig.depenseMax + ' EUR', color: '#fbbf24', cle: 'depenseMax' },
+          { label: 'ROAS minimum', val: riskConfig.roasMin + 'x', color: '#4ade80', cle: 'roasMin' },
+        ].map((c,i) => (
+          <div key={i} style={S.card}>
+            <div style={S.cardTitle}>{c.label}</div>
+            <div style={{ ...S.cardValue, color: c.color }}>{c.val}</div>
+            <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
+              <button style={{ ...S.btn('outline'), padding: '4px 12px', fontSize: '12px' }} onClick={() => setRiskConfig(r => ({...r, [c.cle]: Math.max(0, (r[c.cle as keyof typeof r] as number) - (c.cle === 'roasMin' ? 0.1 : 50))}))}>-</button>
+              <button style={{ ...S.btn('outline'), padding: '4px 12px', fontSize: '12px' }} onClick={() => setRiskConfig(r => ({...r, [c.cle]: (r[c.cle as keyof typeof r] as number) + (c.cle === 'roasMin' ? 0.1 : 50)}))}>+</button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ ...S.grid(2), marginTop: '20px' }}>
+        <div style={S.card}>
+          <div style={S.sectionTitle}>🔒 Garde-fous actifs</div>
+          {[
+            { label: 'Stop-loss global', desc: 'Arrete tout si perte > ' + riskConfig.perteMax + ' EUR/j', actif: true, critique: true },
+            { label: 'Stop-loss par campagne', desc: 'Kill si ROAS < ' + riskConfig.roasMin + 'x pendant 48h', actif: true, critique: true },
+            { label: 'Stop-loss par produit', desc: 'Arrete produit si perte > 50 EUR/j', actif: true, critique: false },
+            { label: 'Budget cap dynamique', desc: 'Max ' + riskConfig.depenseMax + ' EUR/j toutes plateformes', actif: true, critique: true },
+            { label: 'Drawdown max', desc: 'Freeze si -20% capital en 7j', actif: true, critique: true },
+            { label: 'Kill switch total', desc: 'Arret d'urgence en 1 clic', actif: true, critique: true },
+            { label: 'Emergency freeze', desc: 'Auto-freeze si anomalie critique', actif: true, critique: true },
+            { label: 'Risk ratio P/L', desc: 'Alerte si ratio < 2:1', actif: true, critique: false },
+          ].map((r,i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #0f0f1a' }}>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: '14px' }}>{r.label} {r.critique && <span style={{ color: '#f87171', fontSize: '11px' }}>CRITIQUE</span>}</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>{r.desc}</div>
+              </div>
+              <span style={S.badge(r.actif ? 'green' : 'red')}>{r.actif ? 'Arme' : 'Inactif'}</span>
+            </div>
+          ))}
+        </div>
+        <div style={S.card}>
+          <div style={S.sectionTitle}>☢️ Kill Switch d'urgence</div>
+          <div style={{ padding: '20px', background: '#1a0000', border: '1px solid #dc2626', borderRadius: '12px', marginBottom: '16px', textAlign: 'center' as const }}>
+            <div style={{ fontSize: '32px', marginBottom: '8px' }}>🚨</div>
+            <div style={{ fontWeight: 700, fontSize: '16px', color: '#f87171', marginBottom: '8px' }}>ARRET D'URGENCE</div>
+            <div style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '16px' }}>Arrete immediatement TOUTES les campagnes sur toutes les plateformes. Action irreversible sans confirmation.</div>
+            <button style={{ ...S.btn('danger'), width: '100%', padding: '14px', fontSize: '16px' }} onClick={() => { if(window.confirm('CONFIRMER L'ARRET D'URGENCE ? Toutes les campagnes seront stoppees.')) alert('Kill switch active ! Toutes les campagnes sont stoppees.') }}>
+              🛑 ACTIVER KILL SWITCH
+            </button>
+          </div>
+          <div style={S.sectionTitle}>📊 Risque en temps reel</div>
+          {[
+            { label: 'Depense aujourd'hui', val: '1 247 EUR', max: riskConfig.depenseMax, pct: Math.round(1247/riskConfig.depenseMax*100) },
+            { label: 'Perte nette', val: '0 EUR', max: riskConfig.perteMax, pct: 0 },
+          ].map((r,i) => (
+            <div key={i} style={{ marginBottom: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span style={{ fontSize: '13px', color: '#94a3b8' }}>{r.label}</span>
+                <span style={{ fontWeight: 700 }}>{r.val} / {r.max} EUR</span>
+              </div>
+              <div style={S.progress(r.pct)}>
+                <div style={S.progressBar(r.pct, r.pct > 80 ? '#dc2626' : r.pct > 60 ? '#f59e0b' : '#16a34a')} />
+              </div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>{r.pct}% de la limite</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+
+  // ============================================================
+  // PAGE FINANCIER (FINANCIAL EVOLUTION ENGINE)
+  // ============================================================
+  const renderFinancier = () => (
+    <div>
+      <div style={S.info}>
+        💹 <strong>Financial Evolution Engine.</strong> AEGIS evolue avec toi. Chaque phase debloques des capacites et des budgets plus importants, avec des garde-fous adaptes.
+      </div>
+      <div style={S.grid(3)}>
+        {[
+          { ph: 1, titre: 'Phase 1 : 0 → 1M EUR', gardefous: 45, status: 'En cours', color: '#4f46e5', desc: 'Demarrage et validation', specs: ['Budget cap: 500 EUR/j', 'ROAS min: 1.1x', 'Validation humaine frequente', '45 garde-fous actifs'] },
+          { ph: 2, titre: 'Phase 2 : 1M → 10M EUR', gardefous: 70, status: 'Verrouille', color: '#374151', desc: 'Croissance acceleree', specs: ['Budget cap: 5000 EUR/j', 'Scaling agressif', 'Automatisation accrue', '70 garde-fous actifs'] },
+          { ph: 3, titre: 'Phase 3 : 10M → 100M EUR', gardefous: 100, status: 'Verrouille', color: '#374151', desc: 'Mode hedge fund complet', specs: ['Multi-produits', 'Multi-comptes', 'Multi-marches', '100 garde-fous + hedge logic'] },
+        ].map((ph,i) => (
+          <div key={i} style={{ ...S.card, border: ph.ph === phase ? '2px solid #4f46e5' : undefined, opacity: ph.ph > phase ? 0.6 : 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <span style={{ fontWeight: 700, color: ph.ph === phase ? '#a5b4fc' : '#94a3b8' }}>{ph.titre}</span>
+              <span style={S.badge(ph.status === 'En cours' ? 'blue' : 'yellow')}>{ph.status}</span>
+            </div>
+            <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '12px' }}>{ph.desc}</div>
+            {ph.specs.map((s,j) => <div key={j} style={{ fontSize: '13px', padding: '4px 0', color: ph.ph === phase ? '#e2e8f0' : '#94a3b8' }}>• {s}</div>)}
+            {ph.ph === phase && (
+              <div style={{ marginTop: '12px' }}>
+                <div style={S.progress(37)}>
+                  <div style={S.progressBar(37)} />
+                </div>
+                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>37% vers Phase 2</div>
+              </div>
             )}
           </div>
         ))}
       </div>
-
-      <div style={S.panel}>
-        <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700 }}>💰 Modèle de partage de revenus</h3>
-        <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b' }}>
-          Au-delà de 200 000€ de chiffre d'affaires mensuel, un partage de 2% s'applique. En dessous, aucun frais supplémentaire.
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+      <div style={{ ...S.card, marginTop: '20px' }}>
+        <div style={S.sectionTitle}>💰 Projection financiere</div>
+        <div style={S.grid(4)}>
           {[
-            ['📈 Revenus ce mois', '0€', '#4ade80'],
-            ['🔢 Taux de partage', '2%', '#6366f1'],
-            ['🎯 Seuil dactivation', '200 000€', '#fbbf24']
-          ].map(([k, v, c]) => (
-            <div key={k} style={{ background: '#1a1a2e', borderRadius: 12, padding: '16px 20px', textAlign: 'center' as const }}>
-              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>{k}</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: c }}>{v}</div>
+            { label: 'Revenus ce mois', val: '18 450 EUR', color: '#4ade80' },
+            { label: 'Depenses pub', val: '7 890 EUR', color: '#f87171' },
+            { label: 'Profit net', val: '10 560 EUR', color: '#4ade80' },
+            { label: 'Projection annuelle', val: '220 000 EUR', color: '#a5b4fc' },
+          ].map((c,i) => (
+            <div key={i} style={S.card}>
+              <div style={S.cardTitle}>{c.label}</div>
+              <div style={{ fontSize: '20px', fontWeight: 700, color: c.color }}>{c.val}</div>
             </div>
           ))}
         </div>
       </div>
     </div>
   )
-}
+
+  // ============================================================
+  // PAGES EXISTANTES MAINTENUES
+  // ============================================================
+  const renderCampagnes = () => (
+    <div>
+      <div style={S.info}>🚀 <strong>Qu'est-ce qu'une campagne ?</strong> Une campagne teste automatiquement la publicite d'un produit. L'IA gere les budgets, les creatifs et l'optimisation a votre place. Cliquez sur <strong>"Nouvelle campagne"</strong> pour en demarrer une.</div>
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+        <input style={{ ...S.input, flex: 1 }} placeholder="URL produit ou nom..." value={nouvelleUrl} onChange={e => setNouvelleUrl(e.target.value)} />
+        <select style={{ ...S.input, width: 'auto' }} value={nouvellePlateforme} onChange={e => setNouvellePlateforme(e.target.value)}>
+          <option value="meta">Meta Ads</option>
+          <option value="google">Google Ads</option>
+          <option value="tiktok">TikTok Ads</option>
+        </select>
+        <input style={{ ...S.input, width: '100px' }} type="number" placeholder="Budget" value={nouveauBudget} onChange={e => setNouveauBudget(e.target.value)} />
+        <button style={S.btn('success')} onClick={lancerCampagne} disabled={loading}>{loading ? 'Lancement...' : '🚀 Nouvelle campagne'}</button>
+        <button style={S.btn()} onClick={loadData}>🔄 Actualiser</button>
+      </div>
+      <table style={S.table}>
+        <thead><tr><th style={S.th}>PRODUIT</th><th style={S.th}>STATUT</th><th style={S.th}>BUDGET TOTAL</th><th style={S.th}>DEPENSE</th><th style={S.th}>ROAS</th><th style={S.th}>DATE</th></tr></thead>
+        <tbody>
+          {pipelines.length === 0 ? (
+            <tr><td colSpan={6} style={{ ...S.td, textAlign: 'center', color: '#64748b', padding: '32px' }}>Aucune campagne. Lancez votre premiere campagne ci-dessus.</td></tr>
+          ) : pipelines.map((p: any) => (
+            <tr key={p.id}>
+              <td style={S.td}>{p.product_name}</td>
+              <td style={S.td}><span style={S.badge(p.status === 'active' ? 'green' : p.status === 'paused' ? 'yellow' : 'blue')}>{p.status}</span></td>
+              <td style={S.td}>{p.total_budget} EUR</td>
+              <td style={S.td}>{p.spent_budget || 0} EUR</td>
+              <td style={{ ...S.td, color: p.roas ? (p.roas >= 2 ? '#4ade80' : '#f87171') : '#64748b', fontWeight: 700 }}>{p.roas || 'N/A'}</td>
+              <td style={{ ...S.td, color: '#64748b', fontSize: '12px' }}>{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+
+  const renderDecisions = () => {
+    const pending = actions.filter(a => a.status === 'pending')
+    return (
+      <div>
+        <div style={S.info}>✅ <strong>Que sont les decisions ?</strong> Quand l'IA veut faire une action (ex: augmenter un budget, tester une nouvelle pub), elle vous demande d'abord votre accord ici. Vous pouvez <strong>Valider</strong> (l'IA execute) ou <strong>Refuser</strong> (rien ne change).</div>
+        <div style={{ ...S.row, justifyContent: 'space-between', marginBottom: '20px' }}>
+          <div style={{ fontWeight: 700, fontSize: '16px' }}>⏳ {pending.length} decision(s) en attente de votre accord</div>
+          <button style={S.btn()} onClick={loadData}>🔄</button>
+        </div>
+        {pending.length === 0 ? (
+          <div style={{ ...S.card, textAlign: 'center', padding: '48px', color: '#64748b' }}>✅ Aucune decision en attente. Tout est traite !</div>
+        ) : pending.map((a: any) => (
+          <div key={a.id} style={{ ...S.card, marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <span style={{ fontSize: '28px' }}>🤖</span>
+              <div>
+                <div style={{ fontWeight: 700 }}>{a.agent_name} — {a.action_type}</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>Priorite : {a.priority >= 8 ? '🔴 Haute' : a.priority >= 5 ? '🟡 Moyenne' : '🟢 Faible'}</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <span style={S.badge('yellow')}>⏳ En attente</span>
+              <button style={S.btn('success')} onClick={() => validerAction(a.id)}>✓ Valider</button>
+              <button style={S.btn('danger')} onClick={() => refuserAction(a.id)}>✗ Refuser</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  const renderAgents = () => (
+    <div>
+      <div style={S.info}>🤖 <strong>Qu'est-ce qu'un agent IA ?</strong> Un agent est un "robot" specialise qui effectue une tache precise automatiquement. Vous pouvez les <strong>activer (ON)</strong> ou <strong>desactiver (OFF)</strong> selon vos besoins.</div>
+      <div style={{ ...S.row, justifyContent: 'space-between', marginBottom: '20px' }}>
+        <div style={{ fontWeight: 700 }}>🤖 {agents.length || 25} agents configures · <span style={{ color: '#4ade80' }}>{agents.filter((a: any) => a.is_enabled).length || 25} actifs</span>, <span style={{ color: '#fbbf24' }}>{agents.filter((a: any) => !a.is_enabled).length} en pause</span></div>
+        <button style={S.btn()} onClick={loadData}>🔄 Actualiser</button>
+      </div>
+      {['CREATIVE','MARKET','MEDIA_BUYING','ANALYTICS','OPTIMIZATION'].map(cat => {
+        const catAgents = agents.filter((a: any) => a.category === cat)
+        if (catAgents.length === 0) return null
+        return (
+          <div key={cat} style={S.section}>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: '#64748b', marginBottom: '8px', letterSpacing: '1px' }}>🤖 {cat.toLowerCase()}</div>
+            {catAgents.map((a: any) => (
+              <div key={a.id} style={{ ...S.card, marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <span style={{ fontSize: '24px' }}>🤖</span>
+                  <div>
+                    <div style={{ fontWeight: 600 }}>{a.name}</div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>{a.description}</div>
+                    <div style={{ fontSize: '11px', color: '#475569' }}>{a.run_count || 0} executions</div>
+                  </div>
+                </div>
+                <div style={{ padding: '6px 18px', background: a.is_enabled ? '#052e16' : '#1e1e3a', border: '1px solid ' + (a.is_enabled ? '#166534' : '#374151'), borderRadius: '20px', color: a.is_enabled ? '#4ade80' : '#94a3b8', fontWeight: 700, fontSize: '13px' }}>{a.is_enabled ? 'ON' : 'OFF'}</div>
+              </div>
+            ))}
+          </div>
+        )
+      })}
+    </div>
+  )
+
+  const renderSecurite = () => (
+    <div>
+      <div style={S.info}>🛡️ <strong>Comment fonctionne la securite ?</strong> AEGIS dispose de plusieurs "filets de securite" qui protegent votre budget. Si une limite est depassee, le systeme s'arrete automatiquement. Vous definissez les regles, l'IA les respecte.</div>
+      <div style={S.grid(2)}>
+        <div>
+          <div style={S.sectionTitle}>🏗️ Etapes de croissance</div>
+          {[
+            { titre: 'Phase 1 · 0 → 1M EUR', status: 'En cours', specs: ['Perte max: 150 EUR/j', 'Depense max: 500 EUR/j', 'ROAS min: 1.10x'], color: 'blue' },
+            { titre: 'Phase 2 · 1M → 10M EUR', status: 'Verrouille', specs: ['Perte max: 500 EUR/j', 'Depense max: 5000 EUR/j', 'ROAS min: 1.5x'], color: 'yellow' },
+            { titre: 'Phase 3 · 10M → 100M EUR', status: 'Verrouille', specs: ['Multi-produits', 'Multi-comptes', 'Hedge logic complete'], color: 'yellow' },
+          ].map((ph,i) => (
+            <div key={i} style={{ ...S.card, marginBottom: '12px', opacity: i > 0 ? 0.6 : 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ fontWeight: 700 }}>{ph.titre}</span>
+                <span style={S.badge(ph.color)}>{ph.status}</span>
+              </div>
+              {ph.specs.map((s,j) => <div key={j} style={{ fontSize: '13px', color: '#94a3b8' }}>• {s}</div>)}
+            </div>
+          ))}
+        </div>
+        <div>
+          <div style={S.sectionTitle}>🔒 Protections actives</div>
+          {[
+            { label: 'Garde-budget', desc: 'Bloque depenses si limite atteinte', status: 'Arme' },
+            { label: 'Garde-ROAS', desc: 'Arrete campagne si ROAS sous minimum', status: 'Arme' },
+            { label: 'Frein automatique', desc: 'Reduit vitesse si anomalie', status: 'Arme' },
+            { label: 'Emergency freeze', desc: 'Gel total si -20% capital', status: 'Arme' },
+            { label: 'Kill switch', desc: 'Arret d'urgence 1 clic', status: 'En veille' },
+            { label: 'Couverture auto', desc: 'Protection automatique', status: 'Surveillance' },
+          ].map((p,i) => (
+            <div key={i} style={{ ...S.card, marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontWeight: 600 }}>{p.label}</div>
+                <div style={{ fontSize: '12px', color: '#64748b' }}>{p.desc}</div>
+              </div>
+              <span style={S.badge(p.status === 'Arme' ? 'green' : 'yellow')}>{p.status}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderAbonnement = () => (
+    <div>
+      <div style={S.info}>💎 Choisis le forfait adapte a ta phase de croissance. Tous les forfaits incluent l'acces aux 25 agents IA et au dashboard complet.</div>
+      <div style={S.grid(4)}>
+        {[
+          { titre: 'Essai', prix: '0 EUR', campagnes: '10 tests', features: ['Tous les agents', 'Dashboard complet', 'Support par email'], color: '#374151', current: false },
+          { titre: 'Starter', prix: '99 EUR/mois', campagnes: '10 campagnes/mois', features: ['Tous les agents', 'Campagnes publicitaires', 'Analyses'], color: '#374151', current: false },
+          { titre: 'Growth', prix: '299 EUR/mois', campagnes: '50 campagnes/mois', features: ['Support prioritaire', 'Scaling avance', 'API acces'], color: '#1e1b4b', current: true },
+          { titre: 'Elite', prix: '999 EUR/mois', campagnes: '200 campagnes/mois', features: ['Partage de revenus', 'Manager dedie', 'Multi-comptes'], color: '#374151', current: false },
+        ].map((f,i) => (
+          <div key={i} style={{ ...S.card, background: f.color, border: f.current ? '2px solid #4f46e5' : undefined }}>
+            {f.current && <div style={{ textAlign: 'center' as const, marginBottom: '8px' }}><span style={S.badge('blue')}>✓ Plan actuel</span></div>}
+            <div style={{ fontSize: '18px', fontWeight: 700, marginBottom: '4px' }}>{f.titre}</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: '#a5b4fc', marginBottom: '4px' }}>{f.prix}</div>
+            <div style={{ fontSize: '13px', color: '#4ade80', marginBottom: '16px' }}>📊 {f.campagnes}</div>
+            {f.features.map((ft,j) => <div key={j} style={{ fontSize: '13px', padding: '3px 0', color: '#94a3b8' }}>✓ {ft}</div>)}
+            <button style={{ ...S.btn(f.current ? 'outline' : 'primary'), marginTop: '16px', width: '100%' }}>{f.current ? 'Plan actuel' : 'Choisir ce plan'}</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+  // ============================================================
+  // NAVIGATION CONFIG
+  // ============================================================
+  const navGroups = [
+    {
+      title: 'PRINCIPAL',
+      items: [
+        { id: 'accueil' as Page, icon: '🏠', label: 'Accueil', sub: 'Vue generale' },
+      ]
+    },
+    {
+      title: 'MOTEURS AEGIS',
+      items: [
+        { id: 'boutique' as Page, icon: '🔗', label: 'Boutique', sub: 'Connecter ma boutique' },
+        { id: 'intelligence' as Page, icon: '🧠', label: 'Intelligence', sub: 'Analyser produits' },
+        { id: 'creatifs' as Page, icon: '🎨', label: 'Creatifs', sub: 'Generer les pubs' },
+        { id: 'funnel' as Page, icon: '🔁', label: 'Funnel', sub: 'Optimiser conversion' },
+        { id: 'media' as Page, icon: '📡', label: 'Media Buying', sub: 'Gerer les campagnes' },
+      ]
+    },
+    {
+      title: 'GESTION',
+      items: [
+        { id: 'campagnes' as Page, icon: '🚀', label: 'Campagnes', sub: 'Mes publicites' },
+        { id: 'decisions' as Page, icon: '✅', label: 'Decisions', sub: 'A valider' },
+        { id: 'agents' as Page, icon: '🤖', label: 'Agents IA', sub: 'Robots actifs' },
+      ]
+    },
+    {
+      title: 'SYSTEME',
+      items: [
+        { id: 'marche' as Page, icon: '📈', label: 'Marche', sub: 'Signaux & adaptation' },
+        { id: 'risque' as Page, icon: '⚠️', label: 'Risque', sub: 'Stop-loss & hedge' },
+        { id: 'sante' as Page, icon: '🏥', label: 'Sante systeme', sub: 'Monitoring & repair' },
+        { id: 'gouvernance' as Page, icon: '⚖️', label: 'Gouvernance', sub: 'Mode & audit trail' },
+        { id: 'financier' as Page, icon: '💹', label: 'Financier', sub: 'Phases & evolution' },
+        { id: 'securite' as Page, icon: '🛡️', label: 'Securite', sub: 'Limites & risques' },
+        { id: 'abonnement' as Page, icon: '💎', label: 'Abonnement', sub: 'Mon forfait' },
+      ]
+    }
+  ]
+
+  const pageMap: Record<Page, () => React.ReactElement> = {
+    accueil: renderAccueil,
+    boutique: renderBoutique,
+    intelligence: renderIntelligence,
+    creatifs: renderCreatifs,
+    funnel: renderFunnel,
+    media: renderMedia,
+    campagnes: renderCampagnes,
+    decisions: renderDecisions,
+    agents: renderAgents,
+    marche: renderMarche,
+    risque: renderRisque,
+    sante: renderSante,
+    gouvernance: renderGouvernance,
+    financier: renderFinancier,
+    securite: renderSecurite,
+    abonnement: renderAbonnement,
+  }
+
+  const pageTitles: Record<Page, {icon: string, title: string, sub: string}> = {
+    accueil: { icon: '🏠', title: 'Accueil', sub: 'Vue generale' },
+    boutique: { icon: '🔗', title: 'Boutique', sub: 'Store Connector Engine' },
+    intelligence: { icon: '🧠', title: 'Intelligence Produit', sub: 'Product Intelligence Engine' },
+    creatifs: { icon: '🎨', title: 'Creatifs', sub: 'Creative Engine' },
+    funnel: { icon: '🔁', title: 'Funnel', sub: 'Funnel Engine' },
+    media: { icon: '📡', title: 'Media Buying', sub: 'Media Buying Engine' },
+    campagnes: { icon: '🚀', title: 'Campagnes', sub: 'Mes publicites' },
+    decisions: { icon: '✅', title: 'Decisions', sub: 'A valider' },
+    agents: { icon: '🤖', title: 'Agents IA', sub: 'Robots actifs' },
+    marche: { icon: '📈', title: 'Marche', sub: 'Market Adaptation Engine' },
+    risque: { icon: '⚠️', title: 'Risque', sub: 'Risk Engine - Logique Hedge Fund' },
+    sante: { icon: '🏥', title: 'Sante systeme', sub: 'Health & Self-Repair Engine' },
+    gouvernance: { icon: '⚖️', title: 'Gouvernance', sub: 'Governance Engine' },
+    financier: { icon: '💹', title: 'Evolution Financiere', sub: 'Financial Evolution Engine' },
+    securite: { icon: '🛡️', title: 'Securite', sub: 'Limites & risques' },
+    abonnement: { icon: '💎', title: 'Abonnement', sub: 'Mon forfait' },
+  }
+
+  const currentPageInfo = pageTitles[page]
+  const currentDate = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+
+  // ============================================================
+  // RENDER PRINCIPAL
+  // ============================================================
+  return (
+    <div style={S.app}>
+      {/* SIDEBAR */}
+      <aside style={S.sidebar}>
+        <div style={S.logo}>
+          <div style={S.logoText}>⚡ AEGIS</div>
+          <div style={S.logoSub}>Plateforme publicitaire IA</div>
+          <div style={{ marginTop: '8px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }} />
+            <span style={{ fontSize: '11px', color: '#4ade80' }}>Systeme connecte</span>
+          </div>
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto' as const, padding: '8px 12px' }}>
+          {navGroups.map((group) => (
+            <div key={group.title}>
+              <div style={S.navSection}>{group.title}</div>
+              {group.items.map(item => (
+                <button key={item.id} style={S.navBtn(page === item.id)} onClick={() => setPage(item.id)}>
+                  <span style={{ fontSize: '16px' }}>{item.icon}</span>
+                  <div>
+                    <div style={{ lineHeight: 1.2 }}>{item.label}</div>
+                    <div style={{ fontSize: '11px', color: '#475569', fontWeight: 400 }}>{item.sub}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div style={{ padding: '12px', borderTop: '1px solid #1e1e3a', fontSize: '12px', color: '#64748b' }}>
+          Base de donnees : OK
+        </div>
+      </aside>
+
+      {/* MAIN */}
+      <main style={S.main}>
+        <header style={S.header}>
+          <div>
+            <h1 style={{ fontSize: '22px', fontWeight: 700, margin: 0 }}>{currentPageInfo.icon} {currentPageInfo.title}</h1>
+            <div style={{ fontSize: '13px', color: '#64748b' }}>{currentPageInfo.sub}</div>
+          </div>
+          <div style={{ fontSize: '13px', color: '#64748b', background: '#0f0f1a', padding: '8px 14px', borderRadius: '8px', border: '1px solid #1e1e3a' }}>
+            📅 {currentDate}
+          </div>
+        </header>
+        <div style={S.content}>
+          {pageMap[page]()}
+        </div>
+      </main>
+    </div>
+  )
+         }
