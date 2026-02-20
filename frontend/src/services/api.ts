@@ -1,62 +1,55 @@
-import axios from 'axios'
 import type { Agent, Task, DashboardStats, Workflow } from '../types'
 import { mockAgents, mockDashboardStats, mockTasks, mockTaskChartData } from "./mockData"
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://backend-swart-two-71.vercel.app'
 
-const api = axios.create({
-  baseURL: API_BASE,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 10000,
-})
-
-api.interceptors.request.use(config => {
+async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('aegis_token')
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string> || {}),
+  }
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+    headers['Authorization'] = 'Bearer ' + token
   }
-  return config
-})
+  const res = await fetch(API_BASE + path, { ...options, headers })
+  if (res.status === 401) {
+    localStorage.removeItem('aegis_token')
+  }
+  if (!res.ok) {
+    throw new Error('API error ' + res.status)
+  }
+  return res.json() as Promise<T>
+}
 
-api.interceptors.response.use(
-  response => response,
-  error => {
-    console.error('API Error:', error.message)
-    if (error.response?.status === 401) {
-      localStorage.removeItem('aegis_token')
-    }
-    return Promise.reject(error)
-  }
-)
+async function apiPost<T>(path: string, body?: unknown): Promise<T> {
+  return apiFetch<T>(path, {
+    method: 'POST',
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  })
+}
 
 export const authService = {
   register: async (data: { email: string; password: string; name: string; tenantName: string }) => {
-    const { data: response } = await api.post('/api/auth/register', data)
+    const response = await apiPost<{ token?: string }>('/api/auth/register', data)
     if (response.token) {
       localStorage.setItem('aegis_token', response.token)
     }
     return response
   },
-
   login: async (email: string, password: string) => {
-    const { data: response } = await api.post('/api/auth/login', { email, password })
+    const response = await apiPost<{ token?: string }>('/api/auth/login', { email, password })
     if (response.token) {
       localStorage.setItem('aegis_token', response.token)
     }
     return response
   },
-
   logout: () => {
     localStorage.removeItem('aegis_token')
   },
-
   getMe: async () => {
-    const { data } = await api.get('/api/auth/me')
-    return data
+    return apiFetch<unknown>('/api/auth/me')
   },
-
   isAuthenticated: () => {
     return !!localStorage.getItem('aegis_token')
   }
@@ -65,8 +58,7 @@ export const authService = {
 export const metricsService = {
   getDashboard: async () => {
     try {
-      const { data } = await api.get('/api/metrics/dashboard')
-      return data
+      return await apiFetch<unknown>('/api/metrics/dashboard')
     } catch {
       return {
         revenue: { value: 47892, change: 23.5 },
@@ -77,11 +69,9 @@ export const metricsService = {
       }
     }
   },
-
   getRevenueChart: async (days: number = 30) => {
     try {
-      const { data } = await api.get(`/api/metrics/revenue-chart?days=${days}`)
-      return data
+      return await apiFetch<unknown>('/api/metrics/revenue-chart?days=' + days)
     } catch {
       return [
         { date: '2024-01', revenue: 4200, spend: 1200 },
@@ -99,11 +89,9 @@ export const metricsService = {
       ]
     }
   },
-
   getPlatformBreakdown: async () => {
     try {
-      const { data } = await api.get('/api/metrics/platforms')
-      return data
+      return await apiFetch<unknown>('/api/metrics/platforms')
     } catch {
       return [
         { platform: 'Google Ads', spend: 5670, revenue: 24760, percentage: 45 },
@@ -112,12 +100,10 @@ export const metricsService = {
       ]
     }
   },
-
   getCampaigns: async (platform?: string) => {
     try {
-      const query = platform ? `?platform=${platform}` : ''
-      const { data } = await api.get(`/api/metrics/campaigns${query}`)
-      return data
+      const query = platform ? '?platform=' + platform : ''
+      return await apiFetch<unknown>('/api/metrics/campaigns' + query)
     } catch {
       return [
         { id: '1', name: 'Summer Sale 2024', platform: 'Google Ads', status: 'active', spend: 4250, revenue: 18420, roas: 4.33, conversions: 342 },
@@ -127,20 +113,11 @@ export const metricsService = {
       ]
     }
   },
-
   getGoalProgress: async () => {
     try {
-      const { data } = await api.get('/api/metrics/goal')
-      return data
+      return await apiFetch<unknown>('/api/metrics/goal')
     } catch {
-      return {
-        current: 38450,
-        target: 50000,
-        percentage: 77,
-        daysRemaining: 23,
-        dailyAverage: 1672,
-        requiredDaily: 1850
-      }
+      return { current: 38450, target: 50000, percentage: 77, daysRemaining: 23, dailyAverage: 1672, requiredDaily: 1850 }
     }
   }
 }
@@ -148,8 +125,7 @@ export const metricsService = {
 export const aiAgentsService = {
   getAll: async () => {
     try {
-      const { data } = await api.get('/api/agents')
-      return data
+      return await apiFetch<unknown>('/api/agents')
     } catch {
       return [
         { id: 'SENTINEL-A1', name: 'Stop-Loss Guardian', type: 'stoploss', platform: 'All', status: 'active', lastAction: 'Monitoring ROAS thresholds', decisionsToday: 12, savings: 234 },
@@ -160,11 +136,9 @@ export const aiAgentsService = {
       ]
     }
   },
-
   getActivity: async (limit: number = 20) => {
     try {
-      const { data } = await api.get(`/api/agents/activity?limit=${limit}`)
-      return data
+      return await apiFetch<unknown>('/api/agents/activity?limit=' + limit)
     } catch {
       return [
         { id: '1', action: 'Reduced CPC by 18% on underperforming keywords', platform: 'Google Ads', time: '00:03:22', impact: '+$234', type: 'optimization' },
@@ -174,128 +148,87 @@ export const aiAgentsService = {
       ]
     }
   },
-
   getStats: async () => {
     try {
-      const { data } = await api.get('/api/agents/stats')
-      return data
+      return await apiFetch<unknown>('/api/agents/stats')
     } catch {
-      return {
-        today: { total: 45, executed: 38, pending: 7, auto: 35 },
-        weeklyTrend: [],
-        totalSavings: 891,
-        activeAgents: 5
-      }
+      return { today: { total: 45, executed: 38, pending: 7, auto: 35 }, weeklyTrend: [], totalSavings: 891, activeAgents: 5 }
     }
   },
-
   approveDecision: async (decisionId: string) => {
-    const { data } = await api.post(`/api/agents/decisions/${decisionId}/approve`)
-    return data
+    return apiPost<unknown>('/api/agents/decisions/' + decisionId + '/approve')
   },
-
   rejectDecision: async (decisionId: string) => {
-    const { data } = await api.post(`/api/agents/decisions/${decisionId}/reject`)
-    return data
+    return apiPost<unknown>('/api/agents/decisions/' + decisionId + '/reject')
   }
 }
 
 export const platformsService = {
   getConnections: async () => {
     try {
-      const { data } = await api.get('/api/platforms/connections')
-      return data
+      return await apiFetch<unknown>('/api/platforms/connections')
     } catch {
       return []
     }
   },
-
   initiateOAuth: async (platform: string) => {
-    const { data } = await api.get(`/api/platforms/oauth/${platform}`)
-    return data
+    return apiFetch<unknown>('/api/platforms/oauth/' + platform)
   },
-
   disconnect: async (connectionId: string) => {
-    const { data } = await api.post(`/api/platforms/connections/${connectionId}/disconnect`)
-    return data
+    return apiPost<unknown>('/api/platforms/connections/' + connectionId + '/disconnect')
   },
-
   sync: async (connectionId: string) => {
-    const { data } = await api.post(`/api/platforms/connections/${connectionId}/sync`)
-    return data
+    return apiPost<unknown>('/api/platforms/connections/' + connectionId + '/sync')
   }
 }
 
 export const agentService = {
   getAll: async (): Promise<Agent[]> => {
     try {
-      const { data } = await api.get('/agents')
-      return data
+      return await apiFetch<Agent[]>('/agents')
     } catch {
       return mockAgents
     }
   },
-  
   getById: async (id: string): Promise<Agent> => {
     try {
-      const { data } = await api.get(`/agents/${id}`)
-      return data
+      return await apiFetch<Agent>('/agents/' + id)
     } catch {
       const agent = mockAgents.find(a => a.id === id)
       if (!agent) throw new Error('Agent not found')
       return agent
     }
   },
-
   getByName: async (name: string): Promise<Agent> => {
     try {
-      const { data } = await api.get(`/agents/name/${name}`)
-      return data
+      return await apiFetch<Agent>('/agents/name/' + name)
     } catch {
       const agent = mockAgents.find(a => a.name === name)
       if (!agent) throw new Error('Agent not found')
       return agent
     }
   },
-  
   create: async (agent: Partial<Agent>): Promise<Agent> => {
-    const { data } = await api.post('/agents', agent)
-    return data
+    return apiPost<Agent>('/agents', agent)
   },
-  
   update: async (id: string, agent: Partial<Agent>): Promise<Agent> => {
-    const { data } = await api.put(`/agents/${id}`, agent)
-    return data
+    return apiFetch<Agent>('/agents/' + id, { method: 'PUT', body: JSON.stringify(agent) })
   },
-  
   delete: async (id: string): Promise<void> => {
-    await api.delete(`/agents/${id}`)
+    await apiFetch<void>('/agents/' + id, { method: 'DELETE' })
   },
-
   enable: async (id: string): Promise<Agent> => {
-    const { data } = await api.post(`/agents/${id}/enable`)
-    return data
+    return apiPost<Agent>('/agents/' + id + '/enable')
   },
-
   disable: async (id: string): Promise<Agent> => {
-    const { data } = await api.post(`/agents/${id}/disable`)
-    return data
+    return apiPost<Agent>('/agents/' + id + '/disable')
   },
-
   execute: async (id: string, payload: Record<string, unknown>): Promise<{ executionId: string }> => {
-    const { data } = await api.post(`/agents/${id}/execute`, { payload })
-    return data
+    return apiPost<{ executionId: string }>('/agents/' + id + '/execute', { payload })
   },
-
-  getStats: async (id: string): Promise<{
-    task_count: number
-    success_rate: number
-    error_count: number
-    avg_duration_ms: number
-  }> => {
+  getStats: async (id: string): Promise<{ task_count: number; success_rate: number; error_count: number; avg_duration_ms: number }> => {
     try {
-      const { data } = await api.get(`/agents/${id}/stats`)
-      return data
+      return await apiFetch<{ task_count: number; success_rate: number; error_count: number; avg_duration_ms: number }>('/agents/' + id + '/stats')
     } catch {
       const agent = mockAgents.find(a => a.id === id)
       if (!agent) throw new Error('Agent not found')
@@ -312,8 +245,8 @@ export const agentService = {
 export const taskService = {
   getAll: async (agentId?: string): Promise<Task[]> => {
     try {
-      const { data } = await api.get('/tasks', { params: { agent_id: agentId } })
-      return data
+      const query = agentId ? '?agent_id=' + agentId : ''
+      return await apiFetch<Task[]>('/tasks' + query)
     } catch {
       if (agentId) {
         return mockTasks.filter(t => t.agent_id === agentId)
@@ -321,37 +254,27 @@ export const taskService = {
       return mockTasks
     }
   },
-  
   getById: async (id: string): Promise<Task> => {
     try {
-      const { data } = await api.get(`/tasks/${id}`)
-      return data
+      return await apiFetch<Task>('/tasks/' + id)
     } catch {
       const task = mockTasks.find(t => t.id === id)
       if (!task) throw new Error('Task not found')
       return task
     }
   },
-  
   create: async (task: Partial<Task>): Promise<Task> => {
-    const { data } = await api.post('/tasks', task)
-    return data
+    return apiPost<Task>('/tasks', task)
   },
-
   cancel: async (id: string): Promise<Task> => {
-    const { data } = await api.post(`/tasks/${id}/cancel`)
-    return data
+    return apiPost<Task>('/tasks/' + id + '/cancel')
   },
-
   retry: async (id: string): Promise<Task> => {
-    const { data } = await api.post(`/tasks/${id}/retry`)
-    return data
+    return apiPost<Task>('/tasks/' + id + '/retry')
   },
-
   getRecent: async (limit: number = 10): Promise<Task[]> => {
     try {
-      const { data } = await api.get('/tasks/recent', { params: { limit } })
-      return data
+      return await apiFetch<Task[]>('/tasks/recent?limit=' + limit)
     } catch {
       return mockTasks.slice(0, limit)
     }
@@ -361,21 +284,14 @@ export const taskService = {
 export const dashboardService = {
   getStats: async (): Promise<DashboardStats> => {
     try {
-      const { data } = await api.get('/stats')
-      return data
+      return await apiFetch<DashboardStats>('/stats')
     } catch {
       return mockDashboardStats
     }
   },
-
-  getAgentPerformance: async (): Promise<Array<{
-    name: string
-    tasks: number
-    success_rate: number
-  }>> => {
+  getAgentPerformance: async (): Promise<Array<{ name: string; tasks: number; success_rate: number }>> => {
     try {
-      const { data } = await api.get('/stats/agent-performance')
-      return data
+      return await apiFetch<Array<{ name: string; tasks: number; success_rate: number }>>('/stats/agent-performance')
     } catch {
       return mockAgents
         .filter(a => a.status === 'active')
@@ -387,16 +303,9 @@ export const dashboardService = {
         }))
     }
   },
-
-  getTaskChart: async (days: number = 7): Promise<Array<{
-    day: string
-    completed: number
-    failed: number
-    pending: number
-  }>> => {
+  getTaskChart: async (days: number = 7): Promise<Array<{ day: string; completed: number; failed: number; pending: number }>> => {
     try {
-      const { data } = await api.get('/stats/task-chart', { params: { days } })
-      return data
+      return await apiFetch<Array<{ day: string; completed: number; failed: number; pending: number }>>('/stats/task-chart?days=' + days)
     } catch {
       return mockTaskChartData
     }
@@ -405,43 +314,29 @@ export const dashboardService = {
 
 export const workflowService = {
   getAll: async (): Promise<Workflow[]> => {
-    const { data } = await api.get('/workflows')
-    return data
+    return apiFetch<Workflow[]>('/workflows')
   },
-
   getById: async (id: string): Promise<Workflow> => {
-    const { data } = await api.get(`/workflows/${id}`)
-    return data
+    return apiFetch<Workflow>('/workflows/' + id)
   },
-
   create: async (workflow: Partial<Workflow>): Promise<Workflow> => {
-    const { data } = await api.post('/workflows', workflow)
-    return data
+    return apiPost<Workflow>('/workflows', workflow)
   },
-
   update: async (id: string, workflow: Partial<Workflow>): Promise<Workflow> => {
-    const { data } = await api.put(`/workflows/${id}`, workflow)
-    return data
+    return apiFetch<Workflow>('/workflows/' + id, { method: 'PUT', body: JSON.stringify(workflow) })
   },
-
   delete: async (id: string): Promise<void> => {
-    await api.delete(`/workflows/${id}`)
+    await apiFetch<void>('/workflows/' + id, { method: 'DELETE' })
   },
-
   execute: async (id: string, input?: Record<string, unknown>): Promise<{ runId: string }> => {
-    const { data } = await api.post(`/workflows/${id}/execute`, { input })
-    return data
+    return apiPost<{ runId: string }>('/workflows/' + id + '/execute', { input })
   },
-
   enable: async (id: string): Promise<Workflow> => {
-    const { data } = await api.post(`/workflows/${id}/enable`)
-    return data
+    return apiPost<Workflow>('/workflows/' + id + '/enable')
   },
-
   disable: async (id: string): Promise<Workflow> => {
-    const { data } = await api.post(`/workflows/${id}/disable`)
-    return data
+    return apiPost<Workflow>('/workflows/' + id + '/disable')
   },
 }
 
-export default api
+export default apiFetch
