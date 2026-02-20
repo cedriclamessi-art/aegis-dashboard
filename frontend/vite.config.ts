@@ -21,19 +21,12 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    minify: 'terser',
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor': [
-            'react',
-            'react-dom',
-            'react-router-dom',
-            'recharts'
-          ],
-          'ui': [
-            'lucide-react'
-          ]
+          'vendor': [ 'react', 'react-dom', 'react-router-dom', 'recharts' ],
+          'ui': [ 'lucide-react' ]
         }
       }
     },
