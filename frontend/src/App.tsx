@@ -1265,29 +1265,12 @@ export default function App() {
     ]
 
     const videoTemplates = [
-      { id: 'hook3s', label: 'Hook 3 secondes', emoji: '⚡', format: '9:16', duree: '3s', desc: 'Accroche visuelle ultra-rapide, stop-thumb', script: 'HOOK: [Problème douloureux]
-SOLUTION: [Produit apparaît]
-CTA: "Découvrez maintenant"', score: 96 },
-      { id: 'ugcreview', label: 'UGC Testimonial', emoji: '🎤', format: '9:16', duree: '30s', desc: 'Témoignage client authentique face caméra', script: 'INTRO: "J'avais ce problème..."
-ACTION: Montrer le produit
-RESULT: "Maintenant je..."
-CTA: "Lien en bio"', score: 91 },
-      { id: 'demo', label: 'Démo Produit', emoji: '🎬', format: '1:1', duree: '20s', desc: 'Démonstration fonctionnement étape par étape', script: 'BEFORE: Situation sans produit
-DEMO: Utilisation produit
-AFTER: Résultat impressionnant
-OFFRE: Prix + urgence', score: 88 },
-      { id: 'problem', label: 'Problème/Solution', emoji: '🧩', format: '9:16', duree: '15s', desc: 'Présenter le problème puis la solution produit', script: 'P1: "Tu galères avec X ?"
-P2: "Nous avons créé Y"
-P3: Fonctionnalités
-P4: CTA + offre', score: 85 },
-      { id: 'comparison_vid', label: 'Comparaison Marques', emoji: '🏆', format: '16:9', duree: '25s', desc: 'Notre produit vs les alternatives du marché', script: 'CONCURRENTS: Leurs limites
-NOTRE PRODUIT: Nos avantages
-PREUVE: Chiffres/résultats
-CTA: Passer à l'action', score: 82 },
-      { id: 'unboxing', label: 'Unboxing', emoji: '📦', format: '9:16', duree: '45s', desc: 'Déballage du produit, première impression', script: 'PACKAGING: Montrer la boîte
-DEBALLAGE: Suspense
-DECOUVERTE: Réaction WOW
-UTILISATION: Premier test', score: 78 },
+      { id: 'hook3s', label: 'Hook 3 secondes', emoji: '⚡', format: '9:16', duree: '3s', desc: 'Accroche visuelle ultra-rapide, stop-thumb', script: 'HOOK: [Problème douloureux]\nSOLUTION: [Produit apparaît]\nCTA: Découvrez maintenant', score: 96 },
+      { id: 'ugcreview', label: 'UGC Testimonial', emoji: '🎤', format: '9:16', duree: '30s', desc: 'Témoignage client authentique face caméra', script: "INTRO: J'avais ce problème...\nACTION: Montrer le produit\nRESULT: Maintenant je...\nCTA: Lien en bio", score: 91 },
+      { id: 'demo', label: 'Démo Produit', emoji: '🎬', format: '1:1', duree: '20s', desc: 'Démonstration fonctionnement étape par étape', script: 'BEFORE: Situation sans produit\nDEMO: Utilisation produit\nAFTER: Résultat impressionnant\nOFFRE: Prix + urgence', score: 88 },
+      { id: 'problem', label: 'Problème/Solution', emoji: '🧩', format: '9:16', duree: '15s', desc: 'Présenter le problème puis la solution produit', script: 'P1: Tu galères avec X ?\nP2: Nous avons créé Y\nP3: Fonctionnalités\nP4: CTA + offre', score: 85 },
+      { id: 'comparison_vid', label: 'Comparaison Marques', emoji: '🏆', format: '16:9', duree: '25s', desc: 'Notre produit vs les alternatives du marché', script: "CONCURRENTS: Leurs limites\nNOTRE PRODUIT: Nos avantages\nPREUVE: Chiffres/résultats\nCTA: Passer à l'action", score: 82 },
+      { id: 'unboxing', label: 'Unboxing', emoji: '📦', format: '9:16', duree: '45s', desc: 'Déballage du produit, première impression', script: 'PACKAGING: Montrer la boîte\nDEBALLAGE: Suspense\nDECOUVERTE: Réaction WOW\nUTILISATION: Premier test', score: 78 },
     ]
 
     const niches = [
@@ -1307,7 +1290,7 @@ UTILISATION: Premier test', score: 78 },
       { type: 'Résultat', hook: 'De [SITUATION ACTUELLE] à [RÉSULTAT] en 30 jours.', desc: 'Transformation chiffrée', score: 87, color: '#4ade80' },
       { type: 'Urgence', hook: 'Stock limité : 23 unités restantes au prix promo.', desc: 'FOMO + scarcité', score: 84, color: '#f97316' },
       { type: 'Autorité', hook: 'Le secret des marques $100M+ sur Shopify.', desc: 'Crédibilité + aspiration', score: 86, color: '#a78bfa' },
-      { type: 'Contraste', hook: 'Avant j'avais X. Maintenant j'ai Y.', desc: 'Avant/après émotionnel', score: 83, color: '#60a5fa' },
+      { type: 'Contraste', hook: "Avant j'avais X. Maintenant j'ai Y.", desc: 'Avant/après émotionnel', score: 83, color: '#60a5fa' },
     ]
 
     return (
@@ -2722,7 +2705,7 @@ UTILISATION: Premier test', score: 78 },
             <div style={{ fontSize: '32px', marginBottom: '8px' }}>🚨</div>
             <div style={{ fontWeight: 700, fontSize: '16px', color: '#f87171', marginBottom: '8px' }}>ARRET D'URGENCE</div>
             <div style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '16px' }}>Arrete immediatement TOUTES les campagnes sur toutes les plateformes. Action irreversible sans confirmation.</div>
-            <button style={{ ...S.btn('danger'), width: '100%', padding: '14px', fontSize: '16px' }} onClick={() => { if(window.confirm('CONFIRMER L'ARRET D'URGENCE ? Toutes les campagnes seront stoppees.')) alert('Kill switch active ! Toutes les campagnes sont stoppees.') }}>
+            <button style={{ ...S.btn('danger'), width: '100%', padding: '14px', fontSize: '16px' }} onClick={() => { if(window.confirm("CONFIRMER L'ARRET D'URGENCE ? Toutes les campagnes seront stoppees.")) alert('Kill switch active ! Toutes les campagnes sont stoppees.') }}>
               🛑 ACTIVER KILL SWITCH
             </button>
           </div>
