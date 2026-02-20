@@ -296,7 +296,7 @@ export default function App() {
         setCreatifsLibrary((prev: any[]) => [newCreatif, ...prev])
       }
 
-    } catch(e: any) {
+    } catch(e) {
       console.error('Gemini generation error:', e)
     }
     setGeminiGenerating(false)
@@ -356,17 +356,19 @@ export default function App() {
     if (!nouvelleUrl.trim()) return
     setLoading(true)
     try {
-      const { data } = await supabase.rpc('enqueue_product_pipeline', {
+      const platformEmojis: Record<string,string> = { meta: '📘', google: '🔵', tiktok: '🎵', snapchat: '👻', pinterest: '📌' }
+      const platformLabel = (platformEmojis[nouvellePlateforme] || '📢') + ' ' + nouvellePlateforme.charAt(0).toUpperCase() + nouvellePlateforme.slice(1)
+      await supabase.rpc('enqueue_product_pipeline', {
         p_tenant_id: TENANT_ID || 'AEGIS-OWNER',
         p_product_id: 'prod_' + Date.now(),
-        p_product_name: nouvelleUrl,
+        p_product_name: nouvelleUrl + ' [' + platformLabel + ']',
         p_budget: parseFloat(nouveauBudget) || 500,
         p_target_roas: 1.5
       })
       await loadData()
       setNouvelleUrl('')
-      alert('Campagne lancee avec succes!')
-    } catch(e: any) { alert('Erreur: ' + e.message) }
+      alert('Campagne lancée avec succès sur ' + platformLabel + ' !')
+    } catch(e) { alert('Erreur: ' + (e as Error).message) }
     setLoading(false)
   }
 
@@ -570,7 +572,7 @@ export default function App() {
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '11px', color: '#64748b' }}>
               <span>Total: 1 200 EUR/j</span>
-              <span style={{ color: '#4ade80' }}>ROAS global: 3.4x</span>
+              <span style={{ color: '#4ade80' }}>ROAS global: 3.3x</span>
             </div>
           </div>
         </div>
@@ -630,15 +632,15 @@ export default function App() {
     const connecterAPI = async (service: string, key: string) => {
       setLoading(true)
       await new Promise(r => setTimeout(r, 1500))
-      setApiConnections(prev => ({ ...prev, [service]: !!key.trim() }))
+      setApiConnections(prev => ({ ...prev, [service as keyof typeof prev]: !!key.trim() }))
       setLoading(false)
     }
 
     return (
       <div>
         <div style={S.info}>
-          🔗 <strong>Store Connector Engine + API Hub.</strong> Connecte ta boutique Shopify/WooCommerce et tes comptes publicitaires Meta, Google, TikTok, et Gemini IA.
-          Une fois connectes, AEGIS prend le controle total en temps reel.
+          🔗 <strong>Store Connector Engine + API Hub.</strong> Connecte ta boutique Shopify/WooCommerce et tes comptes publicitaires Meta, Google, TikTok, Snapchat, Pinterest et Gemini IA.
+          Une fois connectés, AEGIS prend le contrôle total en temps réel sur 5 plateformes.
         </div>
 
         {/* Statut connexions */}
@@ -1051,7 +1053,7 @@ export default function App() {
       <div style={{ ...S.card, marginBottom: '20px' }}>
         <div style={S.sectionTitle}>🔍 Analyser un produit</div>
         <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-          <input style={{ ...S.input, flex: 1 }} placeholder="URL produit, pub Facebook, AliExpress, Amazon, TikTok..." value={intelligenceProduit} onChange={e => setIntelligenceProduit(e.target.value)} />
+          <input style={{ ...S.input, flex: 1 }} placeholder="URL produit, pub Facebook/TikTok/Snap/Pinterest, AliExpress, Amazon..." value={intelligenceProduit} onChange={e => setIntelligenceProduit(e.target.value)} />
           <button style={S.btn('primary')} onClick={analyserIntelligence} disabled={intelligenceLoading}>
             {intelligenceLoading ? '⏳ Analyse en cours...' : '🔍 Analyser'}
           </button>
@@ -1145,7 +1147,9 @@ export default function App() {
                       { vendeur: 'Brand A', plat: 'Meta', depenses: '5k-10k EUR', actif: '3 mois', angle: 'Lifestyle', menace: 'Haute' },
                       { vendeur: 'Store B', plat: 'Google', depenses: '2k-5k EUR', actif: '1 mois', angle: 'Performance', menace: 'Moyenne' },
                       { vendeur: 'Brand C', plat: 'TikTok', depenses: '1k-3k EUR', actif: '2 semaines', angle: 'Viral UGC', menace: 'Faible' },
-                      { vendeur: 'Aliexpress', plat: 'SEO', depenses: 'N/A', actif: '2 ans', angle: 'Prix', menace: 'Faible (qualite)' },
+                      { vendeur: 'Creator D', plat: 'Snapchat', depenses: '500-2k EUR', actif: '1 semaine', angle: 'Gen Z Hook', menace: 'Faible' },
+                      { vendeur: 'Brand E', plat: 'Pinterest', depenses: '2k-4k EUR', actif: '4 mois', angle: 'Lifestyle déco', menace: 'Moyenne' },
+                      { vendeur: 'Aliexpress', plat: 'SEO', depenses: 'N/A', actif: '2 ans', angle: 'Prix', menace: 'Faible (qualité)' },
                     ].map((c,i) => (
                       <tr key={i}>
                         <td style={{ ...S.td, fontWeight: 600 }}>{c.vendeur}</td>
@@ -2806,6 +2810,8 @@ UTILISATION: Premier test', score: 78 },
           <option value="meta">Meta Ads</option>
           <option value="google">Google Ads</option>
           <option value="tiktok">TikTok Ads</option>
+          <option value="snapchat">Snapchat Ads</option>
+          <option value="pinterest">Pinterest Ads</option>
         </select>
         <input style={{ ...S.input, width: '100px' }} type="number" placeholder="Budget" value={nouveauBudget} onChange={e => setNouveauBudget(e.target.value)} />
         <button style={S.btn('success')} onClick={lancerCampagne} disabled={loading}>{loading ? 'Lancement...' : '🚀 Nouvelle campagne'}</button>
@@ -3098,4 +3104,4 @@ UTILISATION: Premier test', score: 78 },
       </main>
     </div>
   )
-         }
+}
