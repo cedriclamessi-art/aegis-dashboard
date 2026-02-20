@@ -19,32 +19,33 @@ const S = {
   app: { display: 'flex', minHeight: '100vh', background: '#0f0f1a', color: '#e2e8f0', fontFamily: 'system-ui,sans-serif' },
   sidebar: { width: 240, background: '#0a0a12', borderRight: '1px solid #1e1e3a', padding: '0', display: 'flex', flexDirection: 'column' as const },
   main: { flex: 1, display: 'flex', flexDirection: 'column' as const },
-  header: { padding: '20px 32px', borderBottom: '1px solid #1e1e3a', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0a0a12' },
-  content: { flex: 1, padding: '32px', overflowY: 'auto' as const },
+  header: { padding: '24px 44px', borderBottom: '1px solid #111122', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0a0a12' },
+  content: { flex: 1, padding: '36px 44px', overflowY: 'auto' as const },
   logo: { padding: '24px 20px', borderBottom: '1px solid #1e1e3a' },
   logoText: { fontSize: '22px', fontWeight: 800, color: '#facc15', letterSpacing: '-0.5px' },
   logoSub: { fontSize: '11px', color: '#64748b', marginTop: '2px' },
   navSection: { padding: '12px 12px 4px', fontSize: '10px', fontWeight: 700, color: '#374151', letterSpacing: '1px', textTransform: 'uppercase' as const },
   navBtn: (active: boolean) => ({
-    width: '100%', padding: '10px 16px', background: active ? '#1e1b4b' : 'transparent',
-    border: 'none', borderRadius: '8px', color: active ? '#a5b4fc' : '#94a3b8',
-    cursor: 'pointer', textAlign: 'left' as const, fontSize: '14px', fontWeight: active ? 600 : 400,
+    width: '100%', padding: '9px 16px', background: active ? '#12122a' : 'transparent',
+    border: 'none', borderLeft: active ? '2px solid #6366f1' : '2px solid transparent', borderRadius: '0 8px 8px 0',
+    color: active ? '#a5b4fc' : '#64748b',
+    cursor: 'pointer', textAlign: 'left' as const, fontSize: '13px', fontWeight: active ? 600 : 400,
     display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2px',
     transition: 'all 0.15s'
   }),
-  card: { background: '#0a0a1a', border: '1px solid #1e1e3a', borderRadius: '12px', padding: '20px' },
+  card: { background: '#080810', border: '1px solid #1a1a2e', borderRadius: '14px', padding: '22px 26px' },
   cardTitle: { fontSize: '13px', color: '#64748b', marginBottom: '6px' },
   cardValue: { fontSize: '28px', fontWeight: 700, color: '#fff' },
-  grid: (cols: number) => ({ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '16px' }),
+  grid: (cols: number) => ({ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '14px' }),
   badge: (color: string) => ({ background: color === 'green' ? '#052e16' : color === 'yellow' ? '#451a03' : color === 'red' ? '#450a0a' : color === 'blue' ? '#0c1a3e' : '#1e1e3a', color: color === 'green' ? '#4ade80' : color === 'yellow' ? '#fbbf24' : color === 'red' ? '#f87171' : color === 'blue' ? '#93c5fd' : '#94a3b8', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 600 }),
   btn: (variant: string = 'primary') => ({ padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px', background: variant === 'primary' ? '#4f46e5' : variant === 'success' ? '#16a34a' : variant === 'danger' ? '#dc2626' : variant === 'outline' ? 'transparent' : '#1e1e3a', color: variant === 'outline' ? '#94a3b8' : '#fff', border: variant === 'outline' ? '1px solid #1e1e3a' : 'none' }),
   input: { padding: '10px 14px', background: '#0f0f1a', border: '1px solid #1e1e3a', borderRadius: '8px', color: '#e2e8f0', fontSize: '14px', width: '100%', outline: 'none' },
   table: { width: '100%', borderCollapse: 'collapse' as const },
   th: { padding: '10px 16px', background: '#0a0a1a', color: '#64748b', fontSize: '11px', textAlign: 'left' as const, fontWeight: 700, letterSpacing: '0.5px', borderBottom: '1px solid #1e1e3a' },
   td: { padding: '12px 16px', borderBottom: '1px solid #0f0f1a', fontSize: '14px' },
-  info: { background: '#0c1a3e', border: '1px solid #1e3a8a', borderRadius: '10px', padding: '14px 18px', marginBottom: '24px', fontSize: '14px', color: '#93c5fd' },
+  info: { borderLeft: '3px solid #1e3a8a', padding: '10px 16px', marginBottom: '28px', fontSize: '13px', color: '#475569', display: 'none' },
   section: { marginBottom: '32px' },
-  sectionTitle: { fontSize: '16px', fontWeight: 700, marginBottom: '16px', color: '#c7d2fe' },
+  sectionTitle: { fontSize: '13px', fontWeight: 600, marginBottom: '20px', color: '#64748b', textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
   progress: (pct: number, color: string = '#4f46e5') => ({ height: '8px', background: '#1e1e3a', borderRadius: '4px', overflow: 'hidden' as const }),
   progressBar: (pct: number, color: string = '#4f46e5') => ({ height: '100%', width: `${Math.min(100,pct)}%`, background: color, borderRadius: '4px', transition: 'width 0.3s' }),
   tag: { display: 'inline-block', padding: '2px 8px', background: '#1e1e3a', borderRadius: '4px', fontSize: '11px', color: '#94a3b8', marginRight: '4px', marginTop: '4px' },
@@ -556,29 +557,29 @@ export default function App() {
             { label: 'ROAS moyen', val: '3.4x', color: '#4ade80', hint: 'Pour 1EUR depense -> 3.4EUR recup', sparkData: dataRoas7j.map(v => v*100), sparkColor: '#4ade80' },
             { label: 'Agents actifs', val: agents.length || 25, color: '#818cf8', hint: 'Robots IA configures', sparkData: [20,22,22,24,25,25,agents.length || 25], sparkColor: '#818cf8' },
           ].map((c,i) => (
-            <div key={i} style={S.card}>
-              <div style={S.cardTitle}>{c.label}</div>
+            <div key={i} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ fontSize: '11px', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{c.label}</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                <div style={{ ...S.cardValue, color: c.color, fontSize: '26px' }}>{c.val}</div>
-                <SparkLine data={c.sparkData} color={c.sparkColor} height={36} width={80} />
+                <div style={{ fontSize: '30px', fontWeight: 700, color: c.color, letterSpacing: '-0.5px', lineHeight: 1 }}>{c.val}</div>
+                <SparkLine data={c.sparkData} color={c.sparkColor} height={32} width={72} />
               </div>
-              <div style={{ fontSize: '11px', color: '#475569', marginTop: '4px' }}>{c.hint}</div>
+              <div style={{ fontSize: '12px', color: '#334155' }}>{c.hint}</div>
             </div>
           ))}
         </div>
 
         {/* KPIs financiers avec sparklines */}
-        <div style={{ ...S.grid(3), marginTop: '16px' }}>
+        <div style={{ ...S.grid(3), marginTop: '24px' }}>
           {[
             { label: 'Depenses 7j', val: '1 247 EUR/j', color: '#f87171', sub: '+12% vs semaine passee', sparkData: dataDepenses7j, sparkColor: '#f87171' },
             { label: 'Revenus 7j', val: revenue + ' EUR/j', color: '#4ade80', sub: '+18% vs semaine passee', sparkData: dataRevenus7j, sparkColor: '#4ade80' },
             { label: 'CTR moyen', val: '3.8%', color: '#fbbf24', sub: '+0.4% vs semaine passee', sparkData: dataCtr7j.map(v => v*100), sparkColor: '#fbbf24' },
           ].map((c,i) => (
-            <div key={i} style={S.card}>
-              <div style={S.cardTitle}>{c.label}</div>
+            <div key={i} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ fontSize: '11px', color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{c.label}</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div>
-                  <div style={{ fontSize: '22px', fontWeight: 700, color: c.color }}>{c.val}</div>
+                  <div style={{ fontSize: '24px', fontWeight: 700, color: c.color, letterSpacing: '-0.3px' }}>{c.val}</div>
                   <div style={{ fontSize: '11px', color: '#4ade80', marginTop: '2px' }}>↑ {c.sub}</div>
                 </div>
                 <SparkLine data={c.sparkData} color={c.sparkColor} height={44} width={100} />
@@ -588,7 +589,7 @@ export default function App() {
         </div>
 
         {/* Graphique dépenses vs revenus 7 jours */}
-        <div style={{ ...S.grid(2), marginTop: '16px' }}>
+        <div style={{ ...S.grid(2), marginTop: '28px' }}>
           <div style={S.card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div style={S.sectionTitle}>📈 Revenus vs Depenses ({chartView})</div>
@@ -629,9 +630,9 @@ export default function App() {
         </div>
 
         {/* Etat système + Objectif */}
-        <div style={{ ...S.grid(2), marginTop: '16px' }}>
+        <div style={{ ...S.grid(2), marginTop: '28px' }}>
           <div style={S.card}>
-            <div style={S.sectionTitle}>🖥️ Etat du systeme</div>
+            <div style={S.sectionTitle}>Etat du systeme</div>
             {[
               { label: 'Base de donnees', sub: 'Stockage de vos donnees', status: 'En ligne', color: 'green' },
               { label: 'Moteur de risque', sub: 'Surveille vos depenses', status: 'Actif', color: 'green' },
@@ -2336,14 +2337,14 @@ export default function App() {
               { label: 'Score Preuve', value: funnelAnalyse.preuveScore + '/100', color: funnelAnalyse.preuveScore > 60 ? '#10b981' : '#f87171', hint: 'Avis + UGC' },
             ].map(k => (
               <div key={k.label} style={S.card}>
-                <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>{k.label}</div>
-                <div style={{ fontSize: '24px', fontWeight: 700, color: k.color }}>{k.value}</div>
-                <div style={{ fontSize: '11px', color: '#475569', marginTop: '4px' }}>{k.hint}</div>
+                <div style={{ fontSize: '11px', color: '#475569', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{k.label}</div>
+                <div style={{ fontSize: '28px', fontWeight: 700, color: k.color, letterSpacing: '-0.5px' }}>{k.value}</div>
+                <div style={{ fontSize: '12px', color: '#334155', marginTop: '8px' }}>{k.hint}</div>
               </div>
             ))}
           </div>
           <div style={S.card}>
-            <div style={{ ...S.sectionTitle, marginBottom: '16px' }}>🎯 Recommandations AEGIS</div>
+            <div style={{ ...S.sectionTitle, marginBottom: '16px' }}>Recommandations AEGIS</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {funnelAnalyse.recommandations.map((r: any, i: number) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: '#0f172a', borderRadius: '8px', border: '1px solid ' + (r.priorite === 'CRITIQUE' ? '#ef444444' : r.priorite === 'HAUTE' ? '#f59e0b44' : '#334155') }}>
