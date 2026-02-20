@@ -1253,11 +1253,11 @@ export default function App() {
   const renderCreatifs = () => {
     const imageStyles = [
       { id: 'hero', label: 'Hero Image', emoji: '🦸', desc: 'Photo produit seul fond blanc/gradient, impact fort', prompt: '{"style":"hero_clean","bg":"white","lighting":"studio","shadow":"soft"}', score: 94 },
-      { id: 'lifestyle', label: 'Lifestyle Image', emoji: '🌿', desc: 'Produit en situation réelle d'utilisation', prompt: '{"style":"lifestyle","setting":"natural","mood":"aspirational","model":true}', score: 91 },
+      { id: 'lifestyle', label: 'Lifestyle Image', emoji: '🌿', desc: "Produit en situation réelle d'utilisation", prompt: '{"style":"lifestyle","setting":"natural","mood":"aspirational","model":true}', score: 91 },
       { id: 'infographic', label: 'Infographie', emoji: '📊', desc: 'Bénéfices clés listés visuellement sur le produit', prompt: '{"style":"infographic","callouts":5,"icons":true,"brand_colors":true}', score: 88 },
       { id: 'splitscreen', label: 'Split-Screen', emoji: '⬛', desc: 'Avant / Après ou comparaison côte-à-côte', prompt: '{"style":"split_screen","left":"before","right":"after","divider":"clean"}', score: 85 },
-      { id: 'howto', label: 'How-to/Process', emoji: '📋', desc: 'Étapes d'utilisation du produit (3-4 étapes)', prompt: '{"style":"how_to","steps":3,"numbered":true,"clean_bg":true}', score: 83 },
-      { id: 'multifeature', label: 'Multi-Feature Grid', emoji: '🔲', desc: 'Grille d'icônes et bénéfices autour du produit', prompt: '{"style":"feature_grid","features":6,"icons":"minimal","layout":"surrounding"}', score: 80 },
+      { id: 'howto', label: 'How-to/Process', emoji: '📋', desc: "Étapes d'utilisation du produit (3-4 étapes)", prompt: '{"style":"how_to","steps":3,"numbered":true,"clean_bg":true}', score: 83 },
+      { id: 'multifeature', label: 'Multi-Feature Grid', emoji: '🔲', desc: "Grille d'icônes et bénéfices autour du produit", prompt: '{"style":"feature_grid","features":6,"icons":"minimal","layout":"surrounding"}', score: 80 },
       { id: 'avantapres', label: 'Avant / Après', emoji: '✨', desc: 'Transformation visuelle du résultat produit', prompt: '{"style":"before_after","split":"vertical","labels":true,"dramatic":true}', score: 92 },
       { id: 'comparison', label: 'Comparaison', emoji: '⚖️', desc: 'Vous vs concurrents, tableau de comparaison', prompt: '{"style":"comparison_table","cols":3,"highlight_winner":true}', score: 79 },
       { id: 'ugc', label: 'UGC Style', emoji: '📱', desc: 'Photo style amateur authentique prise en main', prompt: '{"style":"ugc_authentic","lighting":"natural","angle":"handheld","no_studio":true}', score: 87 },
@@ -2703,7 +2703,7 @@ UTILISATION: Premier test', score: 78 },
             { label: 'Stop-loss par produit', desc: 'Arrete produit si perte > 50 EUR/j', actif: true, critique: false },
             { label: 'Budget cap dynamique', desc: 'Max ' + riskConfig.depenseMax + ' EUR/j toutes plateformes', actif: true, critique: true },
             { label: 'Drawdown max', desc: 'Freeze si -20% capital en 7j', actif: true, critique: true },
-            { label: 'Kill switch total', desc: 'Arret d'urgence en 1 clic', actif: true, critique: true },
+            { label: 'Kill switch total', desc: "Arret d'urgence en 1 clic", actif: true, critique: true },
             { label: 'Emergency freeze', desc: 'Auto-freeze si anomalie critique', actif: true, critique: true },
             { label: 'Risk ratio P/L', desc: 'Alerte si ratio < 2:1', actif: true, critique: false },
           ].map((r,i) => (
@@ -2728,7 +2728,7 @@ UTILISATION: Premier test', score: 78 },
           </div>
           <div style={S.sectionTitle}>📊 Risque en temps reel</div>
           {[
-            { label: 'Depense aujourd'hui', val: '1 247 EUR', max: riskConfig.depenseMax, pct: Math.round(1247/riskConfig.depenseMax*100) },
+            { label: "Depense aujourd'hui", val: '1 247 EUR', max: riskConfig.depenseMax, pct: Math.round(1247/riskConfig.depenseMax*100) },
             { label: 'Perte nette', val: '0 EUR', max: riskConfig.perteMax, pct: 0 },
           ].map((r,i) => (
             <div key={i} style={{ marginBottom: '16px' }}>
@@ -2927,7 +2927,7 @@ UTILISATION: Premier test', score: 78 },
             { label: 'Garde-ROAS', desc: 'Arrete campagne si ROAS sous minimum', status: 'Arme' },
             { label: 'Frein automatique', desc: 'Reduit vitesse si anomalie', status: 'Arme' },
             { label: 'Emergency freeze', desc: 'Gel total si -20% capital', status: 'Arme' },
-            { label: 'Kill switch', desc: 'Arret d'urgence 1 clic', status: 'En veille' },
+            { label: 'Kill switch', desc: "Arret d'urgence 1 clic", status: 'En veille' },
             { label: 'Couverture auto', desc: 'Protection automatique', status: 'Surveillance' },
           ].map((p,i) => (
             <div key={i} style={{ ...S.card, marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
