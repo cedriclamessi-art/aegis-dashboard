@@ -37,7 +37,7 @@ const S = {
   cardValue: { fontSize: '28px', fontWeight: 700, color: '#fff' },
   grid: (cols: number) => ({ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '16px' }),
   badge: (color: string) => ({ background: color === 'green' ? '#052e16' : color === 'yellow' ? '#451a03' : color === 'red' ? '#450a0a' : color === 'blue' ? '#0c1a3e' : '#1e1e3a', color: color === 'green' ? '#4ade80' : color === 'yellow' ? '#fbbf24' : color === 'red' ? '#f87171' : color === 'blue' ? '#93c5fd' : '#94a3b8', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 600 }),
-  btn: (variant: string = 'primary') => ({ padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '14px', background: variant === 'primary' ? '#4f46e5' : variant === 'success' ? '#16a34a' : variant === 'danger' ? '#dc2626' : variant === 'outline' ? 'transparent' : '#1e1e3a', color: variant === 'outline' ? '#94a3b8' : '#fff', border: variant === 'outline' ? '1px solid #1e1e3a' : 'none' }),
+  btn: (variant: string = 'primary') => ({ padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px', background: variant === 'primary' ? '#4f46e5' : variant === 'success' ? '#16a34a' : variant === 'danger' ? '#dc2626' : variant === 'outline' ? 'transparent' : '#1e1e3a', color: variant === 'outline' ? '#94a3b8' : '#fff', border: variant === 'outline' ? '1px solid #1e1e3a' : 'none' }),
   input: { padding: '10px 14px', background: '#0f0f1a', border: '1px solid #1e1e3a', borderRadius: '8px', color: '#e2e8f0', fontSize: '14px', width: '100%', outline: 'none' },
   table: { width: '100%', borderCollapse: 'collapse' as const },
   th: { padding: '10px 16px', background: '#0a0a1a', color: '#64748b', fontSize: '11px', textAlign: 'left' as const, fontWeight: 700, letterSpacing: '0.5px', borderBottom: '1px solid #1e1e3a' },
@@ -197,14 +197,14 @@ export default function App() {
     setGeneratedImageUrl(null)
     try {
       let imgUrl = ''
+      const fullPrompt = [
+        produit, style, prompt,
+        'white background', 'professional product photography',
+        'high quality', '4k', 'e-commerce style',
+        'sharp focus', 'no text overlay'
+      ].join(', ')
       if (apiConnections.gemini && geminiApiKey && geminiApiKey !== 'demo_gemini_key') {
         // === VRAIE API GEMINI IMAGEN 3 ===
-        const fullPrompt = [
-          produit, style, prompt,
-          'white background', 'professional product photography',
-          'high quality', '4k', 'e-commerce style',
-          'sharp focus', 'no text overlay'
-        ].join(', ')
         try {
           const res = await fetch(
             'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=' + geminiApiKey,
@@ -491,7 +491,7 @@ export default function App() {
           <h2 style={S.sectionTitle}>📊 Resume du jour</h2>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             {(['7j','30j','90j'] as const).map(v => (
-              <button key={v} onClick={() => setChartView(v)} style={{ padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: chartView === v ? 700 : 400, background: chartView === v ? '#4f46e5' : '#0a0a1a', color: chartView === v ? '#fff' : '#64748b', border: chartView === v ? 'none' : '1px solid #1e1e3a' }}>{v}</button>
+              <button key={v} onClick={() => setChartView(v)} style={{ padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: chartView === v ? 700 : 400, background: chartView === v ? '#4f46e5' : '#0a0a1a', color: chartView === v ? '#fff' : '#64748b', border: chartView === v ? 'none' : '1px solid #1e1e3a' }}>{v}</button>
             ))}
             <button style={S.btn()} onClick={loadData}>🔄 Actualiser</button>
           </div>
@@ -1088,7 +1088,7 @@ export default function App() {
           {/* Onglets d'analyse */}
           <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', borderBottom: '1px solid #1e1e3a', paddingBottom: '12px' }}>
             {([['analyse', '📊 Analyse', 'Détails'], ['concurrence', '⚔️ Concurrence', 'Marché'], ['tendances', '📈 Tendances', 'Google'], ['historique', '🕐 Historique', 'Scans']] as const).map(([id, label, sub]) => (
-              <button key={id} onClick={() => setIntelligenceTab(id)} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', cursor: 'pointer', background: intelligenceTab === id ? '#4f46e5' : '#0a0a1a', color: intelligenceTab === id ? '#fff' : '#94a3b8', fontWeight: intelligenceTab === id ? 700 : 400, fontSize: '13px', border: intelligenceTab === id ? 'none' : '1px solid #1e1e3a' }}>
+              <button key={id} onClick={() => setIntelligenceTab(id)} style={{ padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', background: intelligenceTab === id ? '#4f46e5' : '#0a0a1a', color: intelligenceTab === id ? '#fff' : '#94a3b8', fontWeight: intelligenceTab === id ? 700 : 400, fontSize: '13px', border: intelligenceTab === id ? 'none' : '1px solid #1e1e3a' }}>
                 {label} <span style={{ fontSize: '10px', opacity: 0.7 }}>{sub}</span>
               </button>
             ))}
@@ -1310,7 +1310,7 @@ export default function App() {
             { id: 'plateformes', label: '📲 Plateformes', desc: 'TikTok · Snap · Pin' },
           ].map(tab => (
             <button key={tab.id} onClick={() => setCreatifType(tab.id)} style={{
-              padding: '10px 18px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+              padding: '10px 18px', borderRadius: '10px', cursor: 'pointer',
               background: creatifType === tab.id ? '#4f46e5' : '#0a0a1a',
               color: creatifType === tab.id ? '#fff' : '#94a3b8',
               fontWeight: creatifType === tab.id ? 700 : 400, fontSize: '14px',
@@ -1932,7 +1932,7 @@ export default function App() {
             ['upload', '📸 Upload Photo', 0],
           ] as const).map(([id, label, count]) => (
             <button key={id} onClick={() => setLibraryTab(id)} style={{
-              padding: '9px 16px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '13px',
+              padding: '9px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px',
               background: libraryTab === id ? '#4f46e5' : '#0a0a1a',
               color: libraryTab === id ? '#fff' : '#94a3b8',
               fontWeight: libraryTab === id ? 700 : 400,
