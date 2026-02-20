@@ -451,99 +451,403 @@ export default function App() {
     </div>
   )
   // ============================================================
-  // PAGE CREATIFS (CREATIVE ENGINE)
+  // PAGE CREATIFS (CREATIVE ENGINE) - Inspiré PeelKit
   // ============================================================
-  const renderCreatifs = () => (
-    <div>
-      <div style={S.info}>
-        🎨 <strong>Creative Engine.</strong> Genere automatiquement images, videos UGC, hooks, scripts, copy et landing pages. L'IA adapte les creatifs selon le produit et le marche cible.
-      </div>
-      <div style={S.card}>
-        <div style={S.sectionTitle}>🎨 Generer des creatifs</div>
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-          <input style={{ ...S.input, flex: 1 }} placeholder="Nom ou URL du produit..." value={creatifProduit} onChange={e => setCreatifProduit(e.target.value)} />
-          <select style={{ ...S.input, width: 'auto' }} value={creatifType} onChange={e => setCreatifType(e.target.value)}>
-            <option value="image">Images publicitaires</option>
-            <option value="video">Videos UGC</option>
-            <option value="copy">Copy / textes</option>
-            <option value="landing">Landing pages</option>
-          </select>
-          <button style={S.btn('primary')} onClick={genererCreatifs} disabled={creatifLoading}>{creatifLoading ? 'Generation...' : '✨ Generer'}</button>
+  const renderCreatifs = () => {
+    const imageStyles = [
+      { id: 'hero', label: 'Hero Image', emoji: '🦸', desc: 'Photo produit seul fond blanc/gradient, impact fort', prompt: '{"style":"hero_clean","bg":"white","lighting":"studio","shadow":"soft"}', score: 94 },
+      { id: 'lifestyle', label: 'Lifestyle Image', emoji: '🌿', desc: 'Produit en situation réelle d'utilisation', prompt: '{"style":"lifestyle","setting":"natural","mood":"aspirational","model":true}', score: 91 },
+      { id: 'infographic', label: 'Infographie', emoji: '📊', desc: 'Bénéfices clés listés visuellement sur le produit', prompt: '{"style":"infographic","callouts":5,"icons":true,"brand_colors":true}', score: 88 },
+      { id: 'splitscreen', label: 'Split-Screen', emoji: '⬛', desc: 'Avant / Après ou comparaison côte-à-côte', prompt: '{"style":"split_screen","left":"before","right":"after","divider":"clean"}', score: 85 },
+      { id: 'howto', label: 'How-to/Process', emoji: '📋', desc: 'Étapes d'utilisation du produit (3-4 étapes)', prompt: '{"style":"how_to","steps":3,"numbered":true,"clean_bg":true}', score: 83 },
+      { id: 'multifeature', label: 'Multi-Feature Grid', emoji: '🔲', desc: 'Grille d'icônes et bénéfices autour du produit', prompt: '{"style":"feature_grid","features":6,"icons":"minimal","layout":"surrounding"}', score: 80 },
+      { id: 'avantapres', label: 'Avant / Après', emoji: '✨', desc: 'Transformation visuelle du résultat produit', prompt: '{"style":"before_after","split":"vertical","labels":true,"dramatic":true}', score: 92 },
+      { id: 'comparison', label: 'Comparaison', emoji: '⚖️', desc: 'Vous vs concurrents, tableau de comparaison', prompt: '{"style":"comparison_table","cols":3,"highlight_winner":true}', score: 79 },
+      { id: 'ugc', label: 'UGC Style', emoji: '📱', desc: 'Photo style amateur authentique prise en main', prompt: '{"style":"ugc_authentic","lighting":"natural","angle":"handheld","no_studio":true}', score: 87 },
+      { id: 'bundle', label: 'Bundle Shot', emoji: '📦', desc: 'Plusieurs produits ensemble, offre de valeur', prompt: '{"style":"bundle_flat_lay","products":"multiple","arrangement":"organized","price_tag":true}', score: 82 },
+    ]
+
+    const videoTemplates = [
+      { id: 'hook3s', label: 'Hook 3 secondes', emoji: '⚡', format: '9:16', duree: '3s', desc: 'Accroche visuelle ultra-rapide, stop-thumb', script: 'HOOK: [Problème douloureux]
+SOLUTION: [Produit apparaît]
+CTA: "Découvrez maintenant"', score: 96 },
+      { id: 'ugcreview', label: 'UGC Testimonial', emoji: '🎤', format: '9:16', duree: '30s', desc: 'Témoignage client authentique face caméra', script: 'INTRO: "J'avais ce problème..."
+ACTION: Montrer le produit
+RESULT: "Maintenant je..."
+CTA: "Lien en bio"', score: 91 },
+      { id: 'demo', label: 'Démo Produit', emoji: '🎬', format: '1:1', duree: '20s', desc: 'Démonstration fonctionnement étape par étape', script: 'BEFORE: Situation sans produit
+DEMO: Utilisation produit
+AFTER: Résultat impressionnant
+OFFRE: Prix + urgence', score: 88 },
+      { id: 'problem', label: 'Problème/Solution', emoji: '🧩', format: '9:16', duree: '15s', desc: 'Présenter le problème puis la solution produit', script: 'P1: "Tu galères avec X ?"
+P2: "Nous avons créé Y"
+P3: Fonctionnalités
+P4: CTA + offre', score: 85 },
+      { id: 'comparison_vid', label: 'Comparaison Marques', emoji: '🏆', format: '16:9', duree: '25s', desc: 'Notre produit vs les alternatives du marché', script: 'CONCURRENTS: Leurs limites
+NOTRE PRODUIT: Nos avantages
+PREUVE: Chiffres/résultats
+CTA: Passer à l'action', score: 82 },
+      { id: 'unboxing', label: 'Unboxing', emoji: '📦', format: '9:16', duree: '45s', desc: 'Déballage du produit, première impression', script: 'PACKAGING: Montrer la boîte
+DEBALLAGE: Suspense
+DECOUVERTE: Réaction WOW
+UTILISATION: Premier test', score: 78 },
+    ]
+
+    const niches = [
+      { cat: 'Beauté & Skincare', emoji: '💄', templates: 18, niches: ['Anti-aging', 'Serums', 'Masques', 'SPF', 'Acné'] },
+      { cat: 'Santé & Nutrition', emoji: '💊', templates: 15, niches: ['Suppléments', 'Protéines', 'Probiotiques', 'Vitamines', 'CBD'] },
+      { cat: 'Mode & Accessoires', emoji: '👗', templates: 12, niches: ['Bijoux', 'Sacs', 'Montres', 'Lunettes', 'Vêtements'] },
+      { cat: 'Sport & Fitness', emoji: '🏋️', templates: 14, niches: ['Équipement', 'Vêtements sport', 'Nutrition', 'Récupération', 'Yoga'] },
+      { cat: 'Maison & Décoration', emoji: '🏠', templates: 11, niches: ['Décoration', 'Cuisine', 'Rangement', 'Jardinage', 'Éclairage'] },
+      { cat: 'Tech & Gadgets', emoji: '📱', templates: 13, niches: ['Accessoires phone', 'Smart home', 'Gaming', 'Audio', 'Wearables'] },
+      { cat: 'Animaux', emoji: '🐾', templates: 8, niches: ['Chiens', 'Chats', 'Nutrition animale', 'Jouets', 'Toilettage'] },
+      { cat: 'Bébé & Enfants', emoji: '👶', templates: 9, niches: ['Puériculture', 'Jouets', 'Vêtements bébé', 'Alimentation', 'Sécurité'] },
+    ]
+
+    const copyHooks = [
+      { type: 'Douleur', hook: 'Tu en as marre de [PROBLÈME] ?', desc: 'Adresse directement la frustration', score: 92, color: '#f87171' },
+      { type: 'Curiosité', hook: 'Ce produit utilisé par 47 000 personnes change tout.', desc: 'Preuve sociale + mystère', score: 89, color: '#fbbf24' },
+      { type: 'Résultat', hook: 'De [SITUATION ACTUELLE] à [RÉSULTAT] en 30 jours.', desc: 'Transformation chiffrée', score: 87, color: '#4ade80' },
+      { type: 'Urgence', hook: 'Stock limité : 23 unités restantes au prix promo.', desc: 'FOMO + scarcité', score: 84, color: '#f97316' },
+      { type: 'Autorité', hook: 'Le secret des marques $100M+ sur Shopify.', desc: 'Crédibilité + aspiration', score: 86, color: '#a78bfa' },
+      { type: 'Contraste', hook: 'Avant j'avais X. Maintenant j'ai Y.', desc: 'Avant/après émotionnel', score: 83, color: '#60a5fa' },
+    ]
+
+    return (
+      <div>
+        <div style={S.info}>
+          🎨 <strong>Creative Engine — Style PeelKit.</strong> Génère automatiquement images produit, vidéos UGC, hooks et landing pages.
+          10+ styles d'images testés sur les marques $100M+. Workflows JSON plug-and-play. 15 minutes pour un set complet.
         </div>
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-          <span style={{ fontSize: '13px', color: '#64748b' }}>Marches cibles :</span>
-          {['FR', 'EN', 'ES', 'DE', 'IT'].map(m => <span key={m} style={S.tag}>{m}</span>)}
+
+        {/* ONGLETS */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', borderBottom: '1px solid #1e1e3a', paddingBottom: '12px' }}>
+          {[
+            { id: 'image', label: '🖼️ Images Produit', desc: '10 styles' },
+            { id: 'video', label: '🎬 Vidéos UGC', desc: '6 templates' },
+            { id: 'copy', label: '✍️ Copy & Hooks', desc: '6 types' },
+            { id: 'landing', label: '🔁 Landing Pages', desc: 'Structures' },
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setCreatifType(tab.id)} style={{
+              padding: '10px 18px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+              background: creatifType === tab.id ? '#4f46e5' : '#0a0a1a',
+              color: creatifType === tab.id ? '#fff' : '#94a3b8',
+              fontWeight: creatifType === tab.id ? 700 : 400, fontSize: '14px',
+              border: creatifType === tab.id ? 'none' : '1px solid #1e1e3a',
+            }}>
+              {tab.label} <span style={{ fontSize: '11px', opacity: 0.7 }}>{tab.desc}</span>
+            </button>
+          ))}
         </div>
-        {creatifGenere.length > 0 && (
+
+        {/* === ONGLET IMAGES PRODUIT === */}
+        {creatifType === 'image' && (
           <div>
-            <div style={{ marginBottom: '16px', fontWeight: 600, color: '#a5b4fc' }}>{creatifGenere.length} creatifs generes pour "{creatifProduit}"</div>
-            <div style={S.grid(creatifType === 'copy' ? 1 : 3)}>
-              {creatifGenere.map((c: any, i: number) => (
-                <div key={i} style={{ ...S.card, border: '1px solid #1e3a8a' }}>
-                  {creatifType === 'image' && (
-                    <div>
-                      <div style={{ height: '120px', background: 'linear-gradient(135deg,#1e1b4b,#0c1a3e)', borderRadius: '8px', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5', fontSize: '32px' }}>🖼️</div>
-                      <div style={{ fontWeight: 600 }}>{c.titre}</div>
-                      <div style={{ fontSize: '12px', color: '#64748b' }}>{c.format}</div>
-                      <div style={{ marginTop: '8px' }}><span style={S.badge('green')}>Score: {c.score}/100</span></div>
-                    </div>
-                  )}
-                  {creatifType === 'video' && (
-                    <div>
-                      <div style={{ height: '120px', background: 'linear-gradient(135deg,#1a0533,#0c1a3e)', borderRadius: '8px', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>🎬</div>
-                      <div style={{ fontWeight: 600 }}>{c.titre}</div>
-                      <div style={{ fontSize: '12px', color: '#64748b' }}>{c.format} · {c.duree}</div>
-                      <div style={{ marginTop: '8px' }}><span style={S.badge('blue')}>Score: {c.score}/100</span></div>
-                    </div>
-                  )}
-                  {creatifType === 'copy' && (
-                    <div>
-                      <div style={{ fontWeight: 600, color: '#a5b4fc', marginBottom: '8px' }}>{c.titre}</div>
-                      <div style={{ fontSize: '14px', lineHeight: '1.6', padding: '12px', background: '#0f0f1a', borderRadius: '8px', fontStyle: 'italic' }}>"{c.texte}"</div>
-                      <div style={{ marginTop: '8px' }}><span style={S.badge('green')}>Score: {c.score}/100</span></div>
-                    </div>
-                  )}
-                  {creatifType === 'landing' && (
-                    <div>
-                      <div style={{ fontWeight: 600 }}>{c.titre}</div>
-                      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>Conversion: {c.conversion}</div>
-                      {c.elements.map((el: string, j: number) => <span key={j} style={S.tag}>{el}</span>)}
-                      <div style={{ marginTop: '12px' }}>
-                        <button style={{ ...S.btn('primary'), width: '100%', fontSize: '12px' }}>Deployer cette page</button>
+            {/* Génération */}
+            <div style={S.card}>
+              <div style={S.sectionTitle}>⚡ Générer un set d'images (15 min)</div>
+              <div style={{ ...S.grid(2), marginBottom: '16px' }}>
+                <div>
+                  <label style={{ fontSize: '13px', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Produit ou URL</label>
+                  <input style={S.input} placeholder="Ex: Sérum anti-âge, crème hydratante..." value={creatifProduit} onChange={e => setCreatifProduit(e.target.value)} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '13px', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Niche / Catégorie</label>
+                  <select style={S.input}>
+                    {niches.map(n => <option key={n.cat}>{n.emoji} {n.cat}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '13px', color: '#64748b', alignSelf: 'center' }}>Marché cible :</span>
+                {['🇫🇷 FR', '🇺🇸 EN', '🇪🇸 ES', '🇩🇪 DE', '🇮🇹 IT'].map(m => <span key={m} style={S.tag}>{m}</span>)}
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button style={S.btn('primary')} onClick={genererCreatifs} disabled={creatifLoading}>
+                  {creatifLoading ? '⏳ Génération...' : '✨ Générer le set complet'}
+                </button>
+                <button style={S.btn('outline')} onClick={() => { setCreatifProduit(''); setCreatifGenere([]); }}>
+                  🗑️ Reset
+                </button>
+              </div>
+            </div>
+
+            {/* 10 Styles d'images */}
+            <div style={{ marginTop: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div style={S.sectionTitle}>🖼️ 10 Styles d'Images Testés — $100M+ Brands</div>
+                <span style={S.badge('blue')}>92% de cohérence</span>
+              </div>
+              <div style={S.grid(2)}>
+                {imageStyles.map((style) => (
+                  <div key={style.id} style={{ ...S.card, border: creatifGenere.find((g:any) => g.styleId === style.id) ? '2px solid #4f46e5' : '1px solid #1e1e3a' }}>
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                      <div style={{ fontSize: '28px', flexShrink: 0 }}>{style.emoji}</div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                          <div style={{ fontWeight: 700, fontSize: '14px' }}>{style.label}</div>
+                          <span style={S.badge('green')}>CTR +{Math.round((style.score - 70) * 0.4)}%</span>
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>{style.desc}</div>
+                        {/* JSON Prompt visible */}
+                        <div style={{ background: '#0f0f1a', borderRadius: '6px', padding: '8px 10px', fontFamily: 'monospace', fontSize: '11px', color: '#a5b4fc', marginBottom: '8px', wordBreak: 'break-all' }}>
+                          {style.prompt}
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button style={{ ...S.btn('primary'), padding: '6px 14px', fontSize: '12px', flex: 1 }}
+                            onClick={() => setCreatifGenere((prev: any[]) => [...prev, { styleId: style.id, label: style.label, prompt: style.prompt, generated: true }])}>
+                            ✨ Générer
+                          </button>
+                          <button style={{ ...S.btn('outline'), padding: '6px 14px', fontSize: '12px' }}
+                            onClick={() => navigator.clipboard?.writeText(style.prompt)}>
+                            📋 Copier JSON
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  )}
-                  {creatifType !== 'landing' && (
-                    <div style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
-                      <button style={{ ...S.btn('primary'), flex: 1, fontSize: '12px' }}>Utiliser</button>
-                      <button style={{ ...S.btn('outline'), flex: 1, fontSize: '12px' }}>A/B tester</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Résultats générés */}
+            {creatifGenere.length > 0 && (
+              <div style={{ marginTop: '20px' }}>
+                <div style={S.sectionTitle}>✅ {creatifGenere.length} images générées pour "{creatifProduit || 'votre produit'}"</div>
+                <div style={S.grid(3)}>
+                  {creatifGenere.map((c: any, i: number) => (
+                    <div key={i} style={{ ...S.card, border: '1px solid #1e3a8a' }}>
+                      <div style={{ height: '120px', background: 'linear-gradient(135deg,#1e1b4b,#0c1a3e)', borderRadius: '8px', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px' }}>🖼️</div>
+                      <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '4px' }}>{c.label}</div>
+                      <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '8px', fontFamily: 'monospace', background: '#0f0f1a', padding: '4px 6px', borderRadius: '4px', wordBreak: 'break-all' }}>{c.prompt?.substring(0,60)}...</div>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        <button style={{ ...S.btn('primary'), flex: 1, fontSize: '12px', padding: '6px' }}>Utiliser</button>
+                        <button style={{ ...S.btn('outline'), flex: 1, fontSize: '12px', padding: '6px' }}>A/B Test</button>
+                      </div>
                     </div>
-                  )}
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* A/B Tests */}
+            <div style={{ ...S.card, marginTop: '20px' }}>
+              <div style={S.sectionTitle}>📋 A/B Tests Images en cours</div>
+              <table style={S.table}>
+                <thead><tr><th style={S.th}>Style</th><th style={S.th}>Variante A</th><th style={S.th}>Variante B</th><th style={S.th}>Gagnant</th><th style={S.th}>Impact CTR</th></tr></thead>
+                <tbody>
+                  {[
+                    { style: 'Hero vs Lifestyle', a: 'CTR 3.2%', b: 'CTR 4.1%', winner: 'Lifestyle', impact: '+28%' },
+                    { style: 'Infographie vs Split', a: 'CTR 2.8%', b: 'CTR 3.9%', winner: 'Split-Screen', impact: '+39%' },
+                    { style: 'UGC vs Studio', a: 'CTR 4.4%', b: 'CTR 3.1%', winner: 'UGC', impact: '+42%' },
+                  ].map((t, i) => (
+                    <tr key={i}>
+                      <td style={S.td}>{t.style}</td>
+                      <td style={S.td}>{t.a}</td>
+                      <td style={S.td}>{t.b}</td>
+                      <td style={{ ...S.td, color: '#4ade80', fontWeight: 700 }}>{t.winner}</td>
+                      <td style={{ ...S.td, color: '#4ade80', fontWeight: 700 }}>{t.impact}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* === ONGLET VIDEOS === */}
+        {creatifType === 'video' && (
+          <div>
+            <div style={S.card}>
+              <div style={S.sectionTitle}>🎬 Générer des Vidéos UGC</div>
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                <input style={{ ...S.input, flex: 1 }} placeholder="Nom ou URL du produit..." value={creatifProduit} onChange={e => setCreatifProduit(e.target.value)} />
+                <button style={S.btn('primary')} onClick={genererCreatifs} disabled={creatifLoading}>
+                  {creatifLoading ? 'Génération...' : '🎬 Générer'}
+                </button>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '20px' }}>
+              <div style={S.sectionTitle}>🎬 6 Templates Vidéo Haute Performance</div>
+              <div style={S.grid(2)}>
+                {videoTemplates.map((tmpl) => (
+                  <div key={tmpl.id} style={S.card}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <span style={{ fontSize: '24px' }}>{tmpl.emoji}</span>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: '14px' }}>{tmpl.label}</div>
+                          <div style={{ fontSize: '12px', color: '#64748b' }}>{tmpl.format} · {tmpl.duree}</div>
+                        </div>
+                      </div>
+                      <span style={S.badge(tmpl.score >= 90 ? 'green' : 'blue')}>Score {tmpl.score}/100</span>
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '12px' }}>{tmpl.desc}</div>
+                    {/* Script visible */}
+                    <div style={{ background: '#0f0f1a', borderRadius: '8px', padding: '10px 12px', fontFamily: 'monospace', fontSize: '11px', color: '#fbbf24', marginBottom: '12px', whiteSpace: 'pre-line', lineHeight: 1.6 }}>
+                      {tmpl.script}
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button style={{ ...S.btn('primary'), flex: 1, fontSize: '12px', padding: '8px' }}>
+                        🎬 Générer ce template
+                      </button>
+                      <button style={{ ...S.btn('outline'), fontSize: '12px', padding: '8px' }}
+                        onClick={() => navigator.clipboard?.writeText(tmpl.script)}>
+                        📋
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Stats vidéo */}
+            <div style={{ ...S.grid(4), marginTop: '20px' }}>
+              {[
+                { label: 'Hook rate moyen', val: '34%', color: '#4ade80', sub: 'Taux de visionnage 3s' },
+                { label: 'CTR vidéo moyen', val: '4.7%', color: '#a5b4fc', sub: 'Sur Meta Reels' },
+                { label: 'CVR post-clic', val: '2.9%', color: '#fbbf24', sub: 'Traffic vidéo' },
+                { label: 'ROAS moyen vidéo', val: '3.8x', color: '#4ade80', sub: 'Vs image 2.4x' },
+              ].map((s, i) => (
+                <div key={i} style={S.card}>
+                  <div style={S.cardTitle}>{s.label}</div>
+                  <div style={{ fontSize: '24px', fontWeight: 700, color: s.color }}>{s.val}</div>
+                  <div style={{ fontSize: '11px', color: '#475569', marginTop: '4px' }}>{s.sub}</div>
                 </div>
               ))}
             </div>
           </div>
         )}
-      </div>
-      <div style={{ ...S.card, marginTop: '16px' }}>
-        <div style={S.sectionTitle}>📋 A/B Tests en cours</div>
-        <table style={S.table}>
-          <thead><tr><th style={S.th}>Creative</th><th style={S.th}>Variante A</th><th style={S.th}>Variante B</th><th style={S.th}>Gagnant</th><th style={S.th}>Statut</th></tr></thead>
-          <tbody>
-            {[
-              { name: 'Hook produit X', a: 'CTR 3.2%', b: 'CTR 4.1%', winner: 'B', status: 'En cours' },
-              { name: 'Image hero', a: 'CVR 1.8%', b: 'CVR 2.3%', winner: 'B', status: 'Termine' },
-              { name: 'Copy urgence', a: 'CTR 2.9%', b: 'CTR 2.7%', winner: 'A', status: 'Termine' },
-            ].map((t,i) => (
-              <tr key={i}><td style={S.td}>{t.name}</td><td style={S.td}>{t.a}</td><td style={S.td}>{t.b}</td><td style={{ ...S.td, color: '#4ade80', fontWeight: 700 }}>{t.winner}</td><td style={S.td}><span style={S.badge(t.status === 'En cours' ? 'blue' : 'green')}>{t.status}</span></td></tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
 
-  // ============================================================
+        {/* === ONGLET COPY === */}
+        {creatifType === 'copy' && (
+          <div>
+            <div style={S.card}>
+              <div style={S.sectionTitle}>✍️ Générer des Hooks & Copy</div>
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                <input style={{ ...S.input, flex: 1 }} placeholder="Nom ou URL du produit..." value={creatifProduit} onChange={e => setCreatifProduit(e.target.value)} />
+                <button style={S.btn('primary')} onClick={genererCreatifs} disabled={creatifLoading}>
+                  {creatifLoading ? 'Génération...' : '✍️ Générer'}
+                </button>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '20px' }}>
+              <div style={S.sectionTitle}>🎯 6 Types de Hooks Haute Conversion</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {copyHooks.map((hook) => (
+                  <div key={hook.type} style={{ ...S.card, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '6px' }}>
+                        <span style={{ ...S.badge('blue'), background: hook.color + '22', color: hook.color }}>{hook.type}</span>
+                        <span style={{ fontSize: '11px', color: '#64748b' }}>{hook.desc}</span>
+                      </div>
+                      <div style={{ fontSize: '15px', fontWeight: 600, fontStyle: 'italic', color: '#e2e8f0', padding: '8px 12px', background: '#0f0f1a', borderRadius: '6px' }}>
+                        "{hook.hook}"
+                      </div>
+                    </div>
+                    <div style={{ marginLeft: '16px', display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+                      <span style={S.badge('green')}>Score {hook.score}/100</span>
+                      <button style={{ ...S.btn('primary'), padding: '6px 14px', fontSize: '12px' }}>
+                        Adapter
+                      </button>
+                      <button style={{ ...S.btn('outline'), padding: '4px 12px', fontSize: '11px' }}
+                        onClick={() => navigator.clipboard?.writeText(hook.hook)}>
+                        📋 Copier
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* === ONGLET LANDING === */}
+        {creatifType === 'landing' && (
+          <div>
+            <div style={S.card}>
+              <div style={S.sectionTitle}>🔁 Structures de Landing Pages</div>
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                <input style={{ ...S.input, flex: 1 }} placeholder="Nom ou URL du produit..." value={creatifProduit} onChange={e => setCreatifProduit(e.target.value)} />
+                <button style={S.btn('primary')} onClick={genererCreatifs} disabled={creatifLoading}>
+                  {creatifLoading ? 'Génération...' : '🔁 Générer'}
+                </button>
+              </div>
+              <div style={{ fontSize: '13px', color: '#64748b', background: '#0c1a3e', padding: '12px', borderRadius: '8px' }}>
+                💡 <strong>Séquence PeelKit :</strong> Hero → Preuve sociale → Bénéfices × 5 → FAQ → Urgence → CTA x3.
+                Testée sur 100+ marques Shopify $100M+. CVR moyen : +22 à +43%.
+              </div>
+            </div>
+
+            <div style={{ ...S.grid(2), marginTop: '20px' }}>
+              {[
+                { titre: 'Page VSL (Vidéo)', conversion: 'Haute (+43%)', emoji: '🎬',
+                  sequence: ['Hero video 3s hook', 'Sous-titre accrocheur', 'Bénéfices ×5 avec icônes', 'Avis clients (social proof)', 'Garantie 30j', 'Bundle/Offre', 'Urgence + stock', 'CTA ×3'],
+                  desc: 'Idéale pour produits nécessitant explication. ROAS moyen 4.1x.' },
+                { titre: 'Page Image Longue', conversion: 'Moyenne (+22%)', emoji: '🖼️',
+                  sequence: ['Hero image produit + titre', 'Problème/douleur', 'Notre solution', 'Features ×6', 'Avant/Après', 'Testimonials', 'FAQ', 'Bundle + urgence'],
+                  desc: 'Simple à déployer. Fonctionne sur tous les niches. ROAS moyen 3.2x.' },
+                { titre: 'Page Comparaison', conversion: 'Haute (+38%)', emoji: '⚖️',
+                  sequence: ['Hero: Vous vs Eux', 'Tableau comparatif', 'Nos avantages ×4', 'Preuve (chiffres)', 'Avis clients', 'Garantie', 'CTA principal'],
+                  desc: 'Parfaite si marché compétitif. Taux de conviction élevé.' },
+                { titre: 'Page Bundle/Offre', conversion: 'Très Haute (+51%)', emoji: '📦',
+                  sequence: ['Hero bundle visuel', 'Valeur totale barré', 'Prix promo + timer', 'Ce que vous recevez', 'Bénéfices ×3', 'Urgence stock', 'Garantie', 'CTA'],
+                  desc: 'AOV multiplié par 2-3x. Idéale Phase 2 du funnel.' },
+              ].map((lp, i) => (
+                <div key={i} style={S.card}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <span style={{ fontSize: '24px' }}>{lp.emoji}</span>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '14px' }}>{lp.titre}</div>
+                        <div style={{ fontSize: '12px', color: '#4ade80', fontWeight: 600 }}>{lp.conversion}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '10px' }}>{lp.desc}</div>
+                  <div style={{ marginBottom: '12px' }}>
+                    {lp.sequence.map((step, j) => (
+                      <div key={j} style={{ display: 'flex', gap: '8px', padding: '4px 0', borderBottom: '1px solid #0f0f1a', fontSize: '12px' }}>
+                        <span style={{ color: '#4f46e5', fontWeight: 700, minWidth: '18px' }}>{j+1}.</span>
+                        <span style={{ color: '#94a3b8' }}>{step}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <button style={{ ...S.btn('primary'), width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    disabled={!boutique.connecte}>
+                    {boutique.connecte ? '🚀 Déployer cette structure' : '🔗 Boutique requise'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Section Niches */}
+        <div style={{ ...S.card, marginTop: '24px' }}>
+          <div style={S.sectionTitle}>🎯 30+ Niches Shopify — Templates Pré-testés</div>
+          <div style={S.grid(4)}>
+            {niches.map((n) => (
+              <div key={n.cat} style={{ background: '#0f0f1a', borderRadius: '10px', padding: '14px', cursor: 'pointer',
+                border: '1px solid #1e1e3a', transition: 'all 0.15s' }}>
+                <div style={{ fontSize: '22px', marginBottom: '6px' }}>{n.emoji}</div>
+                <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '4px' }}>{n.cat}</div>
+                <div style={{ fontSize: '11px', color: '#4ade80', marginBottom: '6px' }}>{n.templates} templates</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+                  {n.niches.slice(0,3).map(nn => <span key={nn} style={{ ...S.tag, fontSize: '10px' }}>{nn}</span>)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+
+    // ============================================================
   // PAGE FUNNEL ENGINE
   // ============================================================
   const renderFunnel = () => (
