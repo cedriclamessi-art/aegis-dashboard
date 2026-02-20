@@ -523,15 +523,15 @@ function SecuritePage() {
   const stages = [
     { phase: 'Phase 1 · 0 → 1M€', maxLoss: '150€/j', maxSpend: '500€/j', minRoas: '1.10x', active: true, desc: 'Démarrage et validation' },
     { phase: 'Phase 2 · 1M → 10M€', maxLoss: '500€/j', maxSpend: '2 000€/j', minRoas: '1.20x', active: false, desc: 'Croissance accélérée' },
-    { phase: 'Phase 3 · 10M → 100M€', maxLoss: '1 500€/j', maxSpend: '8 000€/j', minRoas: '1.30x', active: false, desc: 'Mise à l'échelle' },
+    { phase: 'Phase 3 · 10M → 100M€', maxLoss: '1 500€/j', maxSpend: '8 000€/j', minRoas: '1.30x', active: false, desc: 'Mise a l’echelle' },
   ]
   const guards = [
     { name: 'Garde-budget', desc: 'Bloque automatiquement les dépenses si la limite journalière est atteinte', status: 'Armé', color: 'green', emoji: '💰' },
     { name: 'Garde-ROAS', desc: 'Arrête une campagne si le retour sur pub passe sous le minimum requis', status: 'Armé', color: 'green', emoji: '📊' },
     { name: 'Frein automatique', desc: 'Ralentit les dépenses soudaines ou anormales', status: 'Armé', color: 'green', emoji: '🚦' },
     { name: 'Détecteur de chutes', desc: 'Détecte et signale les baisses de performance inhabituelles', status: 'Surveillance', color: 'blue', emoji: '📉' },
-    { name: 'Protection du capital', desc: 'Arrêt d'urgence en cas de perte catastrophique', status: 'En veille', color: 'yellow', emoji: '🔒' },
-    { name: 'Bouton d'arrêt total', desc: 'Stoppe TOUTES les campagnes immédiatement', status: 'En veille', color: 'red', emoji: '🛑' },
+    { name: 'Protection du capital', desc: 'Arret urgence perte catastrophique', status: 'En veille', color: 'yellow', emoji: '🔒' },
+    { name: 'Bouton Arret Total', desc: 'Stoppe TOUTES les campagnes immédiatement', status: 'En veille', color: 'red', emoji: '🛑' },
   ]
 
   return (
