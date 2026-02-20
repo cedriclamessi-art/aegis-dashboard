@@ -7,6 +7,8 @@ interface StatCardProps {
   icon: React.ReactNode
   trend?: number
   color?: 'blue' | 'green' | 'purple' | 'amber'
+  subtitle?: string
+  hint?: string
 }
 
 const colorClasses = {
