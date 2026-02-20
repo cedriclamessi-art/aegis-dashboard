@@ -71,6 +71,7 @@ export default function App() {
   const [creatifGenere, setCreatifGenere] = useState<any[]>([])
   const [creatifLoading, setCreatifLoading] = useState(false)
   const [urlScraping, setUrlScraping] = useState(false)
+  const [collapsedSections, setCollapsedSections] = useState<Record<string,boolean>>({ SYSTEME: true })
   const [intelligenceProduit, setIntelligenceProduit] = useState('')
   const [intelligenceResultat, setIntelligenceResultat] = useState<any>(null)
   const [intelligenceLoading, setIntelligenceLoading] = useState(false)
@@ -513,9 +514,28 @@ export default function App() {
 
     return (
       <div>
-        <div style={S.info}>
-          <strong>👋 Bienvenue sur AEGIS !</strong> Voici un resume de ce qui se passe en ce moment.
-          Les chiffres se mettent a jour automatiquement. Cliquez sur <strong>"Actualiser"</strong> pour voir les dernieres donnees.
+        {Object.values(apiConnections).filter(Boolean).length === 0 && (
+          <div style={{ background: 'linear-gradient(135deg, #1e293b, #0f172a)', border: '1px solid #f59e0b', borderRadius: '12px', padding: '20px 24px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+              <span style={{ background: '#f59e0b', color: '#000', fontSize: '11px', fontWeight: 700, padding: '3px 8px', borderRadius: '4px', letterSpacing: '0.05em' }}>MODE DEMO</span>
+              <strong style={{ color: '#f8fafc' }}>Connecte tes plateformes pour activer AEGIS en temps reel</strong>
+            </div>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              {[{ step: '1', label: 'Connecter ta boutique', page: 'boutique', done: boutique.connecte, icon: '🔗' },
+                { step: '2', label: 'Ajouter Meta ou Google', page: 'boutique', done: apiConnections.meta || apiConnections.google, icon: '📡' },
+                { step: '3', label: 'Lancer ta 1ere campagne', page: 'campagnes', done: false, icon: '🚀' }
+              ].map(s => (
+                <button key={s.step} onClick={() => setPage(s.page as Page)} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: s.done ? '#064e3b' : '#1e293b', border: s.done ? '1px solid #10b981' : '1px solid #334155', borderRadius: '8px', padding: '10px 14px', cursor: 'pointer', color: '#f8fafc', fontSize: '13px' }}>
+                  <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: s.done ? '#10b981' : '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, flexShrink: 0 }}>{s.done ? '✓' : s.step}</span>
+                  <span>{s.icon} {s.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <div style={{ ...S.info, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span><strong>👋 Bienvenue sur AEGIS !</strong> Voici un resume de ce qui se passe en ce moment. Cliquez sur <strong>"Actualiser"</strong> pour voir les dernieres donnees.</span>
+          {Object.values(apiConnections).filter(Boolean).length === 0 && <span style={{ background: '#f59e0b22', color: '#f59e0b', fontSize: '11px', fontWeight: 700, padding: '3px 8px', borderRadius: '4px', border: '1px solid #f59e0b55' }}>DEMO</span>}
         </div>
 
         <div style={{ ...S.row, justifyContent: 'space-between', marginBottom: '20px' }}>
@@ -2306,6 +2326,53 @@ export default function App() {
             </div>
           </div>
         )}
+      {funnelAnalyse && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px' }}>
+            {[
+              { label: 'CVR actuel', value: funnelAnalyse.cvr + '%', color: '#f87171', hint: 'Moyen: 2.5%' },
+              { label: 'AOV actuel', value: funnelAnalyse.aov + ' EUR', color: '#fbbf24', hint: 'Cible: 75 EUR' },
+              { label: 'Score Hero', value: funnelAnalyse.heroScore + '/100', color: funnelAnalyse.heroScore > 70 ? '#10b981' : '#f87171', hint: 'Image + titre' },
+              { label: 'Score Preuve', value: funnelAnalyse.preuveScore + '/100', color: funnelAnalyse.preuveScore > 60 ? '#10b981' : '#f87171', hint: 'Avis + UGC' },
+            ].map(k => (
+              <div key={k.label} style={S.card}>
+                <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>{k.label}</div>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: k.color }}>{k.value}</div>
+                <div style={{ fontSize: '11px', color: '#475569', marginTop: '4px' }}>{k.hint}</div>
+              </div>
+            ))}
+          </div>
+          <div style={S.card}>
+            <div style={{ ...S.sectionTitle, marginBottom: '16px' }}>🎯 Recommandations AEGIS</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {funnelAnalyse.recommandations.map((r: any, i: number) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: '#0f172a', borderRadius: '8px', border: '1px solid ' + (r.priorite === 'CRITIQUE' ? '#ef444444' : r.priorite === 'HAUTE' ? '#f59e0b44' : '#334155') }}>
+                  <span style={{ padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, background: r.priorite === 'CRITIQUE' ? '#7f1d1d' : r.priorite === 'HAUTE' ? '#78350f' : '#1e293b', color: r.priorite === 'CRITIQUE' ? '#fca5a5' : r.priorite === 'HAUTE' ? '#fcd34d' : '#94a3b8', flexShrink: 0 }}>{r.priorite}</span>
+                  <span style={{ flex: 1, color: '#e2e8f0', fontSize: '14px' }}>{r.action}</span>
+                  <span style={{ color: '#10b981', fontWeight: 600, fontSize: '13px', flexShrink: 0 }}>{r.impact}</span>
+                  <button style={{ ...S.btn('primary'), padding: '6px 12px', fontSize: '12px' }} onClick={() => alert('Application planifiee !')}>Appliquer</button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={S.card}>
+            <div style={S.sectionTitle}>📊 Gains potentiels si tout applique</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '12px', marginTop: '12px' }}>
+              {[
+                { label: 'CVR projete', value: '+1.4%', sub: '1.8% → 3.2%', color: '#10b981' },
+                { label: 'AOV projete', value: '+27 EUR', sub: '52 → 79 EUR', color: '#10b981' },
+                { label: 'Revenue +/mois', value: '+4 200 EUR', sub: 'sur 1000 visiteurs/j', color: '#a78bfa' },
+              ].map(g => (
+                <div key={g.label} style={{ background: '#0f172a', borderRadius: '8px', padding: '16px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>{g.label}</div>
+                  <div style={{ fontSize: '28px', fontWeight: 700, color: g.color, margin: '8px 0' }}>{g.value}</div>
+                  <div style={{ fontSize: '12px', color: '#475569' }}>{g.sub}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   )
@@ -3084,10 +3151,17 @@ export default function App() {
           </div>
         </div>
         <div style={{ flex: 1, overflowY: 'auto' as const, padding: '8px 12px' }}>
-          {navGroups.map((group) => (
+          {navGroups.map((group) => {
+              const collapsible = group.title === 'SYSTEME' || group.title === 'GESTION'
+              const isCollapsed = collapsible && collapsedSections[group.title]
+              return (
             <div key={group.title}>
-              <div style={S.navSection}>{group.title}</div>
-              {group.items.map(item => (
+              <div style={{ ...S.navSection, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: collapsible ? 'pointer' : 'default' }}
+                onClick={() => collapsible && setCollapsedSections(p => ({ ...p, [group.title]: !p[group.title] }))}>
+                <span>{group.title}</span>
+                {collapsible && <span style={{ fontSize: '10px', opacity: 0.5 }}>{isCollapsed ? '▶' : '▼'}</span>}
+              </div>
+              {!isCollapsed && group.items.map(item => (
                 <button key={item.id} style={S.navBtn(page === item.id)} onClick={() => setPage(item.id)}>
                   <span style={{ fontSize: '16px' }}>{item.icon}</span>
                   <div>
@@ -3097,7 +3171,8 @@ export default function App() {
                 </button>
               ))}
             </div>
-          ))}
+          )}
+          )}
         </div>
         <div style={{ padding: '12px', borderTop: '1px solid #1e1e3a', fontSize: '12px', color: '#64748b' }}>
           Base de donnees : OK
