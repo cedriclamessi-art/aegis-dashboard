@@ -523,7 +523,7 @@ function SecuritePage() {
   const stages = [
     { phase: 'Phase 1 · 0 → 1M€', maxLoss: '150€/j', maxSpend: '500€/j', minRoas: '1.10x', active: true, desc: 'Démarrage et validation' },
     { phase: 'Phase 2 · 1M → 10M€', maxLoss: '500€/j', maxSpend: '2 000€/j', minRoas: '1.20x', active: false, desc: 'Croissance accélérée' },
-    { phase: 'Phase 3 · 10M → 100M€', maxLoss: '1 500€/j', maxSpend: '8 000€/j', minRoas: '1.30x', active: false, desc: 'Mise a l’echelle' },
+    { phase: 'Phase 3 · 10M → 100M€', maxLoss: '1 500€/j', maxSpend: '8 000€/j', minRoas: '1.30x', active: false, desc: 'Mise a lechelle' },
   ]
   const guards = [
     { name: 'Garde-budget', desc: 'Bloque automatiquement les dépenses si la limite journalière est atteinte', status: 'Armé', color: 'green', emoji: '💰' },
@@ -657,7 +657,7 @@ function AbonnementPage() {
           {[
             ['📈 Revenus ce mois', '0€', '#4ade80'],
             ['🔢 Taux de partage', '2%', '#6366f1'],
-            ['🎯 Seuil d'activation', '200 000€', '#fbbf24']
+            ['🎯 Seuil dactivation', '200 000€', '#fbbf24']
           ].map(([k, v, c]) => (
             <div key={k} style={{ background: '#1a1a2e', borderRadius: 12, padding: '16px 20px', textAlign: 'center' as const }}>
               <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>{k}</div>
