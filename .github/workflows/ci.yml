@@ -11,15 +11,15 @@ defaults:
     working-directory: frontend
 
 jobs:
-  lint:
+  build:
     name: Lint & Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -38,21 +38,14 @@ jobs:
           VITE_TENANT_ID: ${{ secrets.VITE_TENANT_ID }}
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        if: success()
-        with:
-          name: frontend-dist
-          path: frontend/dist/
-          retention-days: 7
-
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run npm audit
+        working-directory: frontend
         run: npm install && npm audit --audit-level=critical || true
         continue-on-error: true
