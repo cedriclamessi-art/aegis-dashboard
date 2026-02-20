@@ -70,6 +70,7 @@ export default function App() {
   const [creatifProduit, setCreatifProduit] = useState('')
   const [creatifGenere, setCreatifGenere] = useState<any[]>([])
   const [creatifLoading, setCreatifLoading] = useState(false)
+  const [urlScraping, setUrlScraping] = useState(false)
   const [intelligenceProduit, setIntelligenceProduit] = useState('')
   const [intelligenceResultat, setIntelligenceResultat] = useState<any>(null)
   const [intelligenceLoading, setIntelligenceLoading] = useState(false)
@@ -437,6 +438,36 @@ export default function App() {
       ]
     })
     setFunnelLoading(false)
+  }
+
+  const handleProduitInput = async (val: string) => {
+    setCreatifProduit(val)
+    if (val.startsWith('http') && val.length > 10) {
+      setUrlScraping(true)
+      try {
+        const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(val)
+        const res = await fetch(proxy)
+        const data = await res.json()
+        const html = data.contents || ''
+        // Extract title
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i)
+        let productName = titleMatch ? titleMatch[1].replace(/\s*[|\-–].*$/, '').trim() : ''
+        // Extract OG title as fallback
+        if (!productName) {
+          const ogMatch = html.match(/property="og:title"[^>]*content="([^"]+)"/i) || html.match(/content="([^"]+)"[^>]*property="og:title"/i)
+          if (ogMatch) productName = ogMatch[1].trim()
+        }
+        // Extract h1 as last fallback
+        if (!productName) {
+          const h1Match = html.match(/<h1[^>]*>([^<]+)<\/h1>/i)
+          if (h1Match) productName = h1Match[1].trim()
+        }
+        if (productName) setCreatifProduit(productName)
+      } catch (_e) {
+        // keep URL as-is if fetch fails
+      }
+      setUrlScraping(false)
+    }
   }
 
   const genererCreatifs = async () => {
@@ -1330,7 +1361,10 @@ export default function App() {
               <div style={{ ...S.grid(2), marginBottom: '16px' }}>
                 <div>
                   <label style={{ fontSize: '13px', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Produit ou URL</label>
-                  <input style={S.input} placeholder="Ex: Sérum anti-âge, crème hydratante..." value={creatifProduit} onChange={e => setCreatifProduit(e.target.value)} />
+                  <div style={{ position: 'relative' }}>
+                    <input style={{ ...S.input, paddingRight: urlScraping ? '40px' : undefined }} placeholder="Ex: Sérum anti-âge, crème hydratante... ou coller une URL" value={creatifProduit} onChange={e => handleProduitInput(e.target.value)} />
+                    {urlScraping && <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '18px' }}>⏳</span>}
+                  </div>
                 </div>
                 <div>
                   <label style={{ fontSize: '13px', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Niche / Catégorie</label>
@@ -1476,7 +1510,7 @@ export default function App() {
             <div style={S.card}>
               <div style={S.sectionTitle}>🎬 Générer des Vidéos UGC</div>
               <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-                <input style={{ ...S.input, flex: 1 }} placeholder="Nom ou URL du produit..." value={creatifProduit} onChange={e => setCreatifProduit(e.target.value)} />
+                <input style={{ ...S.input, flex: 1 }} placeholder="Nom ou URL du produit..." value={creatifProduit} onChange={e => handleProduitInput(e.target.value)} />
                 <button style={S.btn('primary')} onClick={genererCreatifs} disabled={creatifLoading}>
                   {creatifLoading ? 'Génération...' : '🎬 Générer'}
                 </button>
@@ -1541,7 +1575,7 @@ export default function App() {
             <div style={S.card}>
               <div style={S.sectionTitle}>✍️ Générer des Hooks & Copy</div>
               <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-                <input style={{ ...S.input, flex: 1 }} placeholder="Nom ou URL du produit..." value={creatifProduit} onChange={e => setCreatifProduit(e.target.value)} />
+                <input style={{ ...S.input, flex: 1 }} placeholder="Nom ou URL du produit..." value={creatifProduit} onChange={e => handleProduitInput(e.target.value)} />
                 <button style={S.btn('primary')} onClick={genererCreatifs} disabled={creatifLoading}>
                   {creatifLoading ? 'Génération...' : '✍️ Générer'}
                 </button>
@@ -1585,7 +1619,7 @@ export default function App() {
             <div style={S.card}>
               <div style={S.sectionTitle}>🔁 Structures de Landing Pages</div>
               <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-                <input style={{ ...S.input, flex: 1 }} placeholder="Nom ou URL du produit..." value={creatifProduit} onChange={e => setCreatifProduit(e.target.value)} />
+                <input style={{ ...S.input, flex: 1 }} placeholder="Nom ou URL du produit..." value={creatifProduit} onChange={e => handleProduitInput(e.target.value)} />
                 <button style={S.btn('primary')} onClick={genererCreatifs} disabled={creatifLoading}>
                   {creatifLoading ? 'Génération...' : '🔁 Générer'}
                 </button>
@@ -2172,7 +2206,7 @@ export default function App() {
               <div style={S.sectionTitle}>🎨 Générer depuis ta photo</div>
               <div style={{ marginBottom: '12px' }}>
                 <label style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Nom du produit</label>
-                <input style={S.input} placeholder="Ex: Serum anti-age Rose..." value={creatifProduit} onChange={e => setCreatifProduit(e.target.value)} />
+                <input style={S.input} placeholder="Ex: Serum anti-age Rose..." value={creatifProduit} onChange={e => handleProduitInput(e.target.value)} />
               </div>
               <div style={{ marginBottom: '12px' }}>
                 <label style={{ fontSize: '12px', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Style créatif</label>
