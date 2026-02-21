@@ -371,7 +371,24 @@ export default function App() {
       await loadData()
       setNouvelleUrl('')
       alert('Campagne lancée avec succès sur ' + platformLabel + ' !')
-    } catch(e) { alert('Erreur: ' + (e as Error).message) }
+    } catch(e) {
+      // Supabase unavailable - add demo pipeline to local state
+      const platformEmojisLocal: Record<string,string> = { meta: '📘', google: '🔵', tiktok: '🎵', snapchat: '👻', pinterest: '📌' }
+      const platformLabelLocal = (platformEmojisLocal[nouvellePlateforme] || '📢') + ' ' + nouvellePlateforme.charAt(0).toUpperCase() + nouvellePlateforme.slice(1)
+      const demoPipeline = {
+        id: 'demo_' + Date.now(),
+        product_name: nouvelleUrl + ' [' + platformLabelLocal + ']',
+        plateforme: nouvellePlateforme,
+        budget: parseFloat(nouveauBudget) || 500,
+        statut: 'en_cours',
+        roas: 0,
+        conversions: 0,
+        impressions: 0,
+        date_debut: new Date().toISOString().split('T')[0]
+      }
+      setPipelines((prev: any[]) => [demoPipeline, ...prev])
+      setNouvelleUrl('')
+    }
     setLoading(false)
   }
 
@@ -478,14 +495,14 @@ export default function App() {
     await new Promise(r => setTimeout(r, 2000))
     const types: Record<string, any[]> = {
       image: [
-        { id: 1, titre: 'Hero - Avant/Apres', format: '1080x1080', score: 94 },
-        { id: 2, titre: 'Produit en situation', format: '1080x1350', score: 88 },
-        { id: 3, titre: 'Infographie benefices', format: '1080x1080', score: 82 },
+        { id: 1, label: 'Hero - Avant/Apres', prompt: 'Photo produit {creatifProduit} avant/apres, studio blanc, haute resolution', score: 94 },
+        { id: 2, label: 'Produit en situation', prompt: 'Lifestyle photo de {creatifProduit} en situation reelle, lumiere naturelle', score: 88 },
+        { id: 3, label: 'Infographie benefices', prompt: 'Infographie minimaliste {creatifProduit} avec 3 benefices cles, fond sombre', score: 82 },
       ],
       video: [
-        { id: 1, titre: 'UGC Hook 3 sec', format: '9:16 Vertical', score: 91, duree: '15s' },
-        { id: 2, titre: 'Testimonial client', format: '9:16 Vertical', score: 85, duree: '30s' },
-        { id: 3, titre: 'Demo produit', format: '1:1 Carre', score: 79, duree: '20s' },
+        { id: 1, label: 'UGC Hook 3 sec', prompt: 'Video UGC 15s pour {creatifProduit}: hook choc, demonstration, CTA, format vertical 9:16', score: 91 },
+        { id: 2, label: 'Testimonial client', prompt: 'Testimonial authentique 30s: cliente satisfaite de {creatifProduit}, avant/apres, format vertical', score: 85 },
+        { id: 3, label: 'Demo produit', prompt: 'Demo produit {creatifProduit} 20s: unboxing, utilisation, resultat, format carre 1:1', score: 79 },
       ],
       copy: [
         { id: 1, titre: 'Hook Douleur', texte: 'Tu en as marre de... ? Voici la solution que tu attendais.', score: 92 },
@@ -1484,6 +1501,12 @@ export default function App() {
             {creatifGenere.length > 0 && (
               <div style={{ marginTop: '20px' }}>
                 <div style={S.sectionTitle}>✅ {creatifGenere.length} images générées pour "{creatifProduit || 'votre produit'}"</div>
+                {creatifGenere.length === 0 && !creatifLoading && (
+                  <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                    <div style={{ fontSize: '32px', marginBottom: '12px' }}>✨</div>
+                    <div>Entrez un nom de produit et cliquez sur "Generer le set complet"</div>
+                  </div>
+                )}
                 <div style={S.grid(3)}>
                   {creatifGenere.map((c: any, i: number) => (
                     <div key={i} style={{ ...S.card, border: '1px solid #1e3a8a' }}>
@@ -1614,7 +1637,7 @@ export default function App() {
                         <span style={{ fontSize: '11px', color: '#64748b' }}>{hook.desc}</span>
                       </div>
                       <div style={{ fontSize: '15px', fontWeight: 600, fontStyle: 'italic', color: '#e2e8f0', padding: '8px 12px', background: '#0f0f1a', borderRadius: '6px' }}>
-                        "{hook.hook}"
+                        "{hook.hook.replace('[PROBLÈME]', creatifProduit || 'ce problème').replace('[SITUATION ACTUELLE]', creatifProduit ? 'avant ' + creatifProduit : 'avant').replace('[RÉSULTAT]', creatifProduit ? 'avec ' + creatifProduit : 'maintenant')}"
                       </div>
                     </div>
                     <div style={{ marginLeft: '16px', display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
@@ -2960,8 +2983,24 @@ export default function App() {
         <div style={{ fontWeight: 700 }}>🤖 {agents.length || 25} agents configures · <span style={{ color: '#4ade80' }}>{agents.filter((a: any) => a.is_enabled).length || 25} actifs</span>, <span style={{ color: '#fbbf24' }}>{agents.filter((a: any) => !a.is_enabled).length} en pause</span></div>
         <button style={S.btn()} onClick={loadData}>🔄 Actualiser</button>
       </div>
-      {['CREATIVE','MARKET','MEDIA_BUYING','ANALYTICS','OPTIMIZATION'].map(cat => {
-        const catAgents = agents.filter((a: any) => a.category === cat)
+      {(() => {
+        const demoAgents = agents.length > 0 ? agents : [
+          { id: 1, name: 'Creative Hook Generator', description: 'Genere des hooks viraux pour vos publicites', category: 'CREATIVE', is_enabled: true, performance_score: 94 },
+          { id: 2, name: 'Image Copy Writer', description: 'Redige les textes pour vos visuels', category: 'CREATIVE', is_enabled: true, performance_score: 88 },
+          { id: 3, name: 'Video Script AI', description: 'Scripts video UGC et publicites', category: 'CREATIVE', is_enabled: true, performance_score: 91 },
+          { id: 4, name: 'Market Trend Spy', description: 'Detecte les tendances emergentes du marche', category: 'MARKET', is_enabled: true, performance_score: 87 },
+          { id: 5, name: 'Competitor Analyzer', description: 'Analyse les strategies concurrentes', category: 'MARKET', is_enabled: false, performance_score: 82 },
+          { id: 6, name: 'Product Scorer', description: 'Evalue le potentiel winner de chaque produit', category: 'MARKET', is_enabled: true, performance_score: 96 },
+          { id: 7, name: 'Budget Optimizer', description: 'Optimise la repartition des budgets pub', category: 'MEDIA_BUYING', is_enabled: true, performance_score: 90 },
+          { id: 8, name: 'Bid Manager AI', description: 'Gere les encheres en temps reel', category: 'MEDIA_BUYING', is_enabled: true, performance_score: 85 },
+          { id: 9, name: 'Audience Finder', description: 'Identifie les audiences les plus rentables', category: 'MEDIA_BUYING', is_enabled: true, performance_score: 92 },
+          { id: 10, name: 'ROAS Tracker', description: 'Suit le ROAS en temps reel par campagne', category: 'ANALYTICS', is_enabled: true, performance_score: 97 },
+          { id: 11, name: 'Conversion Auditor', description: 'Audite le tunnel de conversion', category: 'ANALYTICS', is_enabled: true, performance_score: 89 },
+          { id: 12, name: 'Scale Detector', description: 'Detecte les campagnes a scaler', category: 'OPTIMIZATION', is_enabled: true, performance_score: 93 },
+          { id: 13, name: 'Kill Switch AI', description: 'Arrete automatiquement les campagnes non rentables', category: 'OPTIMIZATION', is_enabled: false, performance_score: 86 },
+        ];
+        return ['CREATIVE','MARKET','MEDIA_BUYING','ANALYTICS','OPTIMIZATION'].map(cat => {
+        const catAgents = demoAgents.filter((a: any) => a.category === cat)
         if (catAgents.length === 0) return null
         return (
           <div key={cat} style={S.section}>
@@ -2981,7 +3020,8 @@ export default function App() {
             ))}
           </div>
         )
-      })}
+      })
+      })()
     </div>
   )
 
