@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import AegisEnginePage from './pages/AegisEnginePage';
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL || '',
@@ -10,7 +11,7 @@ const TENANT_ID = import.meta.env.VITE_TENANT_ID || 'AEGIS-OWNER'
 // ============================================================
 // TYPES
 // ============================================================
-type Page = 'accueil' | 'boutique' | 'intelligence' | 'creatifs' | 'bibliotheque' | 'funnel' | 'media' | 'campagnes' | 'decisions' | 'agents' | 'risque' | 'marche' | 'sante' | 'gouvernance' | 'financier' | 'securite' | 'abonnement'
+type Page = 'accueil' | 'boutique' | 'intelligence' | 'creatifs' | 'bibliotheque' | 'funnel' | 'media' | 'campagnes' | 'decisions' | 'agents' | 'risque' | 'marche' | 'sante' | 'gouvernance' | 'financier' | 'securite' | 'abonnement' | 'engine'
 
 // ============================================================
 // STYLES
@@ -3109,6 +3110,7 @@ export default function App() {
         { id: 'bibliotheque' as Page, icon: '📚', label: 'Bibliotheque', sub: 'Creatifs + Rotation auto' },
         { id: 'funnel' as Page, icon: '🔁', label: 'Funnel', sub: 'Optimiser conversion' },
         { id: 'media' as Page, icon: '📡', label: 'Media Buying', sub: 'Gerer les campagnes' },
+        { id: 'engine' as Page, icon: '', label: 'AEGIS Engine', sub: 'Moteur allocation capital' },
       ]
     },
     {
@@ -3116,8 +3118,6 @@ export default function App() {
       items: [
         { id: 'campagnes' as Page, icon: '🚀', label: 'Campagnes', sub: 'Mes publicites' },
         { id: 'decisions' as Page, icon: '✅', label: 'Decisions', sub: 'A valider' },
-        { id: 'agents' as Page, icon: '🤖', label: 'Agents IA', sub: 'Robots actifs' },
-      ]
     },
     {
       title: 'SYSTEME',
@@ -3151,11 +3151,12 @@ export default function App() {
     financier: renderFinancier,
     securite: renderSecurite,
     abonnement: renderAbonnement,
+        engine: () => <AegisEnginePage />,
   }
 
   const pageTitles: Record<Page, {icon: string, title: string, sub: string}> = {
     accueil: { icon: '🏠', title: 'Accueil', sub: 'Vue generale' },
-    boutique: { icon: '🔗', title: 'Boutique', sub: 'Store Connector Engine' },
+            bouique: { icon: '🔗', title: 'Boutique', sub: 'Store Connector Engine' },
     intelligence: { icon: '🧠', title: 'Intelligence Produit', sub: 'Product Intelligence Engine' },
     creatifs: { icon: '🎨', title: 'Creatifs', sub: 'Creative Engine' },
     bibliotheque: { icon: '📚', title: 'Bibliotheque', sub: 'Creatifs + Rotation Auto' },
@@ -3171,10 +3172,11 @@ export default function App() {
     financier: { icon: '💹', title: 'Evolution Financiere', sub: 'Financial Evolution Engine' },
     securite: { icon: '🛡️', title: 'Securite', sub: 'Limites & risques' },
     abonnement: { icon: '💎', title: 'Abonnement', sub: 'Mon forfait' },
+        engine: { icon: '', title: 'AEGIS Engine', sub: 'Moteur allocation capital' },
   }
 
   const currentPageInfo = pageTitles[page]
-  const currentDate = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+          const currentDate = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
 
   // ============================================================
   // RENDER PRINCIPAL
