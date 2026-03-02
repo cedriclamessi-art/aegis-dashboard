@@ -3117,7 +3117,7 @@ export default function App() {
       title: 'GESTION',
       items: [
         { id: 'campagnes' as Page, icon: '🚀', label: 'Campagnes', sub: 'Mes publicites' },
-        { id: 'decisions' as Page, icon: '✅', label: 'Decisions', sub: 'A valider' },
+        { id: 'decisions' as Page, icon: '✅', label: 'Decisions', sub: 'A valider' },        ],
     },
     {
       title: 'SYSTEME',
