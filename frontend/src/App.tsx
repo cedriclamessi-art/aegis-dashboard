@@ -3156,7 +3156,7 @@ export default function App() {
 
   const pageTitles: Record<Page, {icon: string, title: string, sub: string}> = {
     accueil: { icon: '🏠', title: 'Accueil', sub: 'Vue generale' },
-            bouique: { icon: '🔗', title: 'Boutique', sub: 'Store Connector Engine' },
+            boutique: { icon: '🔗', title: 'Boutique', sub: 'Store Connector Engine' },
     intelligence: { icon: '🧠', title: 'Intelligence Produit', sub: 'Product Intelligence Engine' },
     creatifs: { icon: '🎨', title: 'Creatifs', sub: 'Creative Engine' },
     bibliotheque: { icon: '📚', title: 'Bibliotheque', sub: 'Creatifs + Rotation Auto' },
