@@ -1,79 +1,70 @@
-————// AEGIS Stop-Loss Engine
-// Rule: no allocation without stop-loss. Cuts automatically when thresholds are breached.
-
-import { createClient } from '@supabase/supabase-js'
+// AEGIS Stop-Loss Engine
+import { createClient } from '@supabase/supabase-js';
 
 export interface StopLossConfig {
-  roasMin: number
-    perteMaxJour: number
-      depenseMaxJour: number
-        cpaMax?: number
-          killSwitch: boolean
-            mode: 'humain' | 'semi_auto' | 'full_auto'
-            }
+    allocation_id: string;
+    channel_id: string;
+    product_name: string;
+    roas_threshold: number;
+    max_spend: number;
+    cpa_max?: number;
+}
 
-            export interface CampaignSnapshot {
-              id: string; channelKey: string; name: string
-                spend: number; revenue: number; roas: number; cpa: number
-                  status: 'active' | 'paused' | 'stopped'
-                  }
+export interface ChannelMetrics {
+    roas: number;
+    spend: number;
+    revenue: number;
+    cpm: number;
+    ctr: number;
+    cpa: number;
+}
 
-                  export type StopLossVerdict = 'ok' | 'warn' | 'stop' | 'kill'
+export interface StopLossEvaluation {
+    triggered: boolean;
+    reason: string;
+    recommended_action: string;
+    metrics: ChannelMetrics;
+}
 
-                  export interface StopLossEvaluation {
-                    campaignId: string; verdict: StopLossVerdict; reason: string
-                      action: 'none' | 'alert' | 'pause' | 'stop'
-                        metrics: { roas: number; spend: number; cpa: number }
-                        }
+export interface StopLossResult {
+    allocation_id: string;
+    triggered: boolean;
+    verdict: 'ok' | 'warn' | 'stop';
+    reason: string;
+}
 
-                        export const evaluateCampaign = (c: CampaignSnapshot, cfg: StopLossConfig): StopLossEvaluation => {
-                          const m = { roas: c.roas, spend: c.spend, cpa: c.cpa }
+export async function evaluateStopLoss(
+    config: StopLossConfig,
+    metrics: ChannelMetrics
+  ): Promise<StopLossEvaluation> {
+    const triggered = metrics.roas < config.roas_threshold || metrics.spend >= config.max_spend;
+    const reason = metrics.roas < config.roas_threshold
+          ? 'ROAS ' + metrics.roas.toFixed(2) + ' below threshold ' + config.roas_threshold
+          : 'Spend ' + metrics.spend + ' reached max ' + config.max_spend;
+    return {
+          triggered,
+          reason: triggered ? reason : 'All metrics within thresholds',
+          recommended_action: triggered ? 'pause_campaign' : 'none',
+          metrics,
+    };
+}
 
-                            if (cfg.killSwitch)
-                                return { campaignId: c.id, verdict: 'kill', reason: 'Kill switch global', action: 'stop', metrics: m }
+export async function executeStopLoss(
+    config: StopLossConfig,
+    evaluation: StopLossEvaluation
+  ): Promise<StopLossResult> {
+    return {
+          allocation_id: config.allocation_id,
+          triggered: evaluation.triggered,
+          verdict: evaluation.triggered ? 'stop' : 'ok',
+          reason: evaluation.reason,
+    };
+}
 
-                                  if (c.roas < cfg.roasMin && c.spend > 50) {
-                                      const hard = c.roas < cfg.roasMin * 0.7
-                                          return { campaignId: c.id, verdict: hard ? 'stop' : 'warn',
-                                                reason: `ROAS ${c.roas.toFixed(2)}x < min ${cfg.roasMin}x`,
-                                                      action: hard ? 'pause' : 'alert', metrics: m }
-                                                        }
+export async function getStopLossHistory(tenantId: string): Promise<StopLossResult[]> {
+    return [];
+}
 
-                                                          if (c.spend >= cfg.depenseMaxJour)
-                                                              return { campaignId: c.id, verdict: 'stop',
-                                                                    reason: `Spend ${c.spend}EUR >= max ${cfg.depenseMaxJour}EUR/day`,
-                                                                          action: 'pause', metrics: m }
-
-                                                                            if (cfg.cpaMax && c.cpa > cfg.cpaMax && c.spend > 30)
-                                                                                return { campaignId: c.id, verdict: 'warn',
-                                                                                      reason: `CPA ${c.cpa.toFixed(2)}EUR > max ${cfg.cpaMax}EUR`,
-                                                                                            action: 'alert', metrics: m }
-
-                                                                                              return { campaignId: c.id, verdict: 'ok', reason: 'All metrics within thresholds', action: 'none', metrics: m }
-                                                                                              }
-
-                                                                                              export const evaluatePortfolio = (campaigns: CampaignSnapshot[], cfg: StopLossConfig) => {
-                                                                                                const evaluations = campaigns.map(c => evaluateCampaign(c, cfg))
-                                                                                                  return {
-                                                                                                      evaluations,
-                                                                                                          totalSpend: campaigns.reduce((s, c) => s + c.spend, 0),
-                                                                                                              avgRoas: campaigns.length ? campaigns.reduce((s, c) => s + c.roas, 0) / campaigns.length : 0,
-                                                                                                                  alerts: evaluations.filter(e => e.verdict === 'warn').length,
-                                                                                                                      stops: evaluations.filter(e => ['stop','kill'].includes(e.verdict)).length
-                                                                                                                        }
-                                                                                                                        }
-                                                                                                                        
-                                                                                                                        export const persistStopLossEvent = async (
-                                                                                                                          supabase: ReturnType<typeof createClient>,
-                                                                                                                            tenantId: string, evaluation: StopLossEvaluation, executed: boolean
-                                                                                                                            ) => {
-                                                                                                                              await supabase.from('stoploss_events').insert({
-                                                                                                                                  tenant_id: tenantId, campaign_id: evaluation.campaignId,
-                                                                                                                                      verdict: evaluation.verdict, reason: evaluation.reason,
-                                                                                                                                          action_taken: evaluation.action, executed,
-                                                                                                                                              roas_at_event: evaluation.metrics.roas,
-                                                                                                                                                  spend_at_event: evaluation.metrics.spend,
-                                                                                                                                                      cpa_at_event: evaluation.metrics.cpa,
-                                                                                                                                                          created_at: new Date().toISOString()
-                                                                                                                                                            })
-                                                                                                                                                            }
+export async function getActiveStopLossAlerts(tenantId: string): Promise<StopLossResult[]> {
+    return [];
+}
