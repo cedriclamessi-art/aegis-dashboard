@@ -1,39 +1,7 @@
 // AEGIS Engine - Main Entry Point
-// Usage: import { scoreOpportunity, evaluateStopLoss, rememberDecision, resolveChannel } from './engine'
-
-export {
-    resolveChannel,
-    getActiveChannels,
-    registerChannel,
-    type IChannel,
-    type ChannelMetrics,
-    type ChannelAllocation,
-  } from './channels';
-
-export {
-    evaluateStopLoss,
-    executeStopLoss,
-    getStopLossHistory,
-    getActiveStopLossAlerts,
-    type StopLossConfig,
-    type StopLossEvaluation,
-    type StopLossResult,
-  } from './stoploss';
-
-export {
-    rememberDecision,
-    resolveDecision,
-    recallSimilarDecisions,
-    getDecisionWinRate,
-    scoreDecisionWithMemory,
-    type DecisionRecord,
-    type MemoryQuery,
-  } from './memory';
-
-export {
-    scoreOpportunity,
-    getTopOpportunities,
-    getProductHistory,
-    type OpportunityInput,
-    type OpportunityScore,
-  } from './opportunity';
+export { evaluateStopLoss, executeStopLoss, getStopLossHistory, getActiveStopLossAlerts } from './stoploss';
+export type { StopLossConfig, StopLossEvaluation, StopLossResult, ChannelMetrics } from './stoploss';
+export { scoreOpportunity, getTopOpportunities, getProductHistory } from './opportunity';
+export type { OpportunityInput, OpportunityScore } from './opportunity';
+export { rememberDecision, resolveDecision, recallSimilarDecisions, getDecisionWinRate, scoreDecisionWithMemory } from './memory';
+export type { DecisionRecord, MemoryQuery } from './memory';
