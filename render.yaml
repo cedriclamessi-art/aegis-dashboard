@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: aegis-connect
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: COMPOSIO_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: META_ACCESS_TOKEN
+        sync: false
+      - key: META_AD_ACCOUNT_ID
+        sync: false
+      - key: ALLOWED_ORIGIN
+        value: "*"
+      - key: DATABASE_PATH
+        value: /data/aegis.db
+      - key: CLAUDE_MODEL
+        value: claude-sonnet-4-20250514
+    disk:
+      name: aegis-data
+      mountPath: /data
+      sizeGB: 1

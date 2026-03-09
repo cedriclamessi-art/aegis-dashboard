@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AEGIS Connect</title>
+<meta name="description" content="Connecte ta boutique à AEGIS en 4 minutes">
+<meta name="theme-color" content="#09090b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════ */
+:root{
+  --void:#09090b; --void2:#111118; --void3:#1c1c24;
+  --c0:#fff; --c1:#f7f7f8; --c2:#eeeef0; --c3:#dedee2;
+  --c4:#adadb8; --c5:#7a7a88; --c6:#4a4a58; --c7:#2a2a38; --c8:#111118;
+  --blue:#1d6ef5; --blue2:#1558cc;
+  --ba8:rgba(29,110,245,.08); --ba15:rgba(29,110,245,.15); --ba25:rgba(29,110,245,.25);
+  --green:#0d9f5a; --ga8:rgba(13,159,90,.08); --ga20:rgba(13,159,90,.2);
+  --red:#e03131; --ra8:rgba(224,49,49,.08);
+  --amber:#c47f17; --aa10:rgba(196,127,23,.1); --aa25:rgba(196,127,23,.25);
+  --purple:#7c3aed; --pa8:rgba(124,58,237,.08); --pa20:rgba(124,58,237,.2);
+  --r6:6px; --r10:10px; --r14:14px;
+  --sh:0 1px 4px rgba(0,0,0,.06),0 0 0 1px rgba(0,0,0,.04);
+  --sh2:0 6px 20px rgba(0,0,0,.09),0 0 0 1px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;background:var(--void)}
+button{cursor:pointer;border:none;background:none;font-family:inherit;font-size:inherit}
+input,select{font-family:inherit;font-size:inherit;border:none;outline:none;background:none}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes checkPop{0%{transform:scale(0)}65%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes live{0%,100%{box-shadow:0 0 0 0 rgba(13,159,90,.5)}70%{box-shadow:0 0 0 6px rgba(13,159,90,0)}}
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════ */
+.layout{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:252px;flex-shrink:0;background:var(--void2);border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;padding:24px 18px;position:sticky;top:0;height:100vh}
+
+.sb-brand{display:flex;align-items:center;gap:9px;margin-bottom:24px}
+.sb-mark{width:28px;height:28px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-mark svg{width:13px;height:13px}
+.sb-word{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#fff;letter-spacing:.08em}
+
+.sb-eta{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r6);padding:4px 9px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.35);margin-bottom:20px}
+.sb-eta svg{width:10px;height:10px}
+
+/* Steps nav */
+.steps{display:flex;flex-direction:column;gap:2px}
+.st{display:flex;align-items:flex-start;gap:10px;padding:7px;border-radius:var(--r6);position:relative}
+.st::after{content:'';position:absolute;left:17.5px;top:31px;width:1px;height:calc(100% - 12px);background:rgba(255,255,255,.07);z-index:0}
+.st:last-child::after{display:none}
+.stn{width:21px;height:21px;border-radius:50%;border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:rgba(255,255,255,.25);font-family:'JetBrains Mono',monospace;position:relative;z-index:1;background:var(--void2);transition:all .3s}
+.st.done .stn{background:var(--green);border-color:var(--green);color:#fff}
+.st.active .stn{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 0 4px var(--ba15)}
+.stl{font-size:11px;font-weight:600;color:rgba(255,255,255,.22);transition:color .2s;line-height:1.3}
+.sts{font-size:10px;color:rgba(255,255,255,.12);margin-top:1px}
+.st.done .stl{color:rgba(255,255,255,.45)}
+.st.active .stl{color:#fff}
+.st.active .sts{color:rgba(255,255,255,.4)}
+
+.sb-note{margin-top:auto;display:flex;align-items:flex-start;gap:7px;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--r6);font-size:11px;color:rgba(255,255,255,.22);line-height:1.5}
+.sb-note svg{width:11px;height:11px;flex-shrink:0;margin-top:1px;opacity:.4}
+
+/* MAIN */
+.main{flex:1;background:var(--c1);display:flex;flex-direction:column;align-items:center;padding:48px 32px 80px;overflow-y:auto}
+.wrap{width:100%;max-width:468px}
+
+/* Progress */
+.prog{width:100%;height:3px;background:var(--c2);border-radius:99px;overflow:hidden;margin-bottom:32px}
+.prog-fill{height:100%;background:var(--blue);border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* Step header */
+.sh{margin-bottom:22px;animation:fadeUp .3s ease both}
+.sh-eyebrow{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--c4);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.sh-dot{width:5px;height:5px;border-radius:50%;background:var(--blue)}
+.sh-h{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--c8);letter-spacing:-.025em;line-height:1.2;margin-bottom:6px}
+.sh-p{font-size:13px;color:var(--c5);line-height:1.65}
+.sh-p strong{color:var(--c7)}
+
+/* Mode cards */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;animation:fadeUp .3s ease .05s both}
+.mc{background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r14);padding:16px;cursor:pointer;transition:all .2s;position:relative}
+.mc:hover:not(.on){border-color:var(--c3);transform:translateY(-1px);box-shadow:var(--sh2)}
+.mc-chk{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--c3);display:flex;align-items:center;justify-content:center;margin-bottom:10px;transition:all .2s;flex-shrink:0}
+.mc-chk svg{display:none;width:8px;height:8px}
+.mc.on-p .mc-chk{background:var(--purple);border-color:var(--purple)} .mc.on-p .mc-chk svg{display:block}
+.mc.on-b .mc-chk{background:var(--blue);border-color:var(--blue)} .mc.on-b .mc-chk svg{display:block}
+.mc.on-p{border-color:var(--purple);background:var(--pa8)}
+.mc.on-b{border-color:var(--blue);background:var(--ba8)}
+.mc-ico{width:32px;height:32px;border-radius:8px;background:var(--c1);display:flex;align-items:center;justify-content:center;margin-bottom:10px;transition:background .2s}
+.mc-ico svg{width:15px;height:15px;color:var(--c5);transition:color .2s}
+.mc.on-p .mc-ico{background:var(--pa8)} .mc.on-p .mc-ico svg{color:var(--purple)}
+.mc.on-b .mc-ico{background:var(--ba8)} .mc.on-b .mc-ico svg{color:var(--blue)}
+.mc-t{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--c8);margin-bottom:3px}
+.mc-p{font-size:11px;color:var(--c5);line-height:1.45}
+.mc.on-p .mc-t{color:var(--purple)} .mc.on-b .mc-t{color:var(--blue)}
+
+/* Hint box */
+.hint{display:none;border-radius:var(--r10);padding:10px 12px;font-size:12px;line-height:1.55;gap:7px;align-items:flex-start;margin-bottom:12px;animation:fadeUp .2s ease both}
+.hint.show{display:flex}
+.hint svg{width:12px;height:12px;flex-shrink:0;margin-top:2px}
+.hint-p{background:var(--pa8);border:1px solid var(--pa20);color:#5b21b6}
+.hint-b{background:var(--ba8);border:1px solid var(--ba25);color:#1e40af}
+
+/* Connect cards */
+.ccard{background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r14);padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;margin-bottom:8px}
+.ccard:hover:not(.done):not(.busy){border-color:var(--c3);box-shadow:var(--sh2);transform:translateY(-1px)}
+.ccard.done{border-color:var(--green);background:#f0fdf4;cursor:default;pointer-events:none}
+.ccard.busy{cursor:default;pointer-events:none}
+.cc-logo{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cc-info{flex:1;min-width:0}
+.cc-name{font-weight:600;font-size:13px;color:var(--c8);margin-bottom:1px}
+.cc-desc{font-size:11px;color:var(--c5)}
+.cc-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.cc-tag{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;padding:3px 7px;border-radius:var(--r6)}
+.ct-req{background:var(--ba8);color:var(--blue);border:1px solid var(--ba25)}
+.ct-opt{background:var(--c1);color:var(--c4);border:1px solid var(--c2)}
+.ct-ok{background:var(--ga8);color:var(--green);border:1px solid var(--ga20)}
+.ct-busy{background:linear-gradient(90deg,var(--ba8) 25%,var(--ba15) 50%,var(--ba8) 75%);background-size:200% 100%;animation:shimmer 1s infinite;color:var(--blue);border:1px solid var(--ba25)}
+.cc-arr{width:15px;height:15px;color:var(--c3);transition:all .2s;flex-shrink:0}
+.ccard:hover:not(.done) .cc-arr{color:var(--blue);transform:translateX(2px)}
+.cc-ok-ico{width:20px;height:20px;flex-shrink:0;animation:checkPop .35s cubic-bezier(.34,1.56,.64,1)}
+.cc-bar{position:absolute;bottom:0;left:0;height:2px;background:var(--blue);width:0;transition:width 0s}
+
+/* Error box */
+.err-box{background:var(--ra8);border:1px solid rgba(224,49,49,.2);border-radius:var(--r6);padding:9px 12px;font-size:12px;color:var(--red);line-height:1.5;margin-bottom:10px;display:none;animation:fadeUp .2s ease}
+.err-box.show{display:block}
+
+/* Tracking */
+.tcard{background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r14);overflow:hidden;margin-bottom:10px}
+.tc-top{padding:14px 15px}
+.tc-head{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+.tc-ico{width:34px;height:34px;border-radius:9px;background:var(--ba8);border:1px solid var(--ba15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tc-ico svg{width:15px;height:15px;color:var(--blue)}
+.tc-lbl{flex:1}
+.tc-name{font-weight:700;font-size:13px;color:var(--c8)}
+.tc-sub{font-size:11px;color:var(--c5);margin-top:1px}
+.tc-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;padding:3px 7px;border-radius:var(--r6)}
+.tb-off{background:var(--aa10);color:var(--amber);border:1px solid var(--aa25)}
+.tb-on{background:var(--ga8);color:var(--green);border:1px solid var(--ga20)}
+.tc-body{font-size:12px;color:var(--c5);line-height:1.6;padding-top:10px;border-top:1px solid var(--c2)}
+.tc-body strong{color:var(--c7);font-weight:600}
+.tc-toggle{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-top:1px solid var(--c2);cursor:pointer;transition:background .14s}
+.tc-toggle:hover{background:var(--c1)}
+.tc-tl{font-size:12px;font-weight:600;color:var(--c7)}
+.tc-ts{font-size:10px;color:var(--c4);margin-top:1px}
+.sw-row{display:flex;align-items:center;gap:6px}
+.sw-txt{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--c4)}
+.toggle{width:34px;height:18px;border-radius:99px;background:var(--c3);position:relative;transition:background .25s;flex-shrink:0}
+.toggle.on{background:var(--blue)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.toggle.on::after{transform:translateX(16px)}
+.tc-benefits{display:none;border-top:1px solid var(--c2);padding:11px 15px}
+.tc-benefits.show{display:block;animation:fadeUp .2s ease}
+.tb-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--c2)}
+.tb-item:last-child{border-bottom:none;padding-bottom:0}
+.tb-item:first-child{padding-top:0}
+.tbi-dot{width:15px;height:15px;border-radius:4px;background:var(--ba8);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tbi-dot svg{width:8px;height:8px;color:var(--blue)}
+.tbi-t strong{display:block;font-size:11px;font-weight:600;color:var(--c7)}
+.tbi-t span{font-size:11px;color:var(--c5)}
+
+/* Params */
+.qblock{margin-bottom:20px;animation:fadeUp .3s ease both}
+.q-l{font-size:13px;font-weight:600;color:var(--c7);margin-bottom:2px}
+.q-h{font-size:11px;color:var(--c4);margin-bottom:9px;line-height:1.4}
+.sl-v{display:inline-flex;align-items:center;background:var(--ba8);border:1px solid var(--ba15);border-radius:5px;padding:3px 10px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--blue);margin-bottom:7px}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--c2);border-radius:99px;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--blue);border-radius:50%;box-shadow:0 0 0 3px #fff,0 0 0 5px var(--ba15);transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.1)}
+.sl-marks{display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--c4);font-family:'JetBrains Mono',monospace}
+.px-wrap{display:flex;align-items:center;gap:9px}
+.px-inp{flex:1;height:42px;background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r6);padding:0 13px;font-size:15px;font-weight:600;color:var(--c8);transition:border-color .15s;-moz-appearance:textfield}
+.px-inp:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--ba8)}
+.px-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+.px-unit{font-size:12px;font-weight:600;color:var(--c5);white-space:nowrap}
+.cpa-box{margin-top:8px;padding:10px 12px;background:var(--ba8);border:1px solid var(--ba15);border-radius:var(--r6);font-size:11px;color:var(--c6);line-height:1.55;animation:fadeUp .2s ease}
+.cpa-box strong{color:var(--blue)}
+.sect-row{display:flex;flex-wrap:wrap;gap:6px}
+.spill{display:flex;align-items:center;gap:5px;background:var(--c0);border:1.5px solid var(--c2);border-radius:99px;padding:6px 13px;font-size:12px;font-weight:500;color:var(--c6);cursor:pointer;transition:all .15s;user-select:none}
+.spill:hover{border-color:var(--c3);color:var(--c8)}
+.spill.on{background:var(--ba8);border-color:var(--blue);color:var(--blue)}
+.sp-e{font-size:13px}
+
+/* Review */
+.rcard{background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r14);overflow:hidden;margin-bottom:10px;animation:fadeUp .3s ease .05s both}
+.rsec{padding:11px 15px;border-bottom:1px solid var(--c2)}
+.rsec:last-child{border-bottom:none}
+.rsh{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--c4);font-family:'JetBrains Mono',monospace;margin-bottom:6px}
+.rrow{display:flex;align-items:center;justify-content:space-between;padding:2px 0}
+.rk{font-size:12px;color:var(--c5)}
+.rv{font-size:12px;font-weight:600;color:var(--c7)}
+.rv-ok{color:var(--green)} .rv-no{color:var(--c4);font-weight:400} .rv-warn{color:var(--amber)} .rv-bl{color:var(--blue)} .rv-p{color:var(--purple)}
+
+/* Shadow card */
+.shcard{background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r14);overflow:hidden;margin-bottom:10px;animation:fadeUp .3s ease .1s both}
+.shi{display:flex;align-items:flex-start;gap:9px;padding:11px 14px;border-bottom:1px solid var(--c2)}
+.shi:last-child{border-bottom:none}
+.shi-ico{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.shi-g{background:var(--ga8)} .shi-g svg{color:var(--green);width:9px;height:9px}
+.shi-b{background:var(--ba8)} .shi-b svg{color:var(--blue);width:9px;height:9px}
+.shi-t{font-size:12px;font-weight:600;color:var(--c7)}
+.shi-p{font-size:11px;color:var(--c5);line-height:1.4;margin-top:1px}
+
+/* Security note */
+.sec-note{display:flex;align-items:flex-start;gap:7px;background:var(--ga8);border:1px solid var(--ga20);border-radius:var(--r6);padding:9px 11px;font-size:11px;color:#15803d;line-height:1.45;margin-top:9px}
+.sec-note svg{width:11px;height:11px;color:#16a34a;flex-shrink:0;margin-top:1px}
+
+/* Accordion */
+.acc{margin:4px 0 10px}
+.acc-btn{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--c4);transition:color .14s}
+.acc-btn:hover{color:var(--blue)}
+.acc-btn svg{width:10px;height:10px;transition:transform .18s;flex-shrink:0}
+.acc-btn.open svg{transform:rotate(90deg)}
+.acc-body{display:none;margin-top:7px;background:var(--c0);border:1px solid var(--c2);border-radius:var(--r10);overflow:hidden;animation:fadeUp .2s ease}
+.acc-item{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-bottom:1px solid var(--c2)}
+.acc-item:last-child{border-bottom:none}
+.acc-ic{width:17px;height:17px;border-radius:4px;background:var(--ba8);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.acc-ic svg{width:8px;height:8px;color:var(--blue)}
+.acc-al{font-size:11px;font-weight:600;color:var(--c7);margin-bottom:1px}
+.acc-ad{font-size:11px;color:var(--c5);line-height:1.45}
+
+/* Buttons */
+.btns{display:flex;align-items:center;gap:8px;margin-top:22px;animation:fadeUp .3s ease .12s both}
+.btn{height:42px;border-radius:var(--r6);padding:0 18px;font-weight:600;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;cursor:pointer;border:none;white-space:nowrap}
+.btn-prime{background:var(--blue);color:#fff}
+.btn-prime:hover:not(:disabled){background:var(--blue2);box-shadow:0 4px 14px rgba(29,110,245,.3)}
+.btn-coach{background:var(--purple);color:#fff}
+.btn-coach:hover:not(:disabled){background:#6d28d9;box-shadow:0 4px 14px rgba(124,58,237,.3)}
+.btn-ghost{background:transparent;color:var(--c5);border:1.5px solid var(--c2)}
+.btn-ghost:hover{border-color:var(--c3);color:var(--c7)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-lg{height:48px;font-size:14px;padding:0 22px}
+.btn-full{width:100%;justify-content:center}
+.btn svg{width:13px;height:13px;flex-shrink:0}
+.spin{animation:spin .6s linear infinite}
+
+/* API Status banner */
+.api-banner{border-radius:var(--r6);padding:9px 12px;font-size:12px;line-height:1.5;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px}
+.api-banner svg{width:12px;height:12px;flex-shrink:0;margin-top:1px}
+.ab-ok{background:var(--ga8);border:1px solid var(--ga20);color:#15803d;display:none}
+.ab-warn{background:var(--aa10);border:1px solid var(--aa25);color:#92400e}
+.ab-err{background:var(--ra8);border:1px solid rgba(224,49,49,.2);color:var(--red);display:none}
+
+/* Success */
+.success{text-align:center;animation:scaleIn .4s cubic-bezier(.34,1.56,.64,1);padding:24px 0}
+.su-ring{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 0 10px rgba(29,110,245,.08)}
+.su-ring svg{width:26px;height:26px;color:#fff}
+.su-t{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--c8);letter-spacing:-.025em;margin-bottom:7px}
+.su-p{font-size:13px;color:var(--c5);line-height:1.65;max-width:340px;margin:0 auto 20px}
+.su-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:300px;margin:0 auto 22px}
+.sk{background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r10);padding:12px 6px;text-align:center}
+.sk-v{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--blue)}
+.sk-l{font-size:10px;color:var(--c4);margin-top:2px}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD — AGENTS
+═══════════════════════════════════════════ */
+.dash{display:none}
+.dash.show{display:block}
+.dash .wrap{max-width:680px}
+.dash-head{margin-bottom:28px;animation:fadeUp .3s ease both}
+.dash-head h1{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--c8);letter-spacing:-.025em;margin-bottom:4px}
+.dash-head p{font-size:13px;color:var(--c5)}
+
+.agent-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;animation:fadeUp .3s ease .05s both}
+
+.ag-card{background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r14);padding:18px;cursor:pointer;transition:all .2s;position:relative}
+.ag-card:hover{border-color:var(--c3);transform:translateY(-2px);box-shadow:var(--sh2)}
+.ag-card.active{border-color:var(--blue);box-shadow:0 0 0 3px var(--ba8)}
+.ag-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.ag-ico svg{width:18px;height:18px}
+.ag-ico-opt{background:var(--ba8)} .ag-ico-opt svg{color:var(--blue)}
+.ag-ico-con{background:var(--pa8)} .ag-ico-con svg{color:var(--purple)}
+.ag-ico-ana{background:var(--ga8)} .ag-ico-ana svg{color:var(--green)}
+.ag-ico-mon{background:var(--aa10)} .ag-ico-mon svg{color:var(--amber)}
+.ag-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--c8);margin-bottom:3px}
+.ag-desc{font-size:11px;color:var(--c5);line-height:1.45}
+.ag-badge{position:absolute;top:12px;right:12px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px}
+.agb-ai{background:var(--ba8);color:var(--blue);border:1px solid var(--ba15)}
+
+.agent-panel{display:none;background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r14);overflow:hidden;margin-bottom:20px;animation:fadeUp .3s ease both}
+.agent-panel.show{display:block}
+.ap-head{padding:16px 18px;border-bottom:1px solid var(--c2);display:flex;align-items:center;justify-content:space-between}
+.ap-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--c8)}
+.ap-close{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .14s}
+.ap-close:hover{background:var(--c1)}
+.ap-close svg{width:14px;height:14px;color:var(--c5)}
+.ap-body{padding:18px}
+.ap-form{display:flex;flex-direction:column;gap:14px}
+.af-group{display:flex;flex-direction:column;gap:4px}
+.af-label{font-size:12px;font-weight:600;color:var(--c7)}
+.af-hint{font-size:11px;color:var(--c4)}
+.af-input{height:40px;background:var(--c1);border:1.5px solid var(--c2);border-radius:var(--r6);padding:0 12px;font-size:13px;color:var(--c8);transition:border-color .15s}
+.af-input:focus{border-color:var(--blue);background:var(--c0);box-shadow:0 0 0 3px var(--ba8)}
+.af-textarea{min-height:80px;resize:vertical;padding:10px 12px;background:var(--c1);border:1.5px solid var(--c2);border-radius:var(--r6);font-size:13px;color:var(--c8);font-family:inherit;transition:border-color .15s}
+.af-textarea:focus{border-color:var(--blue);background:var(--c0)}
+.af-chips{display:flex;flex-wrap:wrap;gap:6px}
+.af-chip{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:500;background:var(--c1);border:1.5px solid var(--c2);color:var(--c6);cursor:pointer;transition:all .14s;user-select:none}
+.af-chip:hover{border-color:var(--c3)}
+.af-chip.on{background:var(--ba8);border-color:var(--blue);color:var(--blue)}
+
+.ap-result{display:none;margin-top:16px;padding:16px;background:var(--c1);border-radius:var(--r10);border:1px solid var(--c2)}
+.ap-result.show{display:block;animation:fadeUp .3s ease both}
+.apr-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.apr-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:live 2s infinite}
+.apr-title{font-size:13px;font-weight:700;color:var(--c7)}
+.apr-body{font-size:12px;color:var(--c6);line-height:1.7;white-space:pre-wrap;font-family:'JetBrains Mono',monospace;max-height:400px;overflow-y:auto}
+.apr-json{background:var(--void);color:var(--c3);border-radius:var(--r6);padding:12px;font-size:11px;max-height:300px;overflow-y:auto}
+
+.ap-loading{display:none;padding:20px;text-align:center}
+.ap-loading.show{display:block;animation:fadeUp .2s ease}
+.ap-loading svg{animation:spin .8s linear infinite;margin-bottom:8px}
+.ap-loading p{font-size:12px;color:var(--c5)}
+
+.alerts-panel{background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r14);overflow:hidden;margin-bottom:20px;animation:fadeUp .3s ease .1s both}
+.alerts-panel .ap-head{border-bottom:1px solid var(--c2)}
+.alert-item{display:flex;align-items:flex-start;gap:10px;padding:12px 18px;border-bottom:1px solid var(--c2)}
+.alert-item:last-child{border-bottom:none}
+.al-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.al-crit{background:var(--red)} .al-warn{background:var(--amber)} .al-info{background:var(--blue)}
+.al-msg{font-size:12px;color:var(--c6);line-height:1.5}
+.al-time{font-size:10px;color:var(--c4);margin-top:2px;font-family:'JetBrains Mono',monospace}
+.al-empty{padding:20px;text-align:center;font-size:12px;color:var(--c4)}
+
+/* ═══════════════════════════════════════════
+   META TOOLS SECTION
+═══════════════════════════════════════════ */
+.meta-tools{margin-bottom:24px;animation:fadeUp .3s ease .08s both}
+.mt-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.mt-head h2{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--c8)}
+.mt-head span{font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace;padding:3px 8px;border-radius:99px;background:var(--ba8);color:var(--blue);border:1px solid var(--ba15)}
+
+.mt-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.mt-card{background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r10);padding:14px;cursor:pointer;transition:all .2s}
+.mt-card:hover{border-color:var(--c3);transform:translateY(-1px);box-shadow:var(--sh2)}
+.mt-card.active{border-color:var(--blue);box-shadow:0 0 0 3px var(--ba8)}
+.mt-card-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.mt-card-ico svg{width:15px;height:15px}
+.mt-card-name{font-size:12px;font-weight:700;color:var(--c8);margin-bottom:2px}
+.mt-card-desc{font-size:10px;color:var(--c5);line-height:1.4}
+
+.mt-panel{display:none;background:var(--c0);border:1.5px solid var(--c2);border-radius:var(--r14);overflow:hidden;margin-top:12px;margin-bottom:16px;animation:fadeUp .3s ease both}
+.mt-panel.show{display:block}
+.mt-result{margin-top:14px;padding:14px;background:var(--c1);border-radius:var(--r10);border:1px solid var(--c2);display:none;max-height:400px;overflow-y:auto}
+.mt-result.show{display:block;animation:fadeUp .3s ease both}
+.mt-result-title{font-size:12px;font-weight:700;color:var(--c7);margin-bottom:8px}
+.interest-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--c2)}
+.interest-item:last-child{border-bottom:none}
+.interest-name{font-size:12px;font-weight:600;color:var(--c7)}
+.interest-size{font-size:11px;color:var(--c4);font-family:'JetBrains Mono',monospace}
+.breakdown-row{display:grid;grid-template-columns:1fr repeat(3,auto);gap:8px;padding:6px 0;border-bottom:1px solid var(--c2);font-size:12px;align-items:center}
+.breakdown-row:last-child{border-bottom:none}
+.breakdown-label{font-weight:600;color:var(--c7)}
+.breakdown-val{color:var(--c5);font-family:'JetBrains Mono',monospace;text-align:right;font-size:11px}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-mark"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h3l2-5 3 10 2-5h2" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="sb-word">AEGIS</span>
+    </div>
+    <div class="sb-eta">
+      <svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3.5V6l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      ~4 minutes
+    </div>
+    <nav class="steps" id="steps-nav">
+      <div class="st active" id="si-0"><div class="stn" id="sn-0">1</div><div><div class="stl">Ton mode</div><div class="sts">Guidé ou autonome</div></div></div>
+      <div class="st" id="si-1"><div class="stn" id="sn-1">2</div><div><div class="stl">Ta boutique</div><div class="sts">Connecter Shopify</div></div></div>
+      <div class="st" id="si-2"><div class="stn" id="sn-2">3</div><div><div class="stl">Tes publicités</div><div class="sts">Meta + optionnel</div></div></div>
+      <div class="st" id="si-3"><div class="stn" id="sn-3">4</div><div><div class="stl">Suivi iOS</div><div class="sts">Récupérer les ventes cachées</div></div></div>
+      <div class="st" id="si-4"><div class="stn" id="sn-4">5</div><div><div class="stl">Tes objectifs</div><div class="sts">Budget et secteur</div></div></div>
+      <div class="st" id="si-5"><div class="stn" id="sn-5">6</div><div><div class="stl">Lancement</div><div class="sts">Shadow mode 7 jours</div></div></div>
+    </nav>
+    <div class="sb-note">
+      <svg viewBox="0 0 12 12" fill="none"><path d="M3.5 5V4a2.5 2.5 0 015 0v1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><rect x="2" y="5" width="8" height="6" rx="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+      AEGIS ne peut jamais faire d'achats ni accéder à ton solde bancaire.
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="wrap">
+
+      <!-- Progress bar -->
+      <div class="prog"><div class="prog-fill" id="prog-fill" style="width:16%"></div></div>
+
+      <!-- API Status -->
+      <div class="api-banner ab-ok" id="api-ok">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M1 6l3.5 3.5L11 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Connecté à AEGIS API
+      </div>
+      <div class="api-banner ab-warn" id="api-warn">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M6 2l5 8.5H1L6 2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M6 6.5v1.5M6 9.5v.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span>Mode démonstration — <strong>Configure <code>API_BASE</code></strong> dans le code pour brancher le vrai backend.</span>
+      </div>
+      <div class="api-banner ab-err" id="api-err">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        API injoignable — les connexions ne seront pas sauvegardées.
+      </div>
+
+      <!-- ── STEP 0 — MODE ── -->
+      <div id="step-0">
+        <div class="sh">
+          <div class="sh-eyebrow"><span class="sh-dot"></span>Étape 1 sur 6</div>
+          <h1 class="sh-h">Comment veux-tu qu'AEGIS te parle ?</h1>
+          <p class="sh-p">Tu pourras changer à tout moment depuis ton espace.</p>
+        </div>
+        <div class="mode-grid">
+          <div class="mc on-p" id="mc-coach" onclick="setMode('coach')">
+            <div class="mc-chk"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="mc-ico"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 14c0-3 2.5-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="mc-t">Mode Accompagné</div>
+            <p class="mc-p">AEGIS explique chaque décision. Tu apprends en vendant.</p>
+          </div>
+          <div class="mc" id="mc-auto" onclick="setMode('auto')">
+            <div class="mc-chk"><svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="mc-ico"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h3l2-5 3 10 2-5h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="mc-t">Mode Autonome</div>
+            <p class="mc-p">AEGIS gère tout. Alertes uniquement si quelque chose d'important.</p>
+          </div>
+        </div>
+        <div class="hint hint-p show" id="hint-coach">
+          <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 6.5v3M7 5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span><strong>Recommandé si tu démarres.</strong> AEGIS explique chaque décision — tu comprends la pub en faisant de vraies ventes.</span>
+        </div>
+        <div class="btns">
+          <button class="btn btn-lg btn-full btn-coach" id="btn-0" onclick="goStep(1)">
+            Continuer en mode Accompagné
+            <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── STEP 1 — SHOPIFY ── -->
+      <div id="step-1" style="display:none">
+        <div class="sh">
+          <div class="sh-eyebrow"><span class="sh-dot"></span>Étape 2 sur 6</div>
+          <h2 class="sh-h">Connecte ta boutique Shopify</h2>
+          <p class="sh-p">AEGIS verra tes commandes pour savoir quelles publicités génèrent des ventes réelles.</p>
+        </div>
+        <div class="err-box" id="err-shopify">Connexion échouée. Vérifie que tu as autorisé l'accès dans la popup Shopify.</div>
+        <div class="ccard" id="cc-shopify" onclick="doConnect('shopify')">
+          <div class="cc-logo" style="background:#95bf47"><svg viewBox="0 0 24 24" fill="white" width="18"><path d="M15.337 23.979l7.453-1.61S19.948 7.271 19.93 7.137a.302.302 0 00-.27-.243c-.12-.012-2.657-.048-2.657-.048s-1.756-1.697-1.95-1.89v.022l-3.097 19.001 3.38 1.001zm-4.59-1.254l-.002-.009-4.06-1.126S5.923 12.73 5.877 12.431a.292.292 0 01.275-.338l2.264-.075 2.33-9.875.001 20.581z"/></svg></div>
+          <div class="cc-info"><div class="cc-name">Shopify</div><div class="cc-desc" id="d-shopify">Clique pour ouvrir la fenêtre de connexion</div></div>
+          <div class="cc-r">
+            <span class="cc-tag ct-req" id="t-shopify">Obligatoire</span>
+            <svg class="cc-arr" id="a-shopify" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cc-bar" id="b-shopify"></div>
+        </div>
+        <div class="acc">
+          <button class="acc-btn" id="acc-sh-btn" onclick="toggleAcc('sh')">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M4 3l4 3-4 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Pourquoi AEGIS a besoin de Shopify ?
+          </button>
+          <div class="acc-body" id="acc-sh">
+            <div class="acc-item"><div class="acc-ic"><svg viewBox="0 0 12 12" fill="none"><path d="M1 6l3.5 3.5L11 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="acc-al">Voir tes ventes en temps réel</div><div class="acc-ad">Pour savoir quelle pub a généré quelle commande.</div></div></div>
+            <div class="acc-item"><div class="acc-ic"><svg viewBox="0 0 12 12" fill="none"><path d="M1 6l3.5 3.5L11 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="acc-al">Créer des pubs avec tes vrais produits</div><div class="acc-ad">Visuels, prix, descriptions — AEGIS les récupère automatiquement.</div></div></div>
+          </div>
+        </div>
+        <div class="sec-note"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1L2 2.5V6c0 2.5 2 4.5 4 5 2-.5 4-2.5 4-5V2.5L6 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>Accès en lecture seule. AEGIS ne peut jamais créer de commandes ni modifier tes prix.</div>
+        <div class="btns">
+          <button class="btn btn-ghost" onclick="goStep(0)">Retour</button>
+          <button class="btn btn-prime" id="btn-1" onclick="goStep(2)" disabled>Continuer <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        </div>
+      </div>
+
+      <!-- ── STEP 2 — PUBS ── -->
+      <div id="step-2" style="display:none">
+        <div class="sh">
+          <div class="sh-eyebrow"><span class="sh-dot"></span>Étape 3 sur 6</div>
+          <h2 class="sh-h">Connecte tes comptes publicitaires</h2>
+          <p class="sh-p">Meta est indispensable. TikTok et Google peuvent être ajoutés plus tard.</p>
+        </div>
+        <div class="err-box" id="err-meta">Connexion Meta échouée. Réessaie ou contacte le support.</div>
+        <div class="ccard" id="cc-meta" onclick="doConnect('meta')">
+          <div class="cc-logo" style="background:linear-gradient(135deg,#1877f2,#0c5de8)"><svg viewBox="0 0 24 24" fill="white" width="16"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></div>
+          <div class="cc-info"><div class="cc-name">Meta Ads</div><div class="cc-desc" id="d-meta">Facebook & Instagram — là où AEGIS lance tes pubs</div></div>
+          <div class="cc-r">
+            <span class="cc-tag ct-req" id="t-meta">Obligatoire</span>
+            <svg class="cc-arr" id="a-meta" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cc-bar" id="b-meta"></div>
+        </div>
+        <div class="ccard" id="cc-tiktok" onclick="doConnect('tiktok')">
+          <div class="cc-logo" style="background:#010101"><svg viewBox="0 0 24 24" fill="white" width="14"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.31 6.31 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.98a8.15 8.15 0 004.77 1.52V7.04a4.85 4.85 0 01-1-.35z"/></svg></div>
+          <div class="cc-info"><div class="cc-name">TikTok Ads</div><div class="cc-desc" id="d-tiktok">Optionnel — ajouter maintenant ou plus tard</div></div>
+          <div class="cc-r">
+            <span class="cc-tag ct-opt" id="t-tiktok">Optionnel</span>
+            <svg class="cc-arr" id="a-tiktok" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cc-bar" id="b-tiktok"></div>
+        </div>
+        <div class="ccard" id="cc-google" onclick="doConnect('google')">
+          <div class="cc-logo" style="background:#fff;border:1px solid var(--c2)"><svg viewBox="0 0 24 24" width="16"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></div>
+          <div class="cc-info"><div class="cc-name">Google Ads</div><div class="cc-desc" id="d-google">Optionnel — YouTube, Search, Shopping</div></div>
+          <div class="cc-r">
+            <span class="cc-tag ct-opt" id="t-google">Optionnel</span>
+            <svg class="cc-arr" id="a-google" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="cc-bar" id="b-google"></div>
+        </div>
+        <div class="btns">
+          <button class="btn btn-ghost" onclick="goStep(1)">Retour</button>
+          <button class="btn btn-prime" id="btn-2" onclick="goStep(3)" disabled>Continuer <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3 — CAPI ── -->
+      <div id="step-3" style="display:none">
+        <div class="sh">
+          <div class="sh-eyebrow"><span class="sh-dot"></span>Étape 4 sur 6</div>
+          <h2 class="sh-h">Active le suivi avancé des ventes</h2>
+          <p class="sh-p">Sans ça, Meta ne voit que <strong>60 à 70% de tes ventes</strong>. AEGIS prend de mauvaises décisions.</p>
+        </div>
+        <div class="tcard">
+          <div class="tc-top">
+            <div class="tc-head">
+              <div class="tc-ico"><svg viewBox="0 0 18 18" fill="none"><path d="M9 1.5L2.5 4v5.5c0 4 2.8 7.5 6.5 8.5 3.7-1 6.5-4.5 6.5-8.5V4L9 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6 9l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+              <div class="tc-lbl"><div class="tc-name">Suivi côté serveur</div><div class="tc-sub">Récupère les ventes que les iPhones cachent à Meta</div></div>
+              <div class="tc-badge tb-off" id="track-badge">Non activé</div>
+            </div>
+            <div class="tc-body"><strong>Depuis iOS 14</strong>, les iPhones bloquent une partie du suivi. Meta pense que certaines pubs ne vendent pas, alors qu'elles vendent vraiment.<br><br><strong>La solution :</strong> un canal direct boutique → Meta, invisible aux bloqueurs.</div>
+          </div>
+          <div class="tc-toggle" onclick="toggleTrack()">
+            <div><div class="tc-tl">Activer le suivi avancé</div><div class="tc-ts">AEGIS configure tout automatiquement</div></div>
+            <div class="sw-row"><span class="sw-txt" id="sw-txt">OFF</span><div class="toggle" id="track-sw"></div></div>
+          </div>
+          <div class="tc-benefits" id="track-ben">
+            <div class="tb-item"><div class="tbi-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5L8.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="tbi-t"><strong>+20 à +35% de ventes visibles</strong><span>Toutes les commandes remontent, même depuis iOS.</span></div></div>
+            <div class="tb-item"><div class="tbi-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5L8.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="tbi-t"><strong>AEGIS ne coupe plus les bonnes pubs</strong><span>Le budget va là où il faut vraiment.</span></div></div>
+          </div>
+        </div>
+        <div class="btns">
+          <button class="btn btn-ghost" onclick="goStep(2)">Retour</button>
+          <button class="btn btn-prime" onclick="goStep(4)">Continuer <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        </div>
+      </div>
+
+      <!-- ── STEP 4 — OBJECTIFS ── -->
+      <div id="step-4" style="display:none">
+        <div class="sh">
+          <div class="sh-eyebrow"><span class="sh-dot"></span>Étape 5 sur 6</div>
+          <h2 class="sh-h">3 questions rapides</h2>
+          <p class="sh-p">AEGIS calibre ses décisions depuis le jour 1.</p>
+        </div>
+        <div class="qblock">
+          <div class="q-l">Combien veux-tu investir en pub par jour ?</div>
+          <div class="q-h">AEGIS ne pourra jamais dépasser cette limite.</div>
+          <div class="sl-v" id="bgt-v">50 €/jour</div>
+          <input type="range" min="10" max="500" step="10" value="50" oninput="onBgt(this.value)">
+          <div class="sl-marks"><span>10 €</span><span>100 €</span><span>250 €</span><span>500 €</span></div>
+        </div>
+        <div class="qblock" style="animation-delay:.07s">
+          <div class="q-l">Prix de vente moyen de tes produits ?</div>
+          <div class="q-h">Moyenne approximative si tu as plusieurs produits.</div>
+          <div class="px-wrap">
+            <input type="number" class="px-inp" id="px-inp" placeholder="49" min="1" oninput="onPx(this.value)">
+            <div class="px-unit">€ par produit</div>
+          </div>
+          <div class="cpa-box" id="cpa-box" style="display:none">
+            AEGIS ciblera un coût par vente autour de <strong id="cpa-v">—</strong>. Il coupera les pubs qui coûtent plus de <strong id="cpa-cut">—</strong>.
+          </div>
+        </div>
+        <div class="qblock" style="animation-delay:.13s">
+          <div class="q-l">Dans quel secteur es-tu ?</div>
+          <div class="sect-row">
+            <div class="spill on" onclick="setSect(this,'Beauté')"><span class="sp-e">✨</span>Beauté</div>
+            <div class="spill" onclick="setSect(this,'Mode')"><span class="sp-e">👗</span>Mode</div>
+            <div class="spill" onclick="setSect(this,'Maison')"><span class="sp-e">🏠</span>Maison</div>
+            <div class="spill" onclick="setSect(this,'Santé')"><span class="sp-e">🌿</span>Santé</div>
+            <div class="spill" onclick="setSect(this,'Sport')"><span class="sp-e">🏃</span>Sport</div>
+            <div class="spill" onclick="setSect(this,'Autre')"><span class="sp-e">📦</span>Autre</div>
+          </div>
+        </div>
+        <div class="btns">
+          <button class="btn btn-ghost" onclick="goStep(3)">Retour</button>
+          <button class="btn btn-prime" id="btn-4" onclick="goStep(5)" disabled>Continuer <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        </div>
+      </div>
+
+      <!-- ── STEP 5 — REVIEW ── -->
+      <div id="step-5" style="display:none">
+        <div class="sh">
+          <div class="sh-eyebrow"><span class="sh-dot"></span>Étape 6 sur 6</div>
+          <h2 class="sh-h">Tout est prêt.</h2>
+          <p class="sh-p">AEGIS commence par 7 jours d'observation silencieuse — zéro risque.</p>
+        </div>
+        <div class="rcard">
+          <div class="rsec"><div class="rsh">Mode</div><div class="rrow"><div class="rk">Comment AEGIS te parle</div><div class="rv rv-p" id="rv-mode">Accompagné</div></div></div>
+          <div class="rsec">
+            <div class="rsh">Connexions</div>
+            <div class="rrow"><div class="rk">Shopify</div><div class="rv rv-ok" id="rv-shopify">Connecté</div></div>
+            <div class="rrow"><div class="rk">Meta Ads</div><div class="rv rv-ok" id="rv-meta">Connecté</div></div>
+            <div class="rrow"><div class="rk">TikTok Ads</div><div class="rv rv-no" id="rv-tiktok">Plus tard</div></div>
+            <div class="rrow"><div class="rk">Google Ads</div><div class="rv rv-no" id="rv-google">Plus tard</div></div>
+            <div class="rrow"><div class="rk">Suivi avancé</div><div class="rv rv-warn" id="rv-track">Non activé</div></div>
+          </div>
+          <div class="rsec">
+            <div class="rsh">Objectifs</div>
+            <div class="rrow"><div class="rk">Budget / jour</div><div class="rv rv-bl" id="rv-bgt">50 €</div></div>
+            <div class="rrow"><div class="rk">Prix de vente</div><div class="rv" id="rv-px">—</div></div>
+            <div class="rrow"><div class="rk">Secteur</div><div class="rv" id="rv-sect">Beauté</div></div>
+          </div>
+        </div>
+        <div class="shcard">
+          <div class="shi"><div class="shi-ico shi-g"><svg viewBox="0 0 12 12" fill="none"><path d="M1 6l3.5 3.5L11 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="shi-t">7 jours d'observation — zéro changement</div><div class="shi-p">AEGIS regarde sans toucher à tes campagnes. Annule à tout moment.</div></div></div>
+          <div class="shi"><div class="shi-ico shi-b"><svg viewBox="0 0 12 12" fill="none"><path d="M1 6l3.5 3.5L11 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="shi-t">Commission 0% pendant l'observation</div><div class="shi-p">Les 1.5% sur CA ne s'activent qu'à partir du Niveau 2.</div></div></div>
+        </div>
+        <div class="btns">
+          <button class="btn btn-ghost" onclick="goStep(4)">Retour</button>
+          <button class="btn btn-lg btn-coach" id="launch-btn" onclick="doLaunch()" style="flex:1">
+            Démarrer AEGIS
+            <svg viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4.5H14l-3.7 2.7 1.4 4.3L8 11l-3.7 2.5L5.7 9.2 2 6.5h4.5z" stroke="currentColor" stroke-width="1.2" fill="currentColor" opacity=".6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── SUCCESS ── -->
+      <div id="step-ok" style="display:none">
+        <div class="success">
+          <div class="su-ring"><svg viewBox="0 0 32 32" fill="none"><path d="M6 16l7 7L26 9" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="su-t">AEGIS est en ligne</div>
+          <p class="su-p">Tes agents sont actifs. 7 jours d'observation silencieuse, puis passage à l'action. Ton premier rapport dans <strong>24 heures</strong>.</p>
+          <div class="su-kpis">
+            <div class="sk"><div class="sk-v">48</div><div class="sk-l">Agents</div></div>
+            <div class="sk"><div class="sk-v">N1</div><div class="sk-l">Niveau</div></div>
+            <div class="sk"><div class="sk-v">J+7</div><div class="sk-l">Actions</div></div>
+          </div>
+          <button class="btn btn-prime btn-full btn-lg" onclick="showDashboard()">
+            Acceder a mes Agents
+            <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /wrap -->
+  </main>
+
+  <!-- ═══════════════════════════════════════════
+       DASHBOARD VIEW — AI AGENTS
+  ═══════════════════════════════════════════ -->
+  <main class="main dash" id="dashboard">
+    <div class="wrap">
+      <div class="dash-head">
+        <h1>AEGIS Agents</h1>
+        <p>5 agents IA + Meta Tools pour optimiser tes campagnes publicitaires</p>
+      </div>
+
+      <!-- Meta Ads Live Status -->
+      <div id="meta-status-bar" style="display:none;border-radius:var(--r10);padding:12px 15px;margin-bottom:18px;animation:fadeUp .3s ease both">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:8px;height:8px;border-radius:50%;animation:live 2s infinite" id="meta-dot"></div>
+            <span style="font-size:12px;font-weight:600" id="meta-label">Meta Ads</span>
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <span style="font-size:11px;color:var(--c5)">Auto-fetch</span>
+            <div class="toggle" id="auto-fetch-sw" onclick="toggleAutoFetch()"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Agent Grid -->
+      <div class="agent-grid">
+        <div class="ag-card" onclick="openAgent('optimizer')">
+          <div class="ag-ico ag-ico-opt"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2v16M2 10h16M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div class="ag-name">Ad Optimizer</div>
+          <div class="ag-desc">Optimise tes budgets et encheres en analysant les performances.</div>
+          <span class="ag-badge agb-ai">AI Agent</span>
+        </div>
+        <div class="ag-card" onclick="openAgent('content')">
+          <div class="ag-ico ag-ico-con"><svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h10M3 15h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div class="ag-name">Content Creator</div>
+          <div class="ag-desc">Genere du contenu publicitaire optimise pour chaque plateforme.</div>
+          <span class="ag-badge agb-ai">AI Agent</span>
+        </div>
+        <div class="ag-card" onclick="openAgent('analytics')">
+          <div class="ag-ico ag-ico-ana"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="10" width="3" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="8.5" y="6" width="3" height="11" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="3" width="3" height="14" rx="1" stroke="currentColor" stroke-width="1.5"/></svg></div>
+          <div class="ag-name">Analytics</div>
+          <div class="ag-desc">Rapports de performance automatiques avec insights actionnables.</div>
+          <span class="ag-badge agb-ai">AI Agent</span>
+        </div>
+        <div class="ag-card" onclick="openAgent('monitor')">
+          <div class="ag-ico ag-ico-mon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2a8 8 0 108 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div class="ag-name">Monitor 24/7</div>
+          <div class="ag-desc">Surveillance continue, alertes si CPA explose ou ROAS chute.</div>
+          <span class="ag-badge agb-ai">AI Agent</span>
+        </div>
+        <div class="ag-card" onclick="openAgent('audit')" style="grid-column:1/-1">
+          <div class="ag-ico" style="background:var(--ra8)"><svg viewBox="0 0 20 20" fill="none" style="color:var(--red)"><path d="M10 2a8 8 0 108 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 6v5M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div class="ag-name">Audit Complet</div>
+          <div class="ag-desc">190 checks, scoring A-F, quality gates, benchmarks 2026 — inspire de claude-ads + meta-ads-kit</div>
+          <span class="ag-badge" style="background:var(--ra8);color:var(--red);border:1px solid rgba(224,49,49,.2)">NEW</span>
+        </div>
+      </div>
+
+      <!-- OPTIMIZER PANEL -->
+      <div class="agent-panel" id="panel-optimizer">
+        <div class="ap-head">
+          <span class="ap-title">Ad Optimizer Agent</span>
+          <div class="ap-close" onclick="closeAgent('optimizer')"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="ap-body">
+          <div class="ap-form" id="form-optimizer">
+            <div class="af-group">
+              <label class="af-label">Budget quotidien</label>
+              <input type="number" class="af-input" id="opt-budget" placeholder="50" value="">
+            </div>
+            <div class="af-group">
+              <label class="af-label">Prix moyen produit</label>
+              <input type="number" class="af-input" id="opt-price" placeholder="49">
+            </div>
+            <div class="af-group">
+              <label class="af-label">Campagnes (JSON simplifie)</label>
+              <div class="af-hint">Ex: nom, plateforme, depense, revenus, ROAS, CPA</div>
+              <textarea class="af-textarea" id="opt-campaigns" placeholder='[{"name":"Summer Sale","platform":"meta","spend":120,"revenue":450,"roas":3.75,"cpa":12,"impressions":15000,"clicks":380,"conversions":10}]'></textarea>
+            </div>
+            <button class="btn btn-prime btn-full" onclick="runAgent('optimizer')">
+              Analyser et optimiser
+              <svg viewBox="0 0 16 16" fill="none"><path d="M2 8h3l2-5 3 10 2-5h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="ap-loading" id="load-optimizer">
+            <svg width="24" height="24" viewBox="0 0 16 16"><path d="M8 2a6 6 0 016 6" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"/></svg>
+            <p>AEGIS Optimizer analyse tes campagnes...</p>
+          </div>
+          <div class="ap-result" id="result-optimizer">
+            <div class="apr-head"><div class="apr-dot"></div><span class="apr-title">Recommandations</span></div>
+            <div class="apr-body" id="out-optimizer"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT PANEL -->
+      <div class="agent-panel" id="panel-content">
+        <div class="ap-head">
+          <span class="ap-title">Content Creator Agent</span>
+          <div class="ap-close" onclick="closeAgent('content')"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="ap-body">
+          <div class="ap-form" id="form-content">
+            <div class="af-group">
+              <label class="af-label">Nom du produit</label>
+              <input type="text" class="af-input" id="con-product" placeholder="Serum Vitamine C Bio">
+            </div>
+            <div class="af-group">
+              <label class="af-label">Description du produit</label>
+              <textarea class="af-textarea" id="con-desc" placeholder="Serum anti-age a base de vitamine C pure, 30ml..."></textarea>
+            </div>
+            <div class="af-group">
+              <label class="af-label">Plateformes</label>
+              <div class="af-chips">
+                <div class="af-chip on" onclick="toggleChip(this)" data-val="meta">Meta</div>
+                <div class="af-chip" onclick="toggleChip(this)" data-val="tiktok">TikTok</div>
+                <div class="af-chip" onclick="toggleChip(this)" data-val="google">Google</div>
+              </div>
+            </div>
+            <div class="af-group">
+              <label class="af-label">Ton</label>
+              <div class="af-chips" id="tone-chips">
+                <div class="af-chip on" onclick="toggleChipSingle(this,'tone-chips')" data-val="professionnel">Pro</div>
+                <div class="af-chip" onclick="toggleChipSingle(this,'tone-chips')" data-val="fun">Fun</div>
+                <div class="af-chip" onclick="toggleChipSingle(this,'tone-chips')" data-val="luxe">Luxe</div>
+                <div class="af-chip" onclick="toggleChipSingle(this,'tone-chips')" data-val="urgence">Urgence</div>
+              </div>
+            </div>
+            <div class="af-group">
+              <label class="af-label">Promotion en cours (optionnel)</label>
+              <input type="text" class="af-input" id="con-promo" placeholder="-30% ce weekend">
+            </div>
+            <button class="btn btn-coach btn-full" onclick="runAgent('content')">
+              Generer le contenu
+              <svg viewBox="0 0 16 16" fill="none"><path d="M3 5h14M3 10h10M3 15h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="ap-loading" id="load-content">
+            <svg width="24" height="24" viewBox="0 0 16 16"><path d="M8 2a6 6 0 016 6" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round"/></svg>
+            <p>AEGIS genere tes creatives...</p>
+          </div>
+          <div class="ap-result" id="result-content">
+            <div class="apr-head"><div class="apr-dot" style="background:var(--purple)"></div><span class="apr-title">Contenu genere</span></div>
+            <div class="apr-body" id="out-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS PANEL -->
+      <div class="agent-panel" id="panel-analytics">
+        <div class="ap-head">
+          <span class="ap-title">Analytics Agent</span>
+          <div class="ap-close" onclick="closeAgent('analytics')"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="ap-body">
+          <div class="ap-form" id="form-analytics">
+            <div class="af-group">
+              <label class="af-label">Periode d'analyse</label>
+              <div class="af-chips" id="period-chips">
+                <div class="af-chip on" onclick="toggleChipSingle(this,'period-chips')" data-val="7 derniers jours">7 jours</div>
+                <div class="af-chip" onclick="toggleChipSingle(this,'period-chips')" data-val="14 derniers jours">14 jours</div>
+                <div class="af-chip" onclick="toggleChipSingle(this,'period-chips')" data-val="30 derniers jours">30 jours</div>
+              </div>
+            </div>
+            <div class="af-group">
+              <label class="af-label">Donnees des campagnes</label>
+              <textarea class="af-textarea" id="ana-campaigns" placeholder='[{"name":"Retargeting FR","platform":"meta","spend":200,"revenue":800,"impressions":25000,"clicks":600,"conversions":18}]'></textarea>
+            </div>
+            <button class="btn btn-full" style="background:var(--green);color:#fff" onclick="runAgent('analytics')">
+              Generer le rapport
+              <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="6" width="3" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="6.5" y="3" width="3" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="5" width="3" height="8" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+            </button>
+          </div>
+          <div class="ap-loading" id="load-analytics">
+            <svg width="24" height="24" viewBox="0 0 16 16"><path d="M8 2a6 6 0 016 6" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round"/></svg>
+            <p>AEGIS analyse tes performances...</p>
+          </div>
+          <div class="ap-result" id="result-analytics">
+            <div class="apr-head"><div class="apr-dot" style="background:var(--green)"></div><span class="apr-title">Rapport d'analyse</span></div>
+            <div class="apr-body" id="out-analytics"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MONITOR PANEL -->
+      <div class="agent-panel" id="panel-monitor">
+        <div class="ap-head">
+          <span class="ap-title">Campaign Monitor Agent</span>
+          <div class="ap-close" onclick="closeAgent('monitor')"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="ap-body">
+          <div class="ap-form" id="form-monitor">
+            <div class="af-group">
+              <label class="af-label">CPA maximum tolere</label>
+              <input type="number" class="af-input" id="mon-cpa" placeholder="20" value="20">
+            </div>
+            <div class="af-group">
+              <label class="af-label">ROAS minimum acceptable</label>
+              <input type="number" class="af-input" id="mon-roas" placeholder="2" value="2" step="0.1">
+            </div>
+            <div class="af-group">
+              <label class="af-label">Budget quotidien</label>
+              <input type="number" class="af-input" id="mon-budget" placeholder="50">
+            </div>
+            <div class="af-group">
+              <label class="af-label">Campagnes en cours</label>
+              <textarea class="af-textarea" id="mon-campaigns" placeholder='[{"name":"Prospecting FR","platform":"meta","spend":45,"cpa":22,"roas":1.8,"ctr":0.9,"conversions":2}]'></textarea>
+            </div>
+            <button class="btn btn-full" style="background:var(--amber);color:#fff" onclick="runAgent('monitor')">
+              Lancer le diagnostic
+              <svg viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 108 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="ap-loading" id="load-monitor">
+            <svg width="24" height="24" viewBox="0 0 16 16"><path d="M8 2a6 6 0 016 6" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"/></svg>
+            <p>AEGIS surveille tes campagnes...</p>
+          </div>
+          <div class="ap-result" id="result-monitor">
+            <div class="apr-head"><div class="apr-dot" style="background:var(--amber)"></div><span class="apr-title">Rapport de surveillance</span></div>
+            <div class="apr-body" id="out-monitor"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUDIT PANEL -->
+      <div class="agent-panel" id="panel-audit">
+        <div class="ap-head">
+          <span class="ap-title">Audit Complet</span>
+          <div class="ap-close" onclick="closeAgent('audit')"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="ap-body">
+          <div class="ap-form" id="form-audit">
+            <div class="af-group">
+              <label class="af-label">Budget quotidien</label>
+              <input type="number" class="af-input" id="aud-budget" placeholder="50">
+            </div>
+            <div class="af-group">
+              <label class="af-label">Prix moyen produit</label>
+              <input type="number" class="af-input" id="aud-price" placeholder="49">
+            </div>
+            <div class="af-group">
+              <label class="af-label">Secteur</label>
+              <div class="af-chips" id="aud-sector-chips">
+                <div class="af-chip on" onclick="toggleChipSingle(this,'aud-sector-chips')" data-val="Beaute">Beaute</div>
+                <div class="af-chip" onclick="toggleChipSingle(this,'aud-sector-chips')" data-val="Mode">Mode</div>
+                <div class="af-chip" onclick="toggleChipSingle(this,'aud-sector-chips')" data-val="Sante">Sante</div>
+                <div class="af-chip" onclick="toggleChipSingle(this,'aud-sector-chips')" data-val="Autre">Autre</div>
+              </div>
+            </div>
+            <div class="af-group">
+              <label class="af-label">Plateformes a auditer</label>
+              <div class="af-chips" id="aud-plat-chips">
+                <div class="af-chip on" onclick="toggleChip(this)" data-val="meta">Meta</div>
+                <div class="af-chip" onclick="toggleChip(this)" data-val="google">Google</div>
+                <div class="af-chip" onclick="toggleChip(this)" data-val="tiktok">TikTok</div>
+              </div>
+            </div>
+            <div class="af-group">
+              <label class="af-label">Donnees campagnes (JSON)</label>
+              <textarea class="af-textarea" id="aud-campaigns" placeholder='[{"name":"Prospecting","platform":"meta","spend":200,"revenue":600,"roas":3.0,"cpa":15,"ctr":1.8,"impressions":20000,"clicks":360,"conversions":13}]'></textarea>
+            </div>
+            <button class="btn btn-full" style="background:var(--red);color:#fff" onclick="runAgent('audit')">
+              Lancer l'audit complet
+              <svg viewBox="0 0 16 16" fill="none"><path d="M10 2a8 8 0 108 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 6v5M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="ap-loading" id="load-audit">
+            <svg width="24" height="24" viewBox="0 0 16 16"><path d="M8 2a6 6 0 016 6" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"/></svg>
+            <p>AEGIS realise l'audit complet (190 checks)...</p>
+          </div>
+          <div class="ap-result" id="result-audit">
+            <div class="apr-head"><div class="apr-dot" style="background:var(--red)"></div><span class="apr-title">Rapport d'audit</span></div>
+            <div class="apr-body" id="out-audit"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- META TOOLS SECTION -->
+      <div class="meta-tools" id="meta-tools-section" style="display:none">
+        <div class="mt-head">
+          <h2>Meta Tools</h2>
+          <span>API v25.0</span>
+        </div>
+        <div class="mt-grid">
+          <div class="mt-card" onclick="openMetaTool('audience')">
+            <div class="mt-card-ico" style="background:var(--pa8)"><svg viewBox="0 0 20 20" fill="none" style="color:var(--purple)"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 17c0-3.3 2.7-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="mt-card-name">Audience Research</div>
+            <div class="mt-card-desc">Interets, estimation taille audience</div>
+          </div>
+          <div class="mt-card" onclick="openMetaTool('duplicate')">
+            <div class="mt-card-ico" style="background:var(--ba8)"><svg viewBox="0 0 20 20" fill="none" style="color:var(--blue)"><rect x="3" y="5" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 5V3.5A1.5 1.5 0 018.5 2h8A1.5 1.5 0 0118 3.5v10a1.5 1.5 0 01-1.5 1.5H15" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            <div class="mt-card-name">Duplication</div>
+            <div class="mt-card-desc">Cloner campagnes et ad sets</div>
+          </div>
+          <div class="mt-card" onclick="openMetaTool('report')">
+            <div class="mt-card-ico" style="background:var(--ga8)"><svg viewBox="0 0 20 20" fill="none" style="color:var(--green)"><path d="M4 16V4h12v12H4z" stroke="currentColor" stroke-width="1.5"/><path d="M7 12v2M10 9v5M13 7v7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="mt-card-name">Reporting</div>
+            <div class="mt-card-desc">Breakdowns demo, placements, daily</div>
+          </div>
+        </div>
+
+        <!-- AUDIENCE TOOL PANEL -->
+        <div class="mt-panel" id="mt-panel-audience">
+          <div class="ap-head">
+            <span class="ap-title">Audience Research</span>
+            <div class="ap-close" onclick="closeMetaTool('audience')"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="ap-body">
+            <div class="af-group">
+              <label class="af-label">Recherche d'interets</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" class="af-input" id="mt-interest-q" placeholder="ex: yoga, fitness, mode..." style="flex:1">
+                <button class="btn btn-prime" onclick="searchInterests()">Chercher</button>
+              </div>
+            </div>
+            <div class="mt-result" id="mt-interest-result"></div>
+            <div class="af-group" style="margin-top:12px">
+              <label class="af-label">Estimation d'audience</label>
+              <div class="af-hint">Pays (code ISO), age min/max</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+                <input type="text" class="af-input" id="mt-aud-country" placeholder="FR" value="FR">
+                <input type="number" class="af-input" id="mt-aud-age-min" placeholder="25" value="25">
+                <input type="number" class="af-input" id="mt-aud-age-max" placeholder="55" value="55">
+              </div>
+            </div>
+            <button class="btn btn-full" style="background:var(--purple);color:#fff;margin-top:8px" onclick="estimateAudience()">Estimer la taille</button>
+            <div class="mt-result" id="mt-audience-result"></div>
+          </div>
+        </div>
+
+        <!-- DUPLICATE TOOL PANEL -->
+        <div class="mt-panel" id="mt-panel-duplicate">
+          <div class="ap-head">
+            <span class="ap-title">Duplication de Campagne</span>
+            <div class="ap-close" onclick="closeMetaTool('duplicate')"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="ap-body">
+            <div class="af-group">
+              <label class="af-label">ID de la campagne</label>
+              <input type="text" class="af-input" id="mt-dup-id" placeholder="ex: 23851234567890">
+            </div>
+            <div class="af-group">
+              <label class="af-label">Nouveau nom (optionnel)</label>
+              <input type="text" class="af-input" id="mt-dup-name" placeholder="Summer Sale v2">
+            </div>
+            <button class="btn btn-prime btn-full" style="margin-top:6px" onclick="duplicateCampaign()">Dupliquer (PAUSED)</button>
+            <div class="mt-result" id="mt-dup-result"></div>
+          </div>
+        </div>
+
+        <!-- REPORT TOOL PANEL -->
+        <div class="mt-panel" id="mt-panel-report">
+          <div class="ap-head">
+            <span class="ap-title">Reporting & Breakdowns</span>
+            <div class="ap-close" onclick="closeMetaTool('report')"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="ap-body">
+            <div class="af-group">
+              <label class="af-label">Periode</label>
+              <div class="af-chips" id="mt-report-period">
+                <div class="af-chip on" data-val="last_7d" onclick="toggleChipSingle(this,'mt-report-period')">7 jours</div>
+                <div class="af-chip" data-val="last_14d" onclick="toggleChipSingle(this,'mt-report-period')">14 jours</div>
+                <div class="af-chip" data-val="last_30d" onclick="toggleChipSingle(this,'mt-report-period')">30 jours</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+              <button class="btn btn-prime btn-full" style="font-size:11px;height:36px" onclick="loadReport('daily')">Daily</button>
+              <button class="btn btn-full" style="background:var(--purple);color:#fff;font-size:11px;height:36px" onclick="loadReport('demographics')">Demographics</button>
+              <button class="btn btn-full" style="background:var(--green);color:#fff;font-size:11px;height:36px" onclick="loadReport('placements')">Placements</button>
+            </div>
+            <div class="mt-result" id="mt-report-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALERTS SECTION -->
+      <div class="alerts-panel" id="alerts-section">
+        <div class="ap-head">
+          <span class="ap-title">Alertes recentes</span>
+        </div>
+        <div id="alerts-list">
+          <div class="al-empty">Aucune alerte pour le moment. Lance le Monitor pour commencer.</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   CONFIG — changer cette URL pour le vrai backend
+═══════════════════════════════════════════ */
+const API_BASE = ''; // ex: 'https://aegis-api.railway.app'
+const DEMO_MODE = !API_BASE; // true si pas d'API configurée
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const S = {
+  step: 0,
+  mode: 'coach',
+  userId: 'user-' + Math.random().toString(36).substr(2, 8),
+  connected: { shopify: false, meta: false, tiktok: false, google: false },
+  tracking: false,
+  budget: 50, prix: null, secteur: 'Beauté',
+};
+
+const PROGS = [16, 33, 50, 67, 83, 100];
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+(async function init() {
+  // Afficher le bon banner API
+  if (DEMO_MODE) {
+    document.getElementById('api-warn').style.display = 'flex';
+  } else {
+    // Vérifier l'API
+    try {
+      const r = await fetch(API_BASE + '/health', { signal: AbortSignal.timeout(4000) });
+      if (r.ok) {
+        const d = await r.json();
+        document.getElementById('api-ok').style.display = 'flex';
+        document.getElementById('api-warn').style.display = 'none';
+      }
+    } catch {
+      document.getElementById('api-err').style.display = 'flex';
+      document.getElementById('api-warn').style.display = 'none';
+    }
+  }
+
+  // Init buttons
+  document.getElementById('btn-1').disabled = true;
+  document.getElementById('btn-2').disabled = true;
+  document.getElementById('btn-4').disabled = true;
+})();
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════ */
+function goStep(n) {
+  if (n === 5) buildReview();
+
+  // Hide all steps
+  for (let i = 0; i <= 6; i++) {
+    const el = document.getElementById('step-' + (i === 6 ? 'ok' : i));
+    if (el) el.style.display = 'none';
+  }
+  const target = document.getElementById(n === 6 ? 'step-ok' : 'step-' + n);
+  if (target) target.style.display = '';
+
+  // Progress
+  document.getElementById('prog-fill').style.width = PROGS[Math.min(n, 5)] + '%';
+
+  // Sidebar steps
+  for (let i = 0; i < 6; i++) {
+    const si = document.getElementById('si-' + i);
+    const sn = document.getElementById('sn-' + i);
+    if (!si || !sn) continue;
+    si.className = 'st' + (i < n ? ' done' : i === n ? ' active' : '');
+    if (i < n) {
+      sn.innerHTML = '<svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>';
+    } else {
+      sn.textContent = String(i + 1);
+    }
+  }
+
+  S.step = n;
+  document.querySelector('.main').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ═══════════════════════════════════════════
+   MODE
+═══════════════════════════════════════════ */
+function setMode(m) {
+  S.mode = m;
+  const coach = document.getElementById('mc-coach');
+  const auto = document.getElementById('mc-auto');
+  coach.className = 'mc' + (m === 'coach' ? ' on-p' : '');
+  auto.className = 'mc' + (m === 'auto' ? ' on-b' : '');
+  document.getElementById('hint-coach').className = 'hint hint-p' + (m === 'coach' ? ' show' : '');
+  const btn = document.getElementById('btn-0');
+  if (m === 'coach') {
+    btn.className = 'btn btn-lg btn-full btn-coach';
+    btn.innerHTML = 'Continuer en mode Accompagné <svg viewBox="0 0 16 16" fill="none" width="13"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  } else {
+    btn.className = 'btn btn-lg btn-full btn-prime';
+    btn.innerHTML = 'Continuer en mode Autonome <svg viewBox="0 0 16 16" fill="none" width="13"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   CONNEXION OAUTH — CŒUR DU SYSTÈME
+═══════════════════════════════════════════ */
+async function doConnect(platform) {
+  if (S.connected[platform]) return;
+
+  const card = document.getElementById('cc-' + platform);
+  const tag = document.getElementById('t-' + platform);
+  const bar = document.getElementById('b-' + platform);
+  const desc = document.getElementById('d-' + platform);
+  const errBox = document.getElementById('err-' + platform);
+
+  // Hide previous errors
+  if (errBox) errBox.classList.remove('show');
+
+  // Start loading state
+  card.classList.add('busy');
+  tag.className = 'cc-tag ct-busy';
+  tag.textContent = 'Connexion…';
+  if (desc) desc.textContent = 'Autorisation en cours…';
+  requestAnimationFrame(() => {
+    bar.style.transition = 'width 1.5s ease';
+    bar.style.width = '60%';
+  });
+
+  try {
+    let authUrl = null;
+
+    if (!DEMO_MODE) {
+      // ── Mode réel : appeler l'API ──
+      const res = await fetch(API_BASE + '/api/connect/init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: S.userId, platform }),
+      });
+
+      if (!res.ok) throw new Error('API error ' + res.status);
+      const data = await res.json();
+      authUrl = data.url;
+
+      // Ouvrir la popup OAuth
+      const popup = window.open(authUrl, 'aegis-oauth', 'width=540,height=680,left=200,top=100');
+
+      // Attendre que la popup se ferme
+      await waitForPopup(popup);
+
+      // Vérifier que la connexion est bien enregistrée
+      const statusRes = await fetch(API_BASE + '/api/connect/status/' + S.userId);
+      const status = await statusRes.json();
+
+      if (!status[platform]) throw new Error('Connexion non confirmée par le serveur');
+
+    } else {
+      // ── Mode démo : simuler OAuth ──
+      await new Promise(r => setTimeout(r, 2200));
+    }
+
+    // ✅ Succès
+    bar.style.transition = 'width .1s';
+    bar.style.width = '100%';
+    await new Promise(r => setTimeout(r, 120));
+
+    S.connected[platform] = true;
+    card.classList.remove('busy');
+    card.classList.add('done');
+    card.onclick = null;
+
+    const LABELS = {
+      shopify: 'Boutique connectée — ventes en temps réel',
+      meta: 'Facebook & Instagram connectés',
+      tiktok: 'TikTok for Business connecté',
+      google: 'Google Ads connecté',
+    };
+    tag.className = 'cc-tag ct-ok';
+    tag.textContent = 'Connecté';
+    if (desc) desc.textContent = LABELS[platform] || 'Connecté';
+
+    const arr = document.getElementById('a-' + platform);
+    if (arr) arr.outerHTML = `<svg class="cc-ok-ico" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/><path d="M6 10l3 3 5-5" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+    bar.style.opacity = '0';
+
+    // Unlock continue buttons
+    if (platform === 'shopify') document.getElementById('btn-1').disabled = false;
+    if (platform === 'meta') document.getElementById('btn-2').disabled = false;
+
+  } catch (err) {
+    // ❌ Erreur
+    bar.style.transition = 'none';
+    bar.style.width = '0';
+    card.classList.remove('busy');
+    card.onclick = () => doConnect(platform);
+    tag.className = 'cc-tag ct-req';
+    tag.textContent = platform === 'shopify' || platform === 'meta' ? 'Obligatoire' : 'Optionnel';
+    if (desc) desc.textContent = 'Réessayer';
+    if (errBox) errBox.classList.add('show');
+    console.error('[AEGIS Connect]', platform, err.message);
+  }
+}
+
+/* Attendre que la popup OAuth se ferme */
+function waitForPopup(popup) {
+  return new Promise((resolve, reject) => {
+    if (!popup || popup.closed) { reject(new Error('Popup bloquée')); return; }
+    const timer = setInterval(() => {
+      try {
+        if (popup.closed) { clearInterval(timer); resolve(); }
+      } catch { clearInterval(timer); resolve(); }
+    }, 400);
+    // Timeout 5 minutes
+    setTimeout(() => { clearInterval(timer); popup.close(); reject(new Error('Timeout')); }, 300000);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   TRACKING
+═══════════════════════════════════════════ */
+function toggleTrack() {
+  S.tracking = !S.tracking;
+  document.getElementById('track-sw').classList.toggle('on', S.tracking);
+  document.getElementById('sw-txt').textContent = S.tracking ? 'ON' : 'OFF';
+  const badge = document.getElementById('track-badge');
+  badge.className = 'tc-badge ' + (S.tracking ? 'tb-on' : 'tb-off');
+  badge.textContent = S.tracking ? 'Activé' : 'Non activé';
+  document.getElementById('track-ben').classList.toggle('show', S.tracking);
+}
+
+/* ═══════════════════════════════════════════
+   ACCORDION
+═══════════════════════════════════════════ */
+function toggleAcc(k) {
+  const btn = document.getElementById('acc-' + k + '-btn');
+  const body = document.getElementById('acc-' + k);
+  const open = body.style.display === 'none' || !body.style.display;
+  body.style.display = open ? 'block' : 'none';
+  btn.classList.toggle('open', open);
+}
+
+/* ═══════════════════════════════════════════
+   PARAMS
+═══════════════════════════════════════════ */
+function onBgt(v) {
+  S.budget = parseInt(v);
+  document.getElementById('bgt-v').textContent = v + ' €/jour';
+}
+
+function onPx(v) {
+  S.prix = parseFloat(v) || null;
+  const box = document.getElementById('cpa-box');
+  const btn = document.getElementById('btn-4');
+  if (S.prix >= 1) {
+    document.getElementById('cpa-v').textContent = Math.round(S.prix * .35) + ' €';
+    document.getElementById('cpa-cut').textContent = Math.round(S.prix * .7) + ' €';
+    box.style.display = 'block';
+    btn.disabled = false;
+  } else {
+    box.style.display = 'none';
+    btn.disabled = true;
+  }
+}
+
+function setSect(el, n) {
+  document.querySelectorAll('.spill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  S.secteur = n;
+}
+
+/* ═══════════════════════════════════════════
+   REVIEW
+═══════════════════════════════════════════ */
+function buildReview() {
+  const set = (id, t, c) => { const e = document.getElementById(id); if (e) { e.textContent = t; if (c) e.className = 'rv ' + c; } };
+  set('rv-mode', S.mode === 'coach' ? 'Accompagné' : 'Autonome', S.mode === 'coach' ? 'rv-p' : 'rv-bl');
+  set('rv-shopify', S.connected.shopify ? 'Connecté' : 'Non connecté', S.connected.shopify ? 'rv-ok' : 'rv-no');
+  set('rv-meta', S.connected.meta ? 'Connecté' : 'Non connecté', S.connected.meta ? 'rv-ok' : 'rv-no');
+  set('rv-tiktok', S.connected.tiktok ? 'Connecté' : 'Plus tard', S.connected.tiktok ? 'rv-ok' : 'rv-no');
+  set('rv-google', S.connected.google ? 'Connecté' : 'Plus tard', S.connected.google ? 'rv-ok' : 'rv-no');
+  set('rv-track', S.tracking ? 'Activé' : 'Non activé', S.tracking ? 'rv-ok' : 'rv-warn');
+  set('rv-bgt', S.budget + ' €', 'rv-bl');
+  set('rv-px', S.prix ? S.prix + ' €' : '—');
+  set('rv-sect', S.secteur);
+  const lb = document.getElementById('launch-btn');
+  lb.className = 'btn btn-lg btn-' + (S.mode === 'coach' ? 'coach' : 'prime');
+  lb.style.flex = '1';
+}
+
+/* ═══════════════════════════════════════════
+   LAUNCH
+═══════════════════════════════════════════ */
+async function doLaunch() {
+  const btn = document.getElementById('launch-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg class="spin" width="14" height="14" viewBox="0 0 16 16"><path d="M8 2a6 6 0 016 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Démarrage…';
+
+  // Sauvegarder la config si API disponible
+  if (!DEMO_MODE) {
+    try {
+      await fetch(API_BASE + '/api/onboarding/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: S.userId,
+          mode: S.mode,
+          budget: S.budget,
+          prix: S.prix,
+          secteur: S.secteur,
+          tracking: S.tracking,
+        }),
+      });
+    } catch (e) {
+      console.error('[AEGIS] Save failed:', e);
+    }
+  }
+
+  await new Promise(r => setTimeout(r, 1600));
+  goStep(6);
+
+  // Mark all sidebar steps done
+  for (let i = 0; i < 6; i++) {
+    const si = document.getElementById('si-' + i);
+    const sn = document.getElementById('sn-' + i);
+    if (si) si.className = 'st done';
+    if (sn) sn.innerHTML = '<svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>';
+  }
+  document.getElementById('prog-fill').style.width = '100%';
+}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD — AI AGENTS
+═══════════════════════════════════════════ */
+let metaConfigured = false;
+let autoFetch = false;
+
+function showDashboard() {
+  document.querySelector('.sidebar').style.display = 'none';
+  document.querySelector('.main:not(.dash)').style.display = 'none';
+  document.getElementById('dashboard').classList.add('show');
+  // Pre-fill from onboarding state
+  const optBgt = document.getElementById('opt-budget');
+  const monBgt = document.getElementById('mon-budget');
+  if (optBgt && S.budget) optBgt.value = S.budget;
+  if (monBgt && S.budget) monBgt.value = S.budget;
+  const optPx = document.getElementById('opt-price');
+  if (optPx && S.prix) optPx.value = S.prix;
+  // Check Meta Ads status
+  checkMetaStatus();
+}
+
+async function checkMetaStatus() {
+  const bar = document.getElementById('meta-status-bar');
+  const dot = document.getElementById('meta-dot');
+  const label = document.getElementById('meta-label');
+  const metaTools = document.getElementById('meta-tools-section');
+  try {
+    const apiBase = API_BASE || '';
+    const res = await fetch(apiBase + '/api/meta/status');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    bar.style.display = 'block';
+    if (data.configured) {
+      metaConfigured = true;
+      bar.style.background = 'var(--ga8)';
+      bar.style.border = '1px solid var(--ga20)';
+      dot.style.background = 'var(--green)';
+      label.style.color = '#15803d';
+      label.textContent = 'Meta Ads connecte' + (data.account_id ? ' — ' + data.account_id : '');
+      if (metaTools) metaTools.style.display = 'block';
+    } else {
+      bar.style.background = 'var(--aa10)';
+      bar.style.border = '1px solid var(--aa25)';
+      dot.style.background = 'var(--amber)';
+      dot.style.animation = 'none';
+      label.style.color = '#92400e';
+      label.textContent = 'Meta Ads non configure — ajoute META_ACCESS_TOKEN dans .env';
+      if (metaTools) metaTools.style.display = 'none';
+    }
+  } catch {
+    bar.style.display = 'none';
+    if (metaTools) metaTools.style.display = 'none';
+  }
+}
+
+function toggleAutoFetch() {
+  autoFetch = !autoFetch;
+  document.getElementById('auto-fetch-sw').classList.toggle('on', autoFetch);
+}
+
+function openAgent(type) {
+  document.querySelectorAll('.agent-panel').forEach(p => p.classList.remove('show'));
+  document.querySelectorAll('.ag-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('panel-' + type).classList.add('show');
+  event.currentTarget.classList.add('active');
+}
+
+function closeAgent(type) {
+  document.getElementById('panel-' + type).classList.remove('show');
+  document.querySelectorAll('.ag-card').forEach(c => c.classList.remove('active'));
+}
+
+function toggleChip(el) {
+  el.classList.toggle('on');
+}
+
+function toggleChipSingle(el, groupId) {
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.af-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function getSelectedChips(container) {
+  return Array.from(container.querySelectorAll('.af-chip.on')).map(c => c.dataset.val);
+}
+
+function getSelectedChip(groupId) {
+  const el = document.querySelector('#' + groupId + ' .af-chip.on');
+  return el ? el.dataset.val : '';
+}
+
+function safeParse(str) {
+  try { return JSON.parse(str); } catch { return []; }
+}
+
+async function runAgent(type) {
+  const form = document.getElementById('form-' + type);
+  const loader = document.getElementById('load-' + type);
+  const result = document.getElementById('result-' + type);
+  const output = document.getElementById('out-' + type);
+
+  form.style.display = 'none';
+  loader.classList.add('show');
+  result.classList.remove('show');
+
+  let body = {};
+  const userId = S.userId || 'user-demo';
+
+  if (type === 'optimizer') {
+    body = {
+      user_id: userId,
+      budget_daily: parseInt(document.getElementById('opt-budget').value) || 50,
+      product_price: parseFloat(document.getElementById('opt-price').value) || 0,
+      secteur: S.secteur || '',
+      campaigns: safeParse(document.getElementById('opt-campaigns').value),
+      auto_fetch: autoFetch && metaConfigured,
+    };
+  } else if (type === 'content') {
+    body = {
+      user_id: userId,
+      product_name: document.getElementById('con-product').value || 'Produit',
+      product_description: document.getElementById('con-desc').value || '',
+      platforms: getSelectedChips(document.querySelector('#panel-content .af-chips')),
+      tone: getSelectedChip('tone-chips') || 'professionnel',
+      language: 'francais',
+      secteur: S.secteur || '',
+      promotion: document.getElementById('con-promo').value || '',
+    };
+  } else if (type === 'analytics') {
+    body = {
+      user_id: userId,
+      date_range: getSelectedChip('period-chips') || '7 derniers jours',
+      campaigns: safeParse(document.getElementById('ana-campaigns').value),
+      auto_fetch: autoFetch && metaConfigured,
+    };
+  } else if (type === 'monitor') {
+    body = {
+      user_id: userId,
+      budget_daily: parseInt(document.getElementById('mon-budget').value) || 50,
+      thresholds: {
+        max_cpa: parseFloat(document.getElementById('mon-cpa').value) || 20,
+        min_roas: parseFloat(document.getElementById('mon-roas').value) || 2,
+      },
+      campaigns: safeParse(document.getElementById('mon-campaigns').value),
+      auto_fetch: autoFetch && metaConfigured,
+    };
+  } else if (type === 'audit') {
+    body = {
+      user_id: userId,
+      budget_daily: parseInt(document.getElementById('aud-budget').value) || 50,
+      product_price: parseFloat(document.getElementById('aud-price').value) || 0,
+      secteur: getSelectedChip('aud-sector-chips') || 'Autre',
+      platforms: getSelectedChips(document.getElementById('aud-plat-chips')),
+      campaigns: safeParse(document.getElementById('aud-campaigns').value),
+      auto_fetch: autoFetch && metaConfigured,
+    };
+  }
+
+  try {
+    const apiBase = API_BASE || '';
+    const res = await fetch(apiBase + '/api/agents/' + type, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Erreur API ' + res.status);
+    }
+
+    const data = await res.json();
+    const agentResult = data.result || {};
+
+    loader.classList.remove('show');
+    result.classList.add('show');
+    form.style.display = 'flex';
+
+    // Format output
+    output.innerHTML = formatAgentResult(type, agentResult);
+
+    // Update alerts if monitor
+    if (type === 'monitor' && agentResult.alerts) {
+      updateAlerts(agentResult.alerts);
+    }
+
+  } catch (err) {
+    loader.classList.remove('show');
+    form.style.display = 'flex';
+    result.classList.add('show');
+    output.innerHTML = '<div style="color:var(--red);padding:8px">Erreur : ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function formatAgentResult(type, data) {
+  // Remove internal fields
+  const clean = {...data};
+  delete clean._raw;
+  delete clean._run_id;
+
+  let html = '';
+
+  if (type === 'optimizer' && clean.summary) {
+    html += '<div style="margin-bottom:12px;font-size:13px;color:var(--c7);font-family:DM Sans,sans-serif">' + escapeHtml(clean.summary) + '</div>';
+    if (clean.score !== undefined) {
+      const color = clean.score >= 70 ? 'var(--green)' : clean.score >= 40 ? 'var(--amber)' : 'var(--red)';
+      html += '<div style="margin-bottom:12px"><span style="font-family:Syne;font-size:28px;font-weight:800;color:' + color + '">' + clean.score + '</span><span style="font-size:11px;color:var(--c4);margin-left:4px">/100</span></div>';
+    }
+    if (clean.recommendations) {
+      html += '<div style="font-size:12px;font-weight:700;color:var(--c7);margin-bottom:6px">Recommandations :</div>';
+      clean.recommendations.forEach(function(r) {
+        const pColor = r.priority === 'high' ? 'var(--red)' : r.priority === 'medium' ? 'var(--amber)' : 'var(--green)';
+        html += '<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--c2)">';
+        html += '<div style="width:6px;height:6px;border-radius:50%;background:' + pColor + ';margin-top:5px;flex-shrink:0"></div>';
+        html += '<div><div style="font-size:12px;font-weight:600;color:var(--c7)">' + escapeHtml(r.action) + '</div>';
+        if (r.impact) html += '<div style="font-size:11px;color:var(--blue)">' + escapeHtml(r.impact) + '</div>';
+        html += '</div></div>';
+      });
+    }
+    if (clean.quick_wins) {
+      html += '<div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--c7);margin-bottom:4px">Quick Wins :</div>';
+      clean.quick_wins.forEach(function(w) { html += '<div style="font-size:11px;color:var(--green);padding:2px 0">+ ' + escapeHtml(w) + '</div>'; });
+    }
+  } else if (type === 'content' && clean.variations) {
+    clean.variations.forEach(function(v, i) {
+      html += '<div style="background:var(--c0);border:1px solid var(--c2);border-radius:8px;padding:12px;margin-bottom:8px">';
+      html += '<div style="font-size:10px;font-weight:700;color:var(--c4);text-transform:uppercase;margin-bottom:6px">' + escapeHtml(v.platform || 'Ad') + ' #' + (i+1) + '</div>';
+      if (v.headline) html += '<div style="font-size:14px;font-weight:700;color:var(--c8);margin-bottom:4px">' + escapeHtml(v.headline) + '</div>';
+      if (v.primary_text) html += '<div style="font-size:12px;color:var(--c6);margin-bottom:6px;line-height:1.5">' + escapeHtml(v.primary_text) + '</div>';
+      if (v.cta) html += '<div style="display:inline-block;background:var(--ba8);color:var(--blue);font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px">' + escapeHtml(v.cta) + '</div>';
+      if (v.hashtags) html += '<div style="font-size:11px;color:var(--purple);margin-top:6px">' + v.hashtags.map(escapeHtml).join(' ') + '</div>';
+      html += '</div>';
+    });
+    if (clean.hooks) {
+      html += '<div style="margin-top:8px;font-size:12px;font-weight:700;color:var(--c7);margin-bottom:4px">Accroches :</div>';
+      clean.hooks.forEach(function(h) { html += '<div style="font-size:12px;color:var(--c6);padding:3px 0;font-family:DM Sans,sans-serif">&ldquo; ' + escapeHtml(h) + ' &rdquo;</div>'; });
+    }
+  } else if (type === 'analytics' && clean.summary) {
+    html += '<div style="margin-bottom:12px;font-size:13px;color:var(--c7);font-family:DM Sans,sans-serif;line-height:1.6">' + escapeHtml(clean.summary) + '</div>';
+    if (clean.kpis) {
+      const k = clean.kpis;
+      html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">';
+      [['Depense', k.total_spend + ' EUR'], ['Revenue', k.total_revenue + ' EUR'], ['ROAS', k.overall_roas], ['CPA moy.', k.average_cpa + ' EUR'], ['Conv.', k.total_conversions], ['Tendance', k.trend === 'up' ? 'Hausse' : k.trend === 'down' ? 'Baisse' : 'Stable']].forEach(function(pair) {
+        html += '<div style="background:var(--c0);border:1px solid var(--c2);border-radius:6px;padding:8px;text-align:center"><div style="font-size:10px;color:var(--c4)">' + pair[0] + '</div><div style="font-size:14px;font-weight:700;color:var(--c8)">' + pair[1] + '</div></div>';
+      });
+      html += '</div>';
+    }
+    if (clean.insights) {
+      clean.insights.forEach(function(ins) {
+        const ic = ins.type === 'positive' ? 'var(--green)' : ins.type === 'negative' ? 'var(--red)' : 'var(--blue)';
+        html += '<div style="display:flex;gap:8px;padding:6px 0"><div style="width:6px;height:6px;border-radius:50%;background:' + ic + ';margin-top:5px;flex-shrink:0"></div><div><div style="font-size:12px;font-weight:600;color:var(--c7)">' + escapeHtml(ins.title) + '</div><div style="font-size:11px;color:var(--c5)">' + escapeHtml(ins.detail) + '</div></div></div>';
+      });
+    }
+  } else if (type === 'monitor') {
+    if (clean.status) {
+      const sc = clean.status === 'ok' ? 'var(--green)' : clean.status === 'warning' ? 'var(--amber)' : 'var(--red)';
+      html += '<div style="display:inline-flex;align-items:center;gap:6px;background:var(--c0);border:1px solid var(--c2);border-radius:6px;padding:6px 12px;margin-bottom:12px"><div style="width:8px;height:8px;border-radius:50%;background:' + sc + '"></div><span style="font-size:13px;font-weight:700;color:var(--c7);text-transform:uppercase">' + clean.status + '</span></div>';
+    }
+    if (clean.alerts && clean.alerts.length) {
+      clean.alerts.forEach(function(a) {
+        const ac = a.severity === 'critical' ? 'var(--red)' : a.severity === 'warning' ? 'var(--amber)' : 'var(--blue)';
+        html += '<div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--c2)">';
+        html += '<div style="width:8px;height:8px;border-radius:50%;background:' + ac + ';margin-top:4px;flex-shrink:0"></div>';
+        html += '<div><div style="font-size:12px;font-weight:600;color:var(--c7)">[' + escapeHtml(a.severity).toUpperCase() + '] ' + escapeHtml(a.message) + '</div>';
+        if (a.suggested_action) html += '<div style="font-size:11px;color:var(--green);margin-top:2px">Action : ' + escapeHtml(a.suggested_action) + '</div>';
+        html += '</div></div>';
+      });
+    } else {
+      html += '<div style="font-size:12px;color:var(--green);padding:8px 0">Aucune alerte — tout est nominal.</div>';
+    }
+  } else if (type === 'audit') {
+    // Score and grade header
+    if (clean.health_score !== undefined) {
+      const sc = clean.health_score >= 80 ? 'var(--green)' : clean.health_score >= 60 ? 'var(--amber)' : 'var(--red)';
+      html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">';
+      html += '<div style="font-family:Syne;font-size:48px;font-weight:800;color:' + sc + '">' + clean.health_score + '</div>';
+      html += '<div><div style="font-size:28px;font-weight:800;font-family:Syne;color:' + sc + '">' + (clean.grade || '') + '</div>';
+      html += '<div style="font-size:11px;color:var(--c4)">Health Score</div></div></div>';
+    }
+    if (clean.executive_summary) {
+      html += '<div style="margin-bottom:14px;font-size:13px;color:var(--c7);line-height:1.6;font-family:DM Sans,sans-serif">' + escapeHtml(clean.executive_summary) + '</div>';
+    }
+    // Quality gates
+    if (clean.quality_gates && clean.quality_gates.length) {
+      html += '<div style="font-size:12px;font-weight:700;color:var(--c7);margin-bottom:6px">Quality Gates :</div>';
+      clean.quality_gates.forEach(function(g) {
+        const gc = g.status === 'pass' ? 'var(--green)' : 'var(--red)';
+        const icon = g.status === 'pass' ? 'PASS' : 'FAIL';
+        html += '<div style="display:flex;gap:8px;padding:4px 0"><span style="font-size:10px;font-weight:700;color:' + gc + ';font-family:JetBrains Mono;min-width:32px">' + icon + '</span><span style="font-size:12px;color:var(--c6)">' + escapeHtml(g.rule) + '</span></div>';
+      });
+      html += '<div style="height:8px"></div>';
+    }
+    // Top issues
+    if (clean.top_issues && clean.top_issues.length) {
+      html += '<div style="font-size:12px;font-weight:700;color:var(--c7);margin-bottom:6px">Top Problemes :</div>';
+      clean.top_issues.forEach(function(issue, i) {
+        const ic = issue.severity === 'critical' ? 'var(--red)' : 'var(--amber)';
+        html += '<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--c2)">';
+        html += '<div style="width:20px;height:20px;border-radius:50%;background:' + ic + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">' + (i+1) + '</div>';
+        html += '<div><div style="font-size:12px;font-weight:600;color:var(--c7)">' + escapeHtml(issue.issue) + '</div>';
+        if (issue.fix) html += '<div style="font-size:11px;color:var(--green);margin-top:2px">Fix : ' + escapeHtml(issue.fix) + '</div>';
+        html += '</div></div>';
+      });
+      html += '<div style="height:8px"></div>';
+    }
+    // Quick wins
+    if (clean.quick_wins && clean.quick_wins.length) {
+      html += '<div style="font-size:12px;font-weight:700;color:var(--c7);margin-bottom:4px">Quick Wins :</div>';
+      clean.quick_wins.forEach(function(w) { html += '<div style="font-size:11px;color:var(--green);padding:2px 0">+ ' + escapeHtml(w) + '</div>'; });
+    }
+  } else {
+    // Fallback: show raw text or JSON
+    if (clean.text) {
+      html = '<div style="font-size:12px;color:var(--c6);line-height:1.7;font-family:DM Sans,sans-serif;white-space:pre-wrap">' + escapeHtml(clean.text) + '</div>';
+    } else {
+      html = '<div class="apr-json"><pre>' + escapeHtml(JSON.stringify(clean, null, 2)) + '</pre></div>';
+    }
+  }
+
+  return html;
+}
+
+function updateAlerts(alerts) {
+  const list = document.getElementById('alerts-list');
+  if (!alerts.length) return;
+  list.innerHTML = '';
+  alerts.forEach(function(a) {
+    const sevClass = a.severity === 'critical' ? 'al-crit' : a.severity === 'warning' ? 'al-warn' : 'al-info';
+    list.innerHTML += '<div class="alert-item"><div class="al-dot ' + sevClass + '"></div><div><div class="al-msg">' + escapeHtml(a.message) + '</div><div class="al-time">' + escapeHtml(a.platform || '') + ' / ' + escapeHtml(a.type || '') + '</div></div></div>';
+  });
+}
+
+/* ═══════════════════════════════════════════
+   META TOOLS — Audience, Duplication, Reporting
+═══════════════════════════════════════════ */
+function openMetaTool(tool) {
+  document.querySelectorAll('.mt-panel').forEach(p => p.classList.remove('show'));
+  document.querySelectorAll('.mt-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('mt-panel-' + tool).classList.add('show');
+  event.currentTarget.classList.add('active');
+}
+
+function closeMetaTool(tool) {
+  document.getElementById('mt-panel-' + tool).classList.remove('show');
+  document.querySelectorAll('.mt-card').forEach(c => c.classList.remove('active'));
+}
+
+async function searchInterests() {
+  const q = document.getElementById('mt-interest-q').value.trim();
+  if (!q) return;
+  const resultDiv = document.getElementById('mt-interest-result');
+  resultDiv.classList.add('show');
+  resultDiv.innerHTML = '<div style="text-align:center;color:var(--c4);font-size:12px">Recherche...</div>';
+  try {
+    const apiBase = API_BASE || '';
+    const res = await fetch(apiBase + '/api/meta/audience/interests?q=' + encodeURIComponent(q));
+    if (!res.ok) throw new Error('Erreur API ' + res.status);
+    const data = await res.json();
+    if (!data.interests || !data.interests.length) {
+      resultDiv.innerHTML = '<div style="color:var(--c4);font-size:12px">Aucun interet trouve pour "' + escapeHtml(q) + '"</div>';
+      return;
+    }
+    let html = '<div class="mt-result-title">Interets trouves (' + data.interests.length + ')</div>';
+    data.interests.forEach(function(i) {
+      const size = i.audience_size ? Number(i.audience_size).toLocaleString('fr-FR') : '—';
+      html += '<div class="interest-item"><span class="interest-name">' + escapeHtml(i.name) + '</span><span class="interest-size">' + size + ' pers.</span></div>';
+    });
+    resultDiv.innerHTML = html;
+  } catch (err) {
+    resultDiv.innerHTML = '<div style="color:var(--red);font-size:12px">' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+async function estimateAudience() {
+  const country = document.getElementById('mt-aud-country').value.trim() || 'FR';
+  const ageMin = parseInt(document.getElementById('mt-aud-age-min').value) || 25;
+  const ageMax = parseInt(document.getElementById('mt-aud-age-max').value) || 55;
+  const resultDiv = document.getElementById('mt-audience-result');
+  resultDiv.classList.add('show');
+  resultDiv.innerHTML = '<div style="text-align:center;color:var(--c4);font-size:12px">Estimation en cours...</div>';
+  try {
+    const apiBase = API_BASE || '';
+    const res = await fetch(apiBase + '/api/meta/audience/estimate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        targeting_spec: { geo_locations: { countries: [country.toUpperCase()] }, age_min: ageMin, age_max: ageMax }
+      }),
+    });
+    if (!res.ok) throw new Error('Erreur API ' + res.status);
+    const data = await res.json();
+    const r = data.result || {};
+    const low = r.estimate_mau_lower_bound ? Number(r.estimate_mau_lower_bound).toLocaleString('fr-FR') : '—';
+    const high = r.estimate_mau_upper_bound ? Number(r.estimate_mau_upper_bound).toLocaleString('fr-FR') : '—';
+    resultDiv.innerHTML = '<div class="mt-result-title">Estimation d\'audience</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+      + '<div style="background:var(--c0);border:1px solid var(--c2);border-radius:6px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--c4)">Estimation basse</div><div style="font-size:16px;font-weight:700;color:var(--purple)">' + low + '</div></div>'
+      + '<div style="background:var(--c0);border:1px solid var(--c2);border-radius:6px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--c4)">Estimation haute</div><div style="font-size:16px;font-weight:700;color:var(--purple)">' + high + '</div></div>'
+      + '</div>'
+      + '<div style="font-size:11px;color:var(--c4);margin-top:6px;text-align:center">' + country.toUpperCase() + ' / ' + ageMin + '-' + ageMax + ' ans</div>';
+  } catch (err) {
+    resultDiv.innerHTML = '<div style="color:var(--red);font-size:12px">' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+async function duplicateCampaign() {
+  const campaignId = document.getElementById('mt-dup-id').value.trim();
+  if (!campaignId) return;
+  const newName = document.getElementById('mt-dup-name').value.trim();
+  const resultDiv = document.getElementById('mt-dup-result');
+  resultDiv.classList.add('show');
+  resultDiv.innerHTML = '<div style="text-align:center;color:var(--c4);font-size:12px">Duplication en cours...</div>';
+  try {
+    const apiBase = API_BASE || '';
+    const body = { campaign_id: campaignId };
+    if (newName) body.new_name = newName;
+    const res = await fetch(apiBase + '/api/meta/duplicate/campaign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Erreur API ' + res.status);
+    }
+    const data = await res.json();
+    const r = data.result || {};
+    resultDiv.innerHTML = '<div class="mt-result-title">Campagne dupliquee</div>'
+      + '<div style="font-size:12px;color:var(--c6);line-height:1.8">'
+      + '<strong>ID original :</strong> ' + escapeHtml(r.original_id || campaignId) + '<br>'
+      + '<strong>Nouvel ID :</strong> ' + escapeHtml(r.new_id || '—') + '<br>'
+      + '<strong>Nom :</strong> ' + escapeHtml(r.name || '—') + '<br>'
+      + '<strong>Status :</strong> <span style="color:var(--amber)">' + escapeHtml(r.status || 'PAUSED') + '</span>'
+      + '</div>';
+  } catch (err) {
+    resultDiv.innerHTML = '<div style="color:var(--red);font-size:12px">' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+async function loadReport(reportType) {
+  const period = getSelectedChip('mt-report-period') || 'last_7d';
+  const resultDiv = document.getElementById('mt-report-result');
+  resultDiv.classList.add('show');
+  resultDiv.innerHTML = '<div style="text-align:center;color:var(--c4);font-size:12px">Chargement du rapport...</div>';
+  try {
+    const apiBase = API_BASE || '';
+    const res = await fetch(apiBase + '/api/meta/report/' + reportType + '?date_preset=' + period);
+    if (!res.ok) throw new Error('Erreur API ' + res.status);
+    const json = await res.json();
+    const data = json.data || [];
+    if (!data.length) {
+      resultDiv.innerHTML = '<div style="color:var(--c4);font-size:12px">Aucune donnee pour cette periode.</div>';
+      return;
+    }
+    let html = '<div class="mt-result-title">' + escapeHtml(reportType.charAt(0).toUpperCase() + reportType.slice(1)) + ' — ' + period.replace('last_', '').replace('d', ' jours') + '</div>';
+    if (reportType === 'daily') {
+      html += '<div style="font-size:10px;color:var(--c4);margin-bottom:6px;font-family:JetBrains Mono">Date | Depense | Clics | CTR</div>';
+      data.forEach(function(row) {
+        html += '<div class="breakdown-row">'
+          + '<span class="breakdown-label">' + escapeHtml(row.date_start || '') + '</span>'
+          + '<span class="breakdown-val">' + (parseFloat(row.spend)||0).toFixed(2) + ' EUR</span>'
+          + '<span class="breakdown-val">' + (row.clicks || 0) + '</span>'
+          + '<span class="breakdown-val">' + (parseFloat(row.ctr)||0).toFixed(2) + '%</span>'
+          + '</div>';
+      });
+    } else if (reportType === 'demographics') {
+      html += '<div style="font-size:10px;color:var(--c4);margin-bottom:6px;font-family:JetBrains Mono">Age/Genre | Depense | Impressions | CTR</div>';
+      data.forEach(function(row) {
+        const label = (row.age || '?') + ' / ' + (row.gender || '?');
+        html += '<div class="breakdown-row">'
+          + '<span class="breakdown-label">' + escapeHtml(label) + '</span>'
+          + '<span class="breakdown-val">' + (parseFloat(row.spend)||0).toFixed(2) + ' EUR</span>'
+          + '<span class="breakdown-val">' + (row.impressions || 0) + '</span>'
+          + '<span class="breakdown-val">' + (parseFloat(row.ctr)||0).toFixed(2) + '%</span>'
+          + '</div>';
+      });
+    } else if (reportType === 'placements') {
+      html += '<div style="font-size:10px;color:var(--c4);margin-bottom:6px;font-family:JetBrains Mono">Placement | Depense | Clics | CTR</div>';
+      data.forEach(function(row) {
+        const label = (row.publisher_platform || '?') + ' / ' + (row.platform_position || '?');
+        html += '<div class="breakdown-row">'
+          + '<span class="breakdown-label">' + escapeHtml(label) + '</span>'
+          + '<span class="breakdown-val">' + (parseFloat(row.spend)||0).toFixed(2) + ' EUR</span>'
+          + '<span class="breakdown-val">' + (row.clicks || 0) + '</span>'
+          + '<span class="breakdown-val">' + (parseFloat(row.ctr)||0).toFixed(2) + '%</span>'
+          + '</div>';
+      });
+    }
+    resultDiv.innerHTML = html;
+  } catch (err) {
+    resultDiv.innerHTML = '<div style="color:var(--red);font-size:12px">' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+// Allow direct /dashboard access
+if (window.location.hash === '#dashboard' || window.location.pathname === '/dashboard') {
+  window.addEventListener('DOMContentLoaded', function() { showDashboard(); });
+}
+</script>
+</body>
+</html>
