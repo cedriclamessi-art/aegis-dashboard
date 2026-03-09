@@ -2,12 +2,20 @@ services:
   - type: web
     name: aegis-connect
     runtime: docker
+    repo: https://github.com/cedriclamessi-art/aegis-dashboard
+    branch: backend
     plan: free
     healthCheckPath: /health
     envVars:
-      - key: COMPOSIO_API_KEY
+      - key: LLM_PROVIDER
+        value: groq
+      - key: LLM_API_KEY
         sync: false
+      - key: LLM_MODEL
+        value: llama-3.1-70b-versatile
       - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: COMPOSIO_API_KEY
         sync: false
       - key: META_ACCESS_TOKEN
         sync: false
@@ -17,8 +25,6 @@ services:
         value: "*"
       - key: DATABASE_PATH
         value: /data/aegis.db
-      - key: CLAUDE_MODEL
-        value: claude-sonnet-4-20250514
     disk:
       name: aegis-data
       mountPath: /data
