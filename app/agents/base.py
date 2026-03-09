@@ -1,7 +1,11 @@
 import json
+import time
+import logging
 import anthropic
 from app.config import ANTHROPIC_API_KEY, CLAUDE_MODEL
 from app.database import save_agent_run, complete_agent_run
+
+log = logging.getLogger("aegis.agent")
 
 
 def get_client():
@@ -16,6 +20,8 @@ class BaseAgent:
 
     def run(self, user_id: str, input_data: dict) -> dict:
         run_id = save_agent_run(user_id, self.agent_type, input_data)
+        t0 = time.time()
+        log.info("[%s] run #%s for user=%s", self.agent_type, run_id, user_id)
         try:
             user_message = self.build_prompt(input_data)
             client = get_client()
@@ -30,8 +36,15 @@ class BaseAgent:
             result["_raw"] = raw_text
             result["_run_id"] = run_id
             complete_agent_run(run_id, result, status="completed")
+            elapsed = time.time() - t0
+            tokens_in = getattr(response.usage, "input_tokens", 0)
+            tokens_out = getattr(response.usage, "output_tokens", 0)
+            log.info("[%s] completed in %.1fs | tokens: %d in / %d out",
+                     self.agent_type, elapsed, tokens_in, tokens_out)
             return result
         except Exception as e:
+            elapsed = time.time() - t0
+            log.error("[%s] FAILED after %.1fs: %s", self.agent_type, elapsed, e)
             error_data = {"error": str(e)}
             complete_agent_run(run_id, error_data, status="failed")
             raise
