@@ -5,12 +5,20 @@ AEGIS Connect is a FastAPI-based platform for e-commerce ad optimization. It con
 
 ## Tech Stack
 - **Backend**: FastAPI (Python 3.12)
-- **LLM**: Claude API via `anthropic` SDK (model: claude-sonnet-4-20250514)
+- **LLM**: Multi-provider — Ollama (gratuit), Groq (gratuit), OpenRouter, Gemini, Anthropic
 - **Database**: SQLite with WAL mode
 - **Meta Ads**: Direct Graph API v25.0 via `httpx`
 - **OAuth**: Composio SDK
 - **Frontend**: Single-file HTML SPA (vanilla JS, no framework)
 - **Deploy**: Docker + Render (render.yaml Blueprint)
+
+## LLM Providers
+Set `LLM_PROVIDER` in `.env`:
+- `ollama` — Gratuit, local, illimité. Requires `ollama serve` running locally.
+- `groq` — Gratuit (30 req/min), ultra rapide. Set `LLM_API_KEY` from console.groq.com.
+- `openrouter` — Agrégateur, certains modèles gratuits. Set `LLM_API_KEY` from openrouter.ai.
+- `gemini` — Google free tier (15 req/min). Set `LLM_API_KEY` from aistudio.google.com.
+- `anthropic` — Payant, meilleure qualité. Set `ANTHROPIC_API_KEY`.
 
 ## Project Structure
 ```
@@ -21,7 +29,7 @@ app/
   benchmarks.py    — Industry thresholds, scoring, psychology framework
   meta_connector.py — Meta Graph API bridge (insights, duplication, audience, previews)
   agents/
-    base.py        — BaseAgent: Claude API call, JSON parsing, logging, DB persistence
+    base.py        — BaseAgent: multi-provider LLM call, JSON parsing, logging, DB persistence
     optimizer.py   — Budget/bid optimization recommendations
     content.py     — Ad copy generation (4 Horsemen psychology)
     analytics.py   — Performance reports with insights
@@ -58,14 +66,16 @@ aegis-connect-v3.html — Full frontend SPA
 
 ## Running Locally
 ```bash
-cp .env.example .env    # Fill in API keys
+cp .env.example .env    # Set LLM_PROVIDER=ollama (gratuit)
 pip install -r requirements.txt
+ollama pull llama3.1    # Telecharger le modele
+ollama serve            # Lancer Ollama en arriere-plan
 uvicorn app.main:app --reload
 ```
 
 ## Deploy to Render
 Push to GitHub, then connect on dashboard.render.com using the Blueprint (render.yaml).
-Set env vars in Render dashboard: ANTHROPIC_API_KEY (required), META_ACCESS_TOKEN + META_AD_ACCOUNT_ID (optional).
+Set `LLM_PROVIDER=groq` + `LLM_API_KEY` for free cloud LLM on Render (Ollama needs local GPU).
 
 ## Conventions
 - All agents respond in French by default
