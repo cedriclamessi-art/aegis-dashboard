@@ -410,7 +410,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.1)}
       </div>
       <div class="api-banner ab-warn" id="api-warn">
         <svg viewBox="0 0 12 12" fill="none"><path d="M6 2l5 8.5H1L6 2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M6 6.5v1.5M6 9.5v.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-        <span>Mode démonstration — <strong>Configure <code>API_BASE</code></strong> dans le code pour brancher le vrai backend.</span>
+        <span>Mode démonstration — API non disponible. Les connexions et agents sont simulés.</span>
       </div>
       <div class="api-banner ab-err" id="api-err">
         <svg viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -642,12 +642,12 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.1)}
           <div class="su-t">AEGIS est en ligne</div>
           <p class="su-p">Tes agents sont actifs. 7 jours d'observation silencieuse, puis passage à l'action. Ton premier rapport dans <strong>24 heures</strong>.</p>
           <div class="su-kpis">
-            <div class="sk"><div class="sk-v">48</div><div class="sk-l">Agents</div></div>
+            <div class="sk"><div class="sk-v">5</div><div class="sk-l">Agents</div></div>
             <div class="sk"><div class="sk-v">N1</div><div class="sk-l">Niveau</div></div>
             <div class="sk"><div class="sk-v">J+7</div><div class="sk-l">Actions</div></div>
           </div>
           <button class="btn btn-prime btn-full btn-lg" onclick="showDashboard()">
-            Acceder a mes Agents
+            Accéder à mes Agents
             <svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </button>
         </div>
@@ -1049,8 +1049,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.1)}
 /* ═══════════════════════════════════════════
    CONFIG — changer cette URL pour le vrai backend
 ═══════════════════════════════════════════ */
-const API_BASE = ''; // ex: 'https://aegis-api.railway.app'
-const DEMO_MODE = !API_BASE; // true si pas d'API configurée
+const API_BASE = ''; // vide = même serveur (relatif), ou URL externe
+let DEMO_MODE = false; // sera activé seulement si /health échoue
 
 /* ═══════════════════════════════════════════
    STATE
@@ -1070,22 +1070,19 @@ const PROGS = [16, 33, 50, 67, 83, 100];
    INIT
 ═══════════════════════════════════════════ */
 (async function init() {
-  // Afficher le bon banner API
-  if (DEMO_MODE) {
-    document.getElementById('api-warn').style.display = 'flex';
-  } else {
-    // Vérifier l'API
-    try {
-      const r = await fetch(API_BASE + '/health', { signal: AbortSignal.timeout(4000) });
-      if (r.ok) {
-        const d = await r.json();
-        document.getElementById('api-ok').style.display = 'flex';
-        document.getElementById('api-warn').style.display = 'none';
-      }
-    } catch {
-      document.getElementById('api-err').style.display = 'flex';
+  // Auto-detect API connectivity
+  try {
+    const r = await fetch((API_BASE || '') + '/health', { signal: AbortSignal.timeout(4000) });
+    if (r.ok) {
+      DEMO_MODE = false;
+      document.getElementById('api-ok').style.display = 'flex';
       document.getElementById('api-warn').style.display = 'none';
+    } else {
+      throw new Error('not ok');
     }
+  } catch {
+    DEMO_MODE = true;
+    document.getElementById('api-warn').style.display = 'flex';
   }
 
   // Init buttons
@@ -1412,7 +1409,7 @@ async function checkMetaStatus() {
       bar.style.border = '1px solid var(--ga20)';
       dot.style.background = 'var(--green)';
       label.style.color = '#15803d';
-      label.textContent = 'Meta Ads connecte' + (data.account_id ? ' — ' + data.account_id : '');
+      label.textContent = 'Meta Ads connecté' + (data.account_id ? ' — ' + data.account_id : '');
       if (metaTools) metaTools.style.display = 'block';
     } else {
       bar.style.background = 'var(--aa10)';
@@ -1420,7 +1417,7 @@ async function checkMetaStatus() {
       dot.style.background = 'var(--amber)';
       dot.style.animation = 'none';
       label.style.color = '#92400e';
-      label.textContent = 'Meta Ads non configure — ajoute META_ACCESS_TOKEN dans .env';
+      label.textContent = 'Meta Ads non configuré — agents disponibles en mode manuel';
       if (metaTools) metaTools.style.display = 'none';
     }
   } catch {
@@ -1876,7 +1873,11 @@ async function loadReport(reportType) {
 
 // Allow direct /dashboard access
 if (window.location.hash === '#dashboard' || window.location.pathname === '/dashboard') {
-  window.addEventListener('DOMContentLoaded', function() { showDashboard(); });
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', function() { showDashboard(); });
+  } else {
+    showDashboard();
+  }
 }
 </script>
 </body>

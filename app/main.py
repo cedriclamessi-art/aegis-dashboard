@@ -69,3 +69,8 @@ def health():
 @app.get("/")
 def root():
     return FileResponse("aegis-connect-v3.html")
+
+
+@app.get("/dashboard")
+def dashboard():
+    return FileResponse("aegis-connect-v3.html")
