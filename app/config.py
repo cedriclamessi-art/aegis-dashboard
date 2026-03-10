@@ -24,7 +24,7 @@ LLM_MODEL = os.getenv("LLM_MODEL", "")
 # Default models per provider (used when LLM_MODEL is empty)
 PROVIDER_DEFAULTS = {
     "ollama": {"base_url": "http://localhost:11434/v1", "model": "llama3.1", "api_key": "ollama"},
-    "groq": {"base_url": "https://api.groq.com/openai/v1", "model": "llama-3.1-70b-versatile"},
+    "groq": {"base_url": "https://api.groq.com/openai/v1", "model": "llama-3.3-70b-versatile"},
     "openrouter": {"base_url": "https://openrouter.ai/api/v1", "model": "meta-llama/llama-3.1-70b-instruct"},
     "anthropic": {"model": "claude-sonnet-4-20250514"},
     "gemini": {"model": "gemini-2.0-flash"},
