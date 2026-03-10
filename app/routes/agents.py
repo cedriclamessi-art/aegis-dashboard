@@ -49,6 +49,7 @@ class OptimizeRequest(BaseModel):
 
 
 @router.post("/optimizer")
+@router.post("/optimize")
 def run_optimizer(body: OptimizeRequest):
     try:
         data = body.model_dump()
